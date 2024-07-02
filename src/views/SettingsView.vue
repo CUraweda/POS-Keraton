@@ -343,6 +343,24 @@ const confirm = () => {
           <ph-database :size="48" color="var(--color-primary)" />
           <span>Catatan Basis Data</span>
         </button>
+
+        <button
+          class="settings__menu-items"
+          v-if="LoginHelper.userData.value.role === 'SUPER_ADMIN'"
+          @click="router.push({ name: 'Backup' })"
+        >
+          <ph-cloud :size="48" color="var(--color-primary)" />
+          <span>Backup Data</span>
+        </button>
+
+        <button
+          class="settings__menu-items"
+          v-if="LoginHelper.userData.value.role === 'SUPER_ADMIN'"
+          @click="router.push({ name: 'Manage' })"
+        >
+          <ph-user :size="48" color="var(--color-primary)" />
+          <span>Manage User</span>
+        </button>
       </div>
     </section>
 

@@ -145,11 +145,12 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="dashboard-header__container w-full flex fd-row align-items-center overflow-hidden">
-      <div class="dashboard-add__container" v-if="userData.role !== 'CASHIER'">
+    <div class="dashboard-header__container">
+      <div class="dashboard-add__container w-full" v-if="userData.role !== 'CASHIER'">
         <button
           class="dashboard-add__button flex fd-col align-items-center justify-content-center"
           @click="navigateToAdd"
+          style="width: 100%"
         >
           <span class="dashboard-add__icon flex align-self-center">
             <ph-plus :size="32" weight="light" />
@@ -158,12 +159,12 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <div class="dashboard-recent__container flex fd-col">
+      <div>
         <h6>Baru Ditambahkan</h6>
         <div
-          class="dashboard__card-container flex fd-row pd[0.5]"
+          class="dashboard__card-container flex"
           :class="{ expanded: dataDashboard.length > 5 }"
-          style="width: 100vw"
+          style="width: 100%"
         >
           <div
             v-for="(item, index) in dataDashboard"

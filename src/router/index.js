@@ -15,6 +15,7 @@ import GlobalHelper from '@/utilities/GlobalHelper'
 import RekapKeramaianView from '@/views/RekapKeramaian.vue'
 import LoginHelper from '@/utilities/LoginHelper'
 import RekapView from '@/views/RekapanView.vue'
+import UserManageView from '@/views/UserManageView.vue'
 
 const { giveAccessRoute, grantAccessRoute } = GlobalHelper
 const { isAuthenticated, userData } = LoginHelper
@@ -22,6 +23,12 @@ const { isAuthenticated, userData } = LoginHelper
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/manage-user',
+      name: 'Manage',
+      component: UserManageView,
+      meta: { protected: true, restrictCuraweda: true }
+    },
     {
       path: '/rekap',
       name: 'Rekap',
@@ -122,8 +129,8 @@ router.beforeEach(async (to, from, next) => {
       next(from)
     } else if (to.meta.restrictAccess && !giveAccessRoute.value) {
       next(from)
-    } else if (to.meta.restrictCuraweda){
-      if(userData.value.role != "CURAWEDA") return next()
+    } else if (to.meta.restrictCuraweda) {
+      if (userData.value.role != 'CURAWEDA') return next()
       next({ path: '/report-curaweda' })
     } else {
       if (to.meta.restrictAccess) grantAccessRoute(false)

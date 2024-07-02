@@ -1,6 +1,6 @@
 <script setup>
 import 'swiper/swiper-bundle.css'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Virtual, Navigation, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import ReportHelper from '@/utilities/ReportHelper'
@@ -23,23 +23,29 @@ import GlobalHelper from '@/utilities/GlobalHelper'
     virtual
   >
     <SwiperSlide v-for="(item, index) in infoCardDatas" :key="index">
-      <div class="ticket-info-card__container flex fd-col pd-1">
+      <div class="ticket-info-card__container flex fd-col pd-1" v-if="statusTransaksi">
         <p class="ticket-info-card__title">{{ item.name }}</p>
         <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
         <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
       </div>
+
+      <div v-else>Tidak Ada Transaksi</div>
     </SwiperSlide>
   </Swiper>
 </template>
 
 <script>
-const { DB_BASE_URL, DETAILTRANS_BASE_URL } = GlobalHelper
 import { ref } from 'vue'
+import GlobalHelper from '@/utilities/GlobalHelper'
+
+const { DB_BASE_URL, DETAILTRANS_BASE_URL } = GlobalHelper
+
 export default {
   data() {
     return {
-      infoCardDatas: ref([]),
-      cardLength: ref(0)
+      infoCardDatas: [],
+      cardLength: 0,
+      statusTransaksi: false
     }
   },
   mounted() {
@@ -51,11 +57,11 @@ export default {
         const response = await fetch(
           `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/category-sell`
         )
-        if (!response.ok) throw Error('Gagal mem-fetch Data')
-        const repsonseData = await response.json()
-        this.infoCardDatas = this.formatToInfoCard(repsonseData.data)
-        console.log(this.infoCardDatas)
+        if (!response.ok) throw new Error('Gagal mem-fetch Data')
+        const responseData = await response.json()
+        this.infoCardDatas = this.formatToInfoCard(responseData.data)
         this.cardLength = this.infoCardDatas.length
+        this.handleCard()
       } catch (err) {
         console.log(err)
       }
@@ -72,6 +78,9 @@ export default {
         infoCardData[categoryName].sum += data.amount
       }
       return Object.values(infoCardData)
+    },
+    handleCard() {
+      this.statusTransaksi = this.infoCardDatas.length > 0
     }
   }
 }
