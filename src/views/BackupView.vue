@@ -31,7 +31,10 @@
         :key="dataRefIndex"
         @click="selectDataReferences(label.dataRef)"
         class="add__preview_button"
-        :style="{ backgroundColor: currentDataReference === label.dataRef ? 'lightblue' : '' }"
+        :style="{
+          backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
+          color: currentDataReference === label.dataRef ? '#a16207' : ''
+        }"
       >
         {{ label.label }}
       </button>
