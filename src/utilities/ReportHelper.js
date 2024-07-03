@@ -100,17 +100,6 @@ const generateExcel = async () => {
     });
     worksheet['!cols'] = colWidths;
 
-    // const currencyColumns = [7, 8, 9]; // Indices of the columns to be formatted as currency
-    // currencyColumns.forEach(colIndex => {
-    //   for (let rowIndex = 1; rowIndex <= range.e.r; ++rowIndex) {
-    //     const cell_address = { c: colIndex, r: rowIndex };
-    //     const cell_ref = XLSX.utils.encode_cell(cell_address);
-    //     if (!worksheet[cell_ref]) continue;
-    //     if (!worksheet[cell_ref].s) worksheet[cell_ref].s = {};
-    //     worksheet[cell_ref].s.numFmt = '[$Rp-421]#,##0.00'; // Indonesian Rupiah currency format
-    //   }
-    // });
-
     // Append worksheet to workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pendapatan Tiket Tahun 2024');
 

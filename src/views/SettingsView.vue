@@ -251,7 +251,7 @@ const idTrans = ref(null)
 
 const showConfirmation = (id, stats) => {
   idTrans.value = id
-deleted.value = stats
+  deleted.value = stats
   confirmAlert.value = true
 }
 const confirm = () => {
@@ -319,8 +319,8 @@ const confirm = () => {
           @click="showSettingsPopup('Backup')"
           v-if="LoginHelper.userData.value.role === 'SUPER_ADMIN'"
         >
-          <ph-folders :size="48" color="var(--color-primary)" />
-          <span>Backup</span>
+          <PhCloud :size="48" color="var(--color-primary)" />
+          <span>Backup Data</span>
         </button>
         <button
           class="settings__menu-items"

@@ -1,220 +1,345 @@
-<script setup>
-import { ref, computed, onMounted, watchEffect, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import GlobalHelper from '@/utilities/GlobalHelper'
-
-const { DB_BASE_URL, LOGS_BASE_URL, showLoader } = GlobalHelper
-const router = useRouter()
-const logsData = ref([])
-const labels = ref(['User', 'Order', 'Events'])
-const searchQuery = ref('')
-const currentData = ref([])
-const headers = ref([])
-const rawSearch = ref('')
-const actionArray = ref([
-  {
-    action: 'CREATE'
-  },
-  {
-    action: 'UPDATE'
-  },
-  {
-    action: 'DELETE'
-  }
-])
-
-const activeLabel = ref('User')
-
-const fetchData = async (label) => {
-  activeLabel.value = label
-  try {
-    showLoader.value = true
-    let url = `${DB_BASE_URL.value}/${LOGS_BASE_URL.value}/database-logs`
-
-    switch (label) {
-      case 'User':
-        url = `${DB_BASE_URL.value}/${LOGS_BASE_URL.value}/database-logs?action=DELETE`
-        break
-      case 'Order':
-        url = `${DB_BASE_URL.value}/${LOGS_BASE_URL.value}/database-logs?action=CREATE`
-        break
-      case 'Events':
-        url = `${DB_BASE_URL.value}/${LOGS_BASE_URL.value}/database-logs?action=UPDATE`
-        break
-    }
-
-    const response = await fetch(url)
-    if (!response) {
-      throw new Error('Failed to fetch data')
-    }
-    const res = await response.json()
-    currentData.value = res.data
-    headers.value = res.data.length > 0 ? Object.keys(res.data[0]) : []
-
-    showLoader.value = false
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  }
-}
-
-const confirmAlert = ref(false)
-//alert
-const showConfirmation = () => {
-  // idTrans.value = id
-  // status.value = stats
-  confirmAlert.value = true
-}
-const confirm = () => {
-  confirmAlert.value = false
-  // updateStatus(idTrans.value, status.value)
-}
-
-// Fetch default data (User) on component mount
-onMounted(() => {
-  fetchData(activeLabel.value)
-})
-// Pagination Start
-const rowsPerPage = 10
-const currentPage = ref(1)
-
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * rowsPerPage
-  const end = start + rowsPerPage
-  return currentData.value.slice(start, end)
-})
-const totalPages = computed(() => {
-  return Math.ceil(currentData.value.length / rowsPerPage)
-})
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page
-  }
-}
-const visiblePages = computed(() => {
-  const maxVisible = 3
-  let startPage = Math.max(currentPage.value - Math.floor(maxVisible / 2), 1)
-  let endPage = startPage + maxVisible - 1
-
-  if (endPage > totalPages.value) {
-    endPage = totalPages.value
-    startPage = Math.max(endPage - maxVisible + 1, 1)
-  }
-
-  const pages = []
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i)
-  }
-  return pages
-})
-watchEffect(() => {})
-onUnmounted(() => {})
-</script>
-
 <template>
-  <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
-    <div class="add__alert-confirmation">
-      <h5>Apakah yakin ingin mengubah status</h5>
-      <!-- <input
-        type="number"
-        v-model="inputValue"
-        style="border-width: 2px"
-        placeholder="Masukkan nominal..."
-      /> -->
-      <div class="button-group">
-        <button @click="confirmAlert = false">Cancel</button>
-        <button @click="confirm()">Yes</button>
+  <div style="width: 100%">
+    <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
+      <div class="add__alert-confirmation">
+        <h5>Apakah anda akan membackup data sekarang?</h5>
+        <div class="button-group">
+          <button @click="confirmAlert = false">Cancel</button>
+          <button @click="backupData()">Yes</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div
-    class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
-    @click="router.push('/settings')"
-  >
-    <ph-caret-left size="24" weight="bold" />
-    <p>Kembali</p>
-  </div>
-  <h5 class="fw-600 sm-top-1"></h5>
-  <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
-    <div>
-      <button
-        v-for="(label, index) in labels"
-        :key="index"
-        @click="fetchData(label)"
-        class="add__preview_button"
-        :style="{ backgroundColor: activeLabel === label ? 'lightblue' : '' }"
-      >
-        {{ label }}
-      </button>
-    </div>
-    <div>
-      <button class="add__preview_button" type="submit" @click="showConfirmation()">Backup</button>
-    </div>
-  </div>
-  <div class="database-logs__content pd-right-1 sm-top-2">
-    <table v-if="currentData.length > 0">
-      <thead>
-        <th>User</th>
-        <th>Aksi</th>
-        <th>Aktivitas</th>
-        <th>Page</th>
-        <th>Status</th>
-        <th>Tanggal</th>
-      </thead>
-      <tbody>
-        <template v-for="logData in paginatedData" :key="logData.user">
-          <tr>
-            <td>{{ logData.user.email }}</td>
-            <td>{{ logData.action }}</td>
-            <td>{{ logData.activity }}</td>
-            <td>{{ logData.changedAt }}</td>
-            <td>
-              <div
-                class="logdata-status"
-                :class="{
-                  'status-success': logData.status === 'Success',
-                  'status-failed': logData.status === 'Failed'
-                }"
-              >
-                {{ logData.status }}
-              </div>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-      <tbody></tbody>
-    </table>
-    <div v-else>Data tidak ditemukan</div>
+    <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
+      <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="navigateToSettings()">
+        <ph-caret-left size="24" weight="bold" />
+        <p>Kembali</p>
+      </div>
 
-    <div class="pagination-container">
-      <button
-        class="pagination-button"
-        @click="changePage(currentPage - 1)"
-        :class="{ invisible: currentPage === 1 }"
-      >
-        <ph-caret-left />
+      <div></div>
+    </div>
+    <h5 class="fw-600 sm-top-1"></h5>
+    <div class="dashboard__card-container" style="width: 98%">
+      <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
+        @click="selectDataReferences(label.dataRef, dataRefIndex)" class="add__preview_button" :style="{
+      backgroundColor: label?.selected ? '#329873' :  currentDataReference === label.dataRef ? '#fef08a' : '',
+      color: currentDataReference === label.dataRef ? '#a16207' : ''
+    }">
+        {{ label.label }}
       </button>
-      <div class="pagination-numbers">
-        <button
-          v-for="page in visiblePages"
-          :key="page"
-          @click="changePage(page)"
-          :class="{ active: page === currentPage }"
-        >
-          {{ page }}
-        </button>
+    </div>
+    <div class="database-logs__content pd-right-1 sm-top-2 dashboard__card-container">
+      <table v-if="tableDatas.row.length > 0">
+        <thead>
+          <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
+        </thead>
+        <tbody>
+          <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
+            <tr>
+              <td v-for="(colName, index) in tableDatas.column" :key="index">{{ row[colName] }}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+      <div v-else>Data tidak ditemukan</div>
+    </div>
+    <button class="fab" @click="action">
+      <span class="material-symbols-outlined"> folder_open </span>
+    </button>
+    <div v-if="floating">
+      <button class="fab_add" @click="addToSelectedBackup(currentDataReference)">
+        <span class="material-symbols-outlined"> upload_2 </span>
+      </button>
+      <button class="fab_add3" type="submit" @click="showConfirmation()">
+        <span class="material-symbols-outlined"> download_2 </span>
+      </button>
+      <button class="fab_add2" @click="floating2">
+        <span class="material-symbols-outlined"> sort </span>
+      </button>
+
+      <div v-if="floatingdetail" class="fab_detail">
+        <div style="display: block; white-space: wrap">
+          <button
+            v-for="(label, dataRefIndex) in listOfDataReference"
+            :key="dataRefIndex"
+            @click="selectDataReferences(label.dataRef)"
+            class="add__preview_button_float wrap"
+            :style="{
+              backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
+              color: currentDataReference === label.dataRef ? '#a16207' : ''
+            }"
+          >
+            {{ label.label }}
+          </button>
+        </div>
       </div>
-      <button
-        class="pagination-button"
-        @click="changePage(currentPage + 1)"
-        :class="{ invisible: currentPage === totalPages || currentPage === 1 }"
-      >
-        <ph-caret-right />
-      </button>
     </div>
   </div>
 </template>
 
+<script>
+import { ref } from 'vue'
+import GlobalHelper from '@/utilities/GlobalHelper'
+import { useRouter } from 'vue-router'
+const { DB_BASE_URL, showLoader } = GlobalHelper
+export default {
+  data() {
+    return {
+      listOfDataReference: ref([]),
+      listOfSelectedReference: ref([]),
+      selectedDataReferences: ref({}),
+      floatingdetail: ref(false),
+      currentBackups: ref({
+        createdBy: '',
+        createdAt: new Date().toISOString(),
+        creatorData: window.navigator.userAgent
+      }),
+      floating: ref(false),
+      confirmAlert: ref(false),
+      currentDataReference: ref(),
+      selectedDataRefIndex: ref(),
+      tableDatas: {
+        column: [],
+        row: []
+      }
+    }
+  },
+  mounted() {
+    this.fetchData()
+  },
+  methods: {
+    async fetchData() {
+      showLoader.value = true
+      try {
+        if (this.listOfDataReference.length < 1) {
+          const responseListDataRef = await fetch(
+            `${DB_BASE_URL.value}/keraton-pos/backup/get-dataref`
+          )
+          if (!responseListDataRef.ok) throw Error('Failed to fetch list Data Reference')
+          const responseData = await responseListDataRef.json()
+          this.listOfDataReference = this.formatToListDataRef(responseData.data)
+          this.currentDataReference = this.listOfDataReference[0].dataRef
+        }
+        if (this.currentDataReference) {
+          const responseDataRef = await fetch(
+            `${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${this.currentDataReference}`
+          )
+          if (!responseDataRef.ok) throw Error('Failed to fetch Data Reference')
+          const responseData = await responseDataRef.json()
+          if (responseData.data.length < 1) throw Error('No Data in this data reference')
+          this.tableDatas = this.formatToTableData(responseData.data)
+        }
+        showLoader.value = false
+      } catch (err) {
+        showLoader.value = false
+        console.log(err)
+      }
+    },
+    addToSelectedBackup(dataName) {
+      this.listOfDataReference[this.selectedDataRefIndex || 0].selected = true
+      this.selectedDataReferences[dataName] = {
+        databaseReferenceTabel: dataName,
+        backupDatas: this.tableDatas.row
+      }
+      console.log(this.selectedDataReferences)
+    },
+    selectDataReferences(dataName, dataRefIndex) {
+      this.selectedDataRefIndex = dataRefIndex 
+      this.currentDataReference = dataName
+      this.fetchData()
+    },
+    formatToListDataRef(arrayDatas) {
+      return arrayDatas.map((item) => ({
+        label: item,
+        dataRef: item.charAt(0).toLowerCase() + item.slice(1)
+      }))
+    },
+    formatToTableData(arrayDatas) {
+      const firstReferenceData = arrayDatas[0]
+      if (!firstReferenceData) throw new Error('No Data to process')
+      const column = Object.keys(firstReferenceData)
+      return { column, row: arrayDatas }
+    },
+    backupData() {
+      this.currentBackups.dataReferences = Object.keys(this.selectedDataReferences)
+      this.currentBackups.backups = this.selectedDataReferences
+      console.log(this.currentBackups)
+      const blob = new Blob([JSON.stringify(this.currentBackups)], { type: 'application/json' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.href = url
+      link.download = 'data.json'
+
+      document.body.appendChild(link)
+      link.click()
+
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    },
+    showConfirmation() {
+      this.confirmAlert = !this.confirmAlert
+    },
+    action() {
+      this.floating = !this.floating
+    },
+    floating2() {
+      this.floatingdetail = !this.floatingdetail
+    },
+    navigateToSettings() {
+      this.$router.push('/settings')
+    }
+  }
+}
+</script>
+
 <style scoped>
+.wrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  color: rgb(61, 61, 61);
+}
+
+.fab_detail::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fab_detail::-webkit-scrollbar-track {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+
+.fab_detail::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.201);
+}
+
+.fab_add {
+  position: fixed;
+  bottom: 160px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.fab_add3 {
+  position: fixed;
+  bottom: 230px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+.fab_add2 {
+  position: fixed;
+  bottom: 90px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+.fab_detail {
+  position: fixed;
+  bottom: 100px;
+  right: 100px;
+  width: 300px;
+  overflow-y: scroll;
+  height: 52vh;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.207);
+  display: block;
+  padding: 5px;
+  background-color: #fffffff1;
+  border-radius: 2%;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+}
+
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.fab:hover {
+  background-color: #e2cb5a;
+}
+
+.fab-icon {
+  font-weight: bold;
+}
+
+.dashboard__card-container {
+  -ms-overflow-style: none;
+  white-space: nowrap;
+  padding: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+  gap: 1rem;
+  flex: 1;
+}
+
+.dashboard__card-container.expanded {
+  overflow-x: scroll;
+}
+
+.dashboard__card-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dashboard__card-container::-webkit-scrollbar-track {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+
+.dashboard__card-container::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
 .add__alert-confirmation_overlay {
   position: fixed;
   top: 0;
@@ -235,6 +360,7 @@ onUnmounted(() => {})
   padding: 1rem;
   border-radius: 0.5rem;
 }
+
 .add__alert-confirmation .button-group {
   display: flex;
   gap: 0.5rem;
@@ -263,6 +389,17 @@ onUnmounted(() => {})
   color: #ffffff;
 }
 
+.add__preview_button_float {
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 0;
+  font-size: 18px;
+  line-height: 28px;
+  box-shadow: #000;
+  /* background-color: #d9d9d9; */
+}
+
 .add__preview_button {
   margin: 0 auto;
   padding: 0.5rem 1rem;
@@ -284,9 +421,11 @@ onUnmounted(() => {})
   height: 2rem;
   border-radius: 0.5rem;
 }
+
 .database-logs__content_cta-search {
   width: 2rem;
 }
+
 .action-filter__input-dropdown {
   position: relative;
   height: 2rem;
@@ -294,6 +433,12 @@ onUnmounted(() => {})
   border-radius: 0.5rem;
   border: 1px solid black;
   cursor: pointer;
+}
+
+.database-logs__content {
+  width: 98%;
+  padding: 0.6rem;
+  overflow-x: auto;
 }
 
 .action-filter__input-dropdown input {
@@ -366,20 +511,25 @@ table {
 border-top-right-radius: 0.5rem;  */
   padding: 1rem;
 }
+
 thead {
   border-bottom: 1px solid #000;
 }
+
 th {
   height: 3rem;
   font-weight: 600;
 }
+
 th:nth-child(3) {
   text-align: start;
   padding: 0 1rem;
 }
+
 tr {
   max-height: 2rem;
 }
+
 td {
   max-height: 1.5rem;
   height: 1.5rem;
@@ -399,18 +549,22 @@ td:nth-child(3) {
 td:nth-child(1) {
   max-width: 10rem;
 }
+
 td:nth-child(5) {
   max-width: 4.5rem;
 }
+
 td:hover:nth-child(1),
 td:hover:nth-child(3) {
   position: relative;
   overflow: visible;
   white-space: normal;
 }
+
 td:hover:nth-child(3) {
   padding: 0 1rem;
 }
+
 .logdata-status span {
   font-weight: 600;
   text-align: center;
@@ -425,12 +579,14 @@ td:hover:nth-child(3) {
   border-radius: 1rem;
   padding-inline: 4px;
 }
+
 .status-failed {
   color: #831d1d;
   background-color: #d636367a;
   border-radius: 1rem;
   padding-inline: 4px;
 }
+
 .pagination-container {
   display: flex;
   width: 100%;
