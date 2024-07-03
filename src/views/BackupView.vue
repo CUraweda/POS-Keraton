@@ -18,11 +18,7 @@
         <p>Kembali</p>
       </div>
 
-      <div>
-        <button class="add__preview_button" type="submit" @click="showConfirmation()">
-          Backup
-        </button>
-      </div>
+      <div></div>
     </div>
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
@@ -54,9 +50,37 @@
       </table>
       <div v-else>Data tidak ditemukan</div>
     </div>
-    <button class="fab" @click="addToSelectedBackup(currentDataReference)">
-      <span class="fab-icon">+</span>
+    <button class="fab" @click="action">
+      <span class="material-symbols-outlined"> folder_open </span>
     </button>
+    <div v-if="floating">
+      <button class="fab_add" @click="addToSelectedBackup(currentDataReference)">
+        <span class="material-symbols-outlined"> upload_2 </span>
+      </button>
+      <button class="fab_add3" type="submit" @click="showConfirmation()">
+        <span class="material-symbols-outlined"> download_2 </span>
+      </button>
+      <button class="fab_add2" @click="floating2">
+        <span class="material-symbols-outlined"> sort </span>
+      </button>
+
+      <div v-if="floatingdetail" class="fab_detail">
+        <div style="display: block; white-space: wrap">
+          <button
+            v-for="(label, dataRefIndex) in listOfDataReference"
+            :key="dataRefIndex"
+            @click="selectDataReferences(label.dataRef)"
+            class="add__preview_button_float wrap"
+            :style="{
+              backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
+              color: currentDataReference === label.dataRef ? '#a16207' : ''
+            }"
+          >
+            {{ label.label }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -71,6 +95,7 @@ export default {
     return {
       listOfDataReference: ref([]),
       selectedDataReferences: ref({}),
+      floatingdetail: ref(false),
       currentBackups: ref({
         createdBy: '',
         createdAt: new Date().toISOString(),
@@ -158,6 +183,9 @@ export default {
     action() {
       this.floating = !this.floating
     },
+    floating2() {
+      this.floatingdetail = !this.floatingdetail
+    },
     navigateToSettings() {
       this.$router.push('/settings')
     }
@@ -186,8 +214,8 @@ export default {
 }
 .fab_add {
   position: fixed;
-  bottom: 20px;
-  right: 100px;
+  bottom: 160px;
+  right: 35px;
   width: 56px;
   height: 56px;
   background-color: #d7b405;
@@ -202,17 +230,51 @@ export default {
   cursor: pointer;
 }
 
+.fab_add3 {
+  position: fixed;
+  bottom: 230px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+.fab_add2 {
+  position: fixed;
+  bottom: 90px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
 .fab_detail {
   position: fixed;
   bottom: 100px;
-  right: 35px;
+  right: 100px;
   width: 300px;
   overflow-y: scroll;
   height: 52vh;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.207);
   display: block;
   padding: 5px;
-  background-color: #c2c2c2d6;
+  background-color: #fffffff1;
   border-radius: 2%;
   align-items: center;
   justify-content: center;
@@ -224,7 +286,7 @@ export default {
 .fab {
   position: fixed;
   bottom: 20px;
-  right: 30px;
+  right: 35px;
   width: 56px;
   height: 56px;
   background-color: #d7b405;
