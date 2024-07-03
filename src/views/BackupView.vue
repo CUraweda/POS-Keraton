@@ -10,10 +10,7 @@
       </div>
     </div>
     <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
-      <div
-        class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
-        @click="navigateToSettings()"
-      >
+      <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="navigateToSettings()">
         <ph-caret-left size="24" weight="bold" />
         <p>Kembali</p>
       </div>
@@ -22,16 +19,11 @@
     </div>
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
-      <button
-        v-for="(label, dataRefIndex) in listOfDataReference"
-        :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef)"
-        class="add__preview_button"
-        :style="{
-          backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
-          color: currentDataReference === label.dataRef ? '#a16207' : ''
-        }"
-      >
+      <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
+        @click="selectDataReferences(label.dataRef, dataRefIndex)" class="add__preview_button" :style="{
+      backgroundColor: label?.selected ? '#329873' :  currentDataReference === label.dataRef ? '#fef08a' : '',
+      color: currentDataReference === label.dataRef ? '#a16207' : ''
+    }">
         {{ label.label }}
       </button>
     </div>
@@ -89,11 +81,11 @@ import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import { useRouter } from 'vue-router'
 const { DB_BASE_URL, showLoader } = GlobalHelper
-const router = useRouter()
 export default {
   data() {
     return {
       listOfDataReference: ref([]),
+      listOfSelectedReference: ref([]),
       selectedDataReferences: ref({}),
       floatingdetail: ref(false),
       currentBackups: ref({
@@ -104,6 +96,7 @@ export default {
       floating: ref(false),
       confirmAlert: ref(false),
       currentDataReference: ref(),
+      selectedDataRefIndex: ref(),
       tableDatas: {
         column: [],
         row: []
@@ -142,13 +135,15 @@ export default {
       }
     },
     addToSelectedBackup(dataName) {
-      console.log(dataName)
+      this.listOfDataReference[this.selectedDataRefIndex || 0].selected = true
       this.selectedDataReferences[dataName] = {
         databaseReferenceTabel: dataName,
         backupDatas: this.tableDatas.row
       }
+      console.log(this.selectedDataReferences)
     },
-    selectDataReferences(dataName) {
+    selectDataReferences(dataName, dataRefIndex) {
+      this.selectedDataRefIndex = dataRefIndex 
       this.currentDataReference = dataName
       this.fetchData()
     },
@@ -165,7 +160,10 @@ export default {
       return { column, row: arrayDatas }
     },
     backupData() {
-      const blob = new Blob([this.currentBackups], { type: 'application/json' })
+      this.currentBackups.dataReferences = Object.keys(this.selectedDataReferences)
+      this.currentBackups.backups = this.selectedDataReferences
+      console.log(this.currentBackups)
+      const blob = new Blob([JSON.stringify(this.currentBackups)], { type: 'application/json' })
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
       link.href = url
@@ -201,17 +199,21 @@ export default {
   width: 100%;
   color: rgb(61, 61, 61);
 }
+
 .fab_detail::-webkit-scrollbar {
   width: 8px;
 }
+
 .fab_detail::-webkit-scrollbar-track {
   background-color: lightgrey;
   border-radius: 2px;
 }
+
 .fab_detail::-webkit-scrollbar-thumb {
   border-radius: 2px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.201);
 }
+
 .fab_add {
   position: fixed;
   bottom: 160px;
@@ -283,6 +285,7 @@ export default {
   border: none;
   cursor: pointer;
 }
+
 .fab {
   position: fixed;
   bottom: 20px;
@@ -318,16 +321,20 @@ export default {
   gap: 1rem;
   flex: 1;
 }
+
 .dashboard__card-container.expanded {
   overflow-x: scroll;
 }
+
 .dashboard__card-container::-webkit-scrollbar {
   height: 6px;
 }
+
 .dashboard__card-container::-webkit-scrollbar-track {
   background-color: lightgrey;
   border-radius: 2px;
 }
+
 .dashboard__card-container::-webkit-scrollbar-thumb {
   border-radius: 2px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -427,11 +434,13 @@ export default {
   border: 1px solid black;
   cursor: pointer;
 }
+
 .database-logs__content {
   width: 98%;
   padding: 0.6rem;
   overflow-x: auto;
 }
+
 .action-filter__input-dropdown input {
   width: 100%;
   height: 100%;
