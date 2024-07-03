@@ -19,7 +19,6 @@ const {
   searchQuery,
   resetSearch,
   deleteTransaction,
-  getRowIndex,
   fetchTaxes,
   mapInvoiceOrders,
   selectedItem,
@@ -109,9 +108,9 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody v-if="dataInvoice">
-          <template v-for="(item, index) in dataInvoice" :key="index">
+          <template v-for="(item, indexItem) in dataInvoice" :key="indexItem">
             <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
-              <td class="invoice-table__data">{{ getRowIndex(item) + 1 }}</td>
+              <td class="invoice-table__data">{{ indexItem + 1 }}</td>
               <td class="invoice-table__data">
                 {{ item.customer ? item.customer.name : item.user.name }}
               </td>

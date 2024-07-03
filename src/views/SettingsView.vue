@@ -150,7 +150,11 @@ const resetData = () => {
 // Modal Type and Subtype
 const showSettingsPopup = (value) => {
   modePopup.value = value
-  isPopupVisible.value = true
+  if (modePopup.value == 'Backup') {
+    router.push({ name: 'databaseBackup' })
+  } else {
+    isPopupVisible.value = true
+  }
 }
 const hideSettingsPopup = () => {
   modePopup.value = ''
@@ -247,7 +251,7 @@ const idTrans = ref(null)
 
 const showConfirmation = (id, stats) => {
   idTrans.value = id
-  deleted.value = stats
+deleted.value = stats
   confirmAlert.value = true
 }
 const confirm = () => {
@@ -310,7 +314,14 @@ const confirm = () => {
           <ph-ticket :size="48" color="var(--color-primary)" />
           <span>Pesanan</span>
         </button>
-
+        <button
+          class="settings__menu-items"
+          @click="showSettingsPopup('Backup')"
+          v-if="LoginHelper.userData.value.role === 'SUPER_ADMIN'"
+        >
+          <ph-folders :size="48" color="var(--color-primary)" />
+          <span>Backup</span>
+        </button>
         <button
           class="settings__menu-items"
           @click="showSettingsPopup('category')"

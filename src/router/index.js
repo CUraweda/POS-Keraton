@@ -8,6 +8,7 @@ import CheckoutView from '@/views/CheckoutView.vue'
 import GenerateTicketsView from '@/views/GenerateTicketsView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import DatabaseLogsView from '@/views/DatabaseLogsView.vue'
+import BackupView from '@/views/BackupView.vue'
 import AfterCheckoutView from '@/views/AfterCheckoutView.vue'
 import reportCurawedaView from '@/views/ReportViewCuraweda.vue'
 import ReportCuraweda from '@/views/ReportCuraweda.vue'
@@ -104,6 +105,12 @@ const router = createRouter({
       path: '/database-logs',
       name: 'databaseLogs',
       component: DatabaseLogsView,
+      meta: { protected: true, restrictCuraweda: true }
+    },
+    {
+      path: '/backup',
+      name: 'databaseBackup',
+      component: BackupView,
       meta: { protected: true, restrictCuraweda: true }
     },
     {

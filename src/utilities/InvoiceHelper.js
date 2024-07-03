@@ -62,6 +62,7 @@ const fetchTaxes = async () => {
 }
 
 const mapInvoiceOrders = (data) => {
+  console.log(data)
   if (data.detailTrans.length > 0) {
     return data.detailTrans
       .map((item) => {
@@ -218,16 +219,6 @@ const deleteTransaction = async (id) => {
     console.log(err)
   }
 }
-const getRowIndex = (index) => {
-  // Logic to calculate correct row index
-  let count = 0;
-  for (let i = 0; i <= index; i++) {
-    if (this.mapInvoiceOrders(this.dataInvoice[i])) {
-      count++;
-    }
-  }
-  return count;
-}
 export default {
   dataInvoice,
   getSearchQuery,
@@ -238,7 +229,6 @@ export default {
   fetchTaxes,
   mapInvoiceDetails,
   selectedItem,
-  getRowIndex,
   deleteTransaction,
   splitDate,
   listOfTaxes,
