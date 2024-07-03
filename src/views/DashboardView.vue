@@ -101,6 +101,7 @@ onUnmounted(() => {
     <div
       class="dashboard-cart-popup__container h-full flex fd-col"
       :class="{ active: showCartPopup }"
+      style="z-index: 100000000"
     >
       <div class="dashboard-cart-popup__header flex align-items-center justify-content-sb pd-1">
         <h6 class="fw-600">Cart</h6>
