@@ -65,6 +65,18 @@
                 <img src="../assets/images/bg-keraton.png" style="width: 10rem; height: 12rem" />
                 <h6 style="margin-top: 1rem">Nadif</h6>
                 <h6 style="margin-top: 1rem">NadifGaming@gmail.com</h6>
+                <button
+                  style="
+                    background: #ffd978;
+                    color: black;
+                    padding: 0.5rem 1rem;
+                    border-radius: 1rem;
+                    margin-top: 1rem;
+                    font-weight: bold;
+                  "
+                >
+                  Update
+                </button>
               </div>
 
               <div>
@@ -76,7 +88,7 @@
                       align-items: center;
                       gap: 0.5rem;
                       flex-wrap: wrap;
-                      margin-top: 0.1rem;
+                      margin-top: 0.3rem;
                     "
                   >
                     <div
