@@ -1,68 +1,80 @@
 <template>
-  <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
-    <div class="add__alert-confirmation">
-      <h5>Apakah anda akan membackup data sekarang?</h5>
-      <!-- <input
-        type="number"
-        v-model="inputValue"
-        style="border-width: 2px"
-        placeholder="Masukkan nominal..."
-        /> -->
-      <div class="button-group">
-        <button @click="confirmAlert = false">Cancel</button>
-        <button @click="confirm()">Yes</button>
+  <div style="width: 100%">
+    <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
+      <div class="add__alert-confirmation">
+        <h5>Apakah anda akan membackup data sekarang?</h5>
+        <div class="button-group">
+          <button @click="confirmAlert = false">Cancel</button>
+          <button @click="backupData()">Yes</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="router.push('/settings')">
-    <ph-caret-left size="24" weight="bold" />
-    <p>Kembali</p>
-  </div>
-  <h5 class="fw-600 sm-top-1"></h5>
-  <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
-    <div>
-      <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef)" class="add__preview_button"
-        :style="{ backgroundColor: currentDataReference === label.dataRef ? 'lightblue' : '' }">
+    <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
+      <div
+        class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
+        @click="navigateToSettings()"
+      >
+        <ph-caret-left size="24" weight="bold" />
+        <p>Kembali</p>
+      </div>
+
+      <div>
+        <button class="add__preview_button" type="submit" @click="showConfirmation()">
+          Backup
+        </button>
+      </div>
+    </div>
+    <h5 class="fw-600 sm-top-1"></h5>
+    <div class="dashboard__card-container" style="width: 98%">
+      <button
+        v-for="(label, dataRefIndex) in listOfDataReference"
+        :key="dataRefIndex"
+        @click="selectDataReferences(label.dataRef)"
+        class="add__preview_button"
+        :style="{ backgroundColor: currentDataReference === label.dataRef ? 'lightblue' : '' }"
+      >
         {{ label.label }}
       </button>
     </div>
-    <div>
-      <button class="add__preview_button" type="submit" @click="showConfirmation()">Backup</button>
+    <div class="database-logs__content pd-right-1 sm-top-2 dashboard__card-container">
+      <table v-if="tableDatas.row.length > 0">
+        <thead>
+          <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
+        </thead>
+        <tbody>
+          <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
+            <tr>
+              <td v-for="(colName, index) in tableDatas.column" :key="index">{{ row[colName] }}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+      <div v-else>Data tidak ditemukan</div>
     </div>
-  </div>
-  <div class="database-logs__content pd-right-1 sm-top-2">
-    <table v-if="tableDatas.row.length > 0">
-      <thead >
-        <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
-      </thead>
-      <tbody>
-        <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
-          <tr>
-            <td v-for="(colName, index) in tableDatas.column" :key="index">{{ row[colName] }}</td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
-    <div v-else>Data tidak ditemukan</div>
+    <button class="fab" @click="addToSelectedBackup(currentDataReference)">
+      <span class="fab-icon">+</span>
+    </button>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
+import { useRouter } from 'vue-router'
 const { DB_BASE_URL, showLoader } = GlobalHelper
-
+const router = useRouter()
 export default {
   data() {
     return {
       listOfDataReference: ref([]),
       selectedDataReferences: ref({}),
       currentBackups: ref({
-        createdBy: "",
+        createdBy: '',
         createdAt: new Date().toISOString(),
-        creatorData: window.navigator.userAgent,
+        creatorData: window.navigator.userAgent
       }),
+      floating: ref(false),
+      confirmAlert: ref(false),
       currentDataReference: ref(),
       tableDatas: {
         column: [],
@@ -78,14 +90,18 @@ export default {
       showLoader.value = true
       try {
         if (this.listOfDataReference.length < 1) {
-          const responseListDataRef = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/get-dataref`)
+          const responseListDataRef = await fetch(
+            `${DB_BASE_URL.value}/keraton-pos/backup/get-dataref`
+          )
           if (!responseListDataRef.ok) throw Error('Failed to fetch list Data Reference')
           const responseData = await responseListDataRef.json()
           this.listOfDataReference = this.formatToListDataRef(responseData.data)
           this.currentDataReference = this.listOfDataReference[0].dataRef
         }
         if (this.currentDataReference) {
-          const responseDataRef = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${this.currentDataReference}`)
+          const responseDataRef = await fetch(
+            `${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${this.currentDataReference}`
+          )
           if (!responseDataRef.ok) throw Error('Failed to fetch Data Reference')
           const responseData = await responseDataRef.json()
           if (responseData.data.length < 1) throw Error('No Data in this data reference')
@@ -98,20 +114,21 @@ export default {
       }
     },
     addToSelectedBackup(dataName) {
-      this.selecteDataReferences[dataName] = {
+      console.log(dataName)
+      this.selectedDataReferences[dataName] = {
         databaseReferenceTabel: dataName,
         backupDatas: this.tableDatas.row
       }
     },
-    selectDataReferences(dataName){
+    selectDataReferences(dataName) {
       this.currentDataReference = dataName
       this.fetchData()
     },
     formatToListDataRef(arrayDatas) {
-      return arrayDatas.map(item => ({
+      return arrayDatas.map((item) => ({
         label: item,
         dataRef: item.charAt(0).toLowerCase() + item.slice(1)
-      }));
+      }))
     },
     formatToTableData(arrayDatas) {
       const firstReferenceData = arrayDatas[0]
@@ -120,23 +137,137 @@ export default {
       return { column, row: arrayDatas }
     },
     backupData() {
-      const blob = new Blob([this.currentBackups], { type: 'application/json' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = 'data.json';
+      const blob = new Blob([this.currentBackups], { type: 'application/json' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.href = url
+      link.download = 'data.json'
 
-      document.body.appendChild(link);
-      link.click();
+      document.body.appendChild(link)
+      link.click()
 
-      document.body.removeChild(link);
+      document.body.removeChild(link)
       URL.revokeObjectURL(url)
+    },
+    showConfirmation() {
+      this.confirmAlert = !this.confirmAlert
+    },
+    action() {
+      this.floating = !this.floating
+    },
+    navigateToSettings() {
+      this.$router.push('/settings')
     }
   }
 }
 </script>
 
 <style scoped>
+.wrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  color: rgb(61, 61, 61);
+}
+.fab_detail::-webkit-scrollbar {
+  width: 8px;
+}
+.fab_detail::-webkit-scrollbar-track {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+.fab_detail::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.201);
+}
+.fab_add {
+  position: fixed;
+  bottom: 20px;
+  right: 100px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.fab_detail {
+  position: fixed;
+  bottom: 100px;
+  right: 35px;
+  width: 300px;
+  overflow-y: scroll;
+  height: 52vh;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.175);
+  display: block;
+  padding: 5px;
+  background-color: #c2c2c2d6;
+  border-radius: 2%;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+}
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  background-color: #d7b405;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.fab:hover {
+  background-color: #e2cb5a;
+}
+
+.fab-icon {
+  font-weight: bold;
+}
+
+.dashboard__card-container {
+  -ms-overflow-style: none;
+  white-space: nowrap;
+  padding: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+  gap: 1rem;
+  flex: 1;
+}
+.dashboard__card-container.expanded {
+  overflow-x: scroll;
+}
+.dashboard__card-container::-webkit-scrollbar {
+  height: 6px;
+}
+.dashboard__card-container::-webkit-scrollbar-track {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+.dashboard__card-container::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
 .add__alert-confirmation_overlay {
   position: fixed;
   top: 0;
@@ -186,6 +317,17 @@ export default {
   color: #ffffff;
 }
 
+.add__preview_button_float {
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 0;
+  font-size: 18px;
+  line-height: 28px;
+  box-shadow: #000;
+  /* background-color: #d9d9d9; */
+}
+
 .add__preview_button {
   margin: 0 auto;
   padding: 0.5rem 1rem;
@@ -220,7 +362,11 @@ export default {
   border: 1px solid black;
   cursor: pointer;
 }
-
+.database-logs__content {
+  width: 98%;
+  padding: 0.6rem;
+  overflow-x: auto;
+}
 .action-filter__input-dropdown input {
   width: 100%;
   height: 100%;
