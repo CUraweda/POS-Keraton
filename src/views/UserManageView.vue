@@ -50,7 +50,7 @@
       <!-- Secondary Dialog -->
       <transition name="dialog-fade">
         <div v-if="showCategoryDialog" class="secondary-dialog">
-          <div class="card">
+          <div class="card" style="width: 40rem">
             <div style="display: flex; align-items: center; justify-content: space-between">
               <h5>Set Category</h5>
               <ph-x
@@ -60,7 +60,7 @@
                 style="cursor: pointer"
               />
             </div>
-            <div style="display: flex; gap: 1rem; margin-top: 0.5rem">
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem">
               <div>
                 <img src="../assets/images/bg-keraton.png" style="width: 10rem; height: 12rem" />
                 <h6 style="margin-top: 1rem">Nadif</h6>
