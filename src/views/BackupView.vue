@@ -1,5 +1,86 @@
 <template>
   <div style="width: 100%">
+    <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
+      <div class="settings_modal-container fee">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            padding: 5px;
+          "
+        >
+          <h5 class="fw-600">Upload</h5>
+          <ph-x class="cursor-pointer" :size="20" weight="bold" @click="showUpload()" />
+        </div>
+        <div style="width: 100%; min-height: 100px; padding: 10px">
+          <div style="display: block; gap: 30px">
+            <div
+              class="drag-area"
+              @click="browseFile"
+              @drop.prevent="uploadFile"
+              @dragover.prevent="dragOver"
+              @dragenter="dragEnter"
+              @dragleave="dragLeave"
+              :class="{ active: isDragOver }"
+            >
+              <a class="browse__placeholder">
+                <div>
+                  <PhFile :size="48" weight="regular" class="icon" />
+                </div>
+                <header>
+                  {{ dragText }}
+                </header>
+                <input
+                  ref="fileInput"
+                  type="file"
+                  name="file"
+                  id="file"
+                  @change="handleFileChange"
+                  hidden
+                />
+              </a>
+            </div>
+            <div
+              style="
+                width: 100%;
+                overflow-x: auto;
+                padding: 20px;
+                overflow-y: auto;
+                height: 400px;
+                margin-top: 50px;
+              "
+            >
+              <table v-if="tableDatas.row.length > 0">
+                <thead>
+                  <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
+                </thead>
+                <tbody>
+                  <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
+                    <tr>
+                      <td v-for="(colName, index) in tableDatas.column" :key="index">
+                        {{ row[colName] }}
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <button
+            class="add__preview_button"
+            style="display: flex; align-items: center; gap: 2px; margin-top: 30px"
+            type="submit"
+            @click="showConfirmation()"
+          >
+            <PhUpload :size="18" />
+            <div>Upload</div>
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
       <div class="add__alert-confirmation">
         <h5>Apakah anda akan membackup data sekarang?</h5>
@@ -10,7 +91,10 @@
       </div>
     </div>
     <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
-      <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="navigateToSettings()">
+      <div
+        class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
+        @click="navigateToSettings()"
+      >
         <ph-caret-left size="24" weight="bold" />
         <p>Kembali</p>
       </div>
@@ -19,16 +103,25 @@
     </div>
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
-      <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef, dataRefIndex)" class="add__preview_button" :style="{
-      backgroundColor: label?.selected ? '#329873' :  currentDataReference === label.dataRef ? '#fef08a' : '',
-      color: currentDataReference === label.dataRef ? '#a16207' : ''
-    }">
+      <button
+        v-for="(label, dataRefIndex) in listOfDataReference"
+        :key="dataRefIndex"
+        @click="selectDataReferences(label.dataRef, dataRefIndex)"
+        class="add__preview_button"
+        :style="{
+          backgroundColor: label?.selected
+            ? '#329873'
+            : currentDataReference === label.dataRef
+              ? '#fef08a'
+              : '',
+          color: label?.selected ? '#000' : currentDataReference === label.dataRef ? '#a16207' : ''
+        }"
+      >
         {{ label.label }}
       </button>
     </div>
     <div class="database-logs__content pd-right-1 sm-top-2 dashboard__card-container">
-      <table v-if="tableDatas.row.length > 0">
+      <table class="tableContainer" v-if="tableDatas.row.length > 0">
         <thead>
           <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
         </thead>
@@ -46,13 +139,16 @@
       <span class="material-symbols-outlined"> folder_open </span>
     </button>
     <div v-if="floating">
-      <button class="fab_add" @click="addToSelectedBackup(currentDataReference)">
-        <span class="material-symbols-outlined"> upload_2 </span>
+      <button class="fab_add4" @click="addToSelectedBackup(currentDataReference)">
+        <span class="material-symbols-outlined"> assignment_turned_in </span>
       </button>
       <button class="fab_add3" type="submit" @click="showConfirmation()">
         <span class="material-symbols-outlined"> download_2 </span>
       </button>
-      <button class="fab_add2" @click="floating2">
+      <button class="fab_add2" type="submit" @click="showUpload()">
+        <span class="material-symbols-outlined"> upload_2 </span>
+      </button>
+      <button class="fab_add" @click="floating2">
         <span class="material-symbols-outlined"> sort </span>
       </button>
 
@@ -87,7 +183,12 @@ export default {
       listOfDataReference: ref([]),
       listOfSelectedReference: ref([]),
       selectedDataReferences: ref({}),
+      isDragOver: false,
+      guideSelectedImage: ref(),
+      guideSelectedImageURL: ref(),
+      dragText: ref('Drag & Drop to Upload File'),
       floatingdetail: ref(false),
+      confirmAlertUpload: ref(false),
       currentBackups: ref({
         createdBy: '',
         createdAt: new Date().toISOString(),
@@ -143,7 +244,7 @@ export default {
       console.log(this.selectedDataReferences)
     },
     selectDataReferences(dataName, dataRefIndex) {
-      this.selectedDataRefIndex = dataRefIndex 
+      this.selectedDataRefIndex = dataRefIndex
       this.currentDataReference = dataName
       this.fetchData()
     },
@@ -178,6 +279,9 @@ export default {
     showConfirmation() {
       this.confirmAlert = !this.confirmAlert
     },
+    showUpload() {
+      this.confirmAlertUpload = !this.confirmAlertUpload
+    },
     action() {
       this.floating = !this.floating
     },
@@ -186,12 +290,148 @@ export default {
     },
     navigateToSettings() {
       this.$router.push('/settings')
+    },
+
+    handleFileChange() {
+      const file = fileInput.value.files[0]
+      if (file) {
+        emit('file-selected', file)
+      }
+    },
+    browseFile() {
+      this.$refs.fileInput.click()
+    },
+    handleFileChange(event) {
+      const file = event.target.files[0]
+      this.uploadFile(file)
+    },
+    dragEnter() {
+      this.isDragOver = true
+      this.dragText = 'Drop to Upload File'
+    },
+    dragLeave() {
+      this.isDragOver = false
+      this.dragText = 'Drag & Drop to Upload File'
+    },
+    dragOver() {
+      this.isDragOver = true
+    },
+    uploadFile(event) {
+      let file
+      if (event.dataTransfer) {
+        file = event.dataTransfer.files[0]
+      } else {
+        file = event
+      }
+      const imageURL = URL.createObjectURL(event)
+      this.guideSelectedImage = file
+      this.guideSelectedImageText = file.name
+      this.guideSelectedImageURL = imageURL
+      this.dragText = file.name
+      // Handle the file upload
+      console.log('File uploaded:', file)
+      this.isDragOver = false
+      // this.dragText = 'Drag & Drop to Upload File'
     }
   }
 }
 </script>
 
 <style scoped>
+.input-image-preview {
+  position: relative;
+}
+
+.image-preview-label {
+  margin-bottom: 0.5rem;
+}
+
+.preview-image {
+  width: 100%;
+  max-height: 200px;
+  border-radius: 0.5rem;
+  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
+}
+.drag-area {
+  border: 2px dashed #000000;
+  height: 193px;
+  width: 100%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.drag-area.active {
+  border: 2px dashed #000000;
+  background-color: #eaeaea;
+}
+
+.drag-area header {
+  overflow: hidden;
+  width: 90%;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.drag-area span {
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+  margin: 10px 0 15px 0;
+}
+
+.drag-area button {
+  padding: 10px 25px;
+  font-size: 20px;
+  font-weight: 500;
+  border: none;
+  outline: none;
+  background: #ffffff;
+  border: 1px dotted #000000;
+  color: #000000;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+
+.drag-area button:hover {
+  background: rgb(228, 220, 220);
+}
+
+.drag-area img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+a.browse__placeholder {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.settings_modal-container {
+  position: fixed;
+  padding: 50px;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%);
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+}
+.settings_modal-container.fee {
+  width: 90%;
+  height: 90%;
+}
+
 .wrap {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -220,7 +460,7 @@ export default {
   right: 35px;
   width: 56px;
   height: 56px;
-  background-color: #d7b405;
+  background-color: #05d79b;
   border-radius: 50%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -232,13 +472,30 @@ export default {
   cursor: pointer;
 }
 
+.fab_add4 {
+  position: fixed;
+  bottom: 300px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #0fd705;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
 .fab_add3 {
   position: fixed;
   bottom: 230px;
   right: 35px;
   width: 56px;
   height: 56px;
-  background-color: #d7b405;
+  background-color: #0586d7;
   border-radius: 50%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -255,7 +512,7 @@ export default {
   right: 35px;
   width: 56px;
   height: 56px;
-  background-color: #d7b405;
+  background-color: #d76005;
   border-radius: 50%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -499,7 +756,7 @@ export default {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-table {
+.tableContainer {
   border-collapse: collapse;
   outline: 0;
   margin-top: 1rem;
