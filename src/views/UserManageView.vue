@@ -1,7 +1,12 @@
 <template>
   <div>
-    <button @click="showCategoryDialog = true">Open Dialog yahhh</button>
-
+    <div
+      class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
+      @click="navigateToSettings()"
+    >
+      <ph-caret-left size="24" weight="bold" />
+      <p>Kembali</p>
+    </div>
     <div class="database-logs__content pd-right-1 sm-top-2">
       <table>
         <thead>
@@ -227,6 +232,9 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    navigateToSettings() {
+      this.$router.push('/settings')
     },
     updateCategory() {
       const shownCategory = this.selectedUser.shownCategory
