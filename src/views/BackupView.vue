@@ -16,56 +16,90 @@
         </div>
         <div style="width: 100%; min-height: 100px; padding: 10px">
           <div style="display: block; gap: 30px">
-            <div
-              class="drag-area"
-              @click="browseFile"
-              @drop.prevent="uploadFile"
-              @dragover.prevent="dragOver"
-              @dragenter="dragEnter"
-              @dragleave="dragLeave"
-              :class="{ active: isDragOver }"
-            >
-              <a class="browse__placeholder">
-                <div>
-                  <PhFile :size="48" weight="regular" class="icon" />
-                </div>
-                <header>
-                  {{ dragText }}
-                </header>
-                <input
-                  ref="fileInput"
-                  type="file"
-                  name="file"
-                  id="file"
-                  @change="handleFileChange"
-                  hidden
-                />
-              </a>
+            <div class="dashboard__card-container" style="width: 100%">
+              <button
+                v-for="(label, dataRefIndex) in listOfDataReference"
+                :key="dataRefIndex"
+                @click="selectDataReferences(label.dataRef, dataRefIndex)"
+                class="add__preview_button"
+                :style="{
+                  backgroundColor: label?.selected
+                    ? '#329873'
+                    : currentDataReference === label.dataRef
+                      ? '#fef08a'
+                      : '',
+                  color: label?.selected
+                    ? '#000'
+                    : currentDataReference === label.dataRef
+                      ? '#a16207'
+                      : ''
+                }"
+              >
+                {{ label.label }}
+              </button>
             </div>
-            <div
-              style="
-                width: 100%;
-                overflow-x: auto;
-                padding: 20px;
-                overflow-y: auto;
-                height: 400px;
-                margin-top: 50px;
-              "
-            >
-              <table v-if="tableDatas.row.length > 0">
-                <thead>
-                  <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
-                </thead>
-                <tbody>
-                  <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
-                    <tr>
-                      <td v-for="(colName, index) in tableDatas.column" :key="index">
-                        {{ row[colName] }}
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
+            <div style="display: flex; margin-top: 50px; gap: 10px">
+              <div style="width: 20%; margin-top: 50px">
+                <div
+                  class="drag-area"
+                  @click="browseFile"
+                  @drop.prevent="uploadFile"
+                  @dragover.prevent="dragOver"
+                  @dragenter="dragEnter"
+                  @dragleave="dragLeave"
+                  :class="{ active: isDragOver }"
+                >
+                  <a class="browse__placeholder">
+                    <div>
+                      <PhFile :size="48" weight="regular" class="icon" />
+                    </div>
+                    <header>
+                      {{ dragText }}
+                    </header>
+                    <input
+                      ref="fileInput"
+                      type="file"
+                      name="file"
+                      id="file"
+                      @change="handleFileChange"
+                      hidden
+                    />
+                  </a>
+                </div>
+                <div style="display: block; text-align: left; padding-top: 10px">
+                  <div style="margin-top: 10px">
+                    <p>Dibuat Tanggal:</p>
+                    <p>test</p>
+                  </div>
+                  <div style="margin-top: 10px">
+                    <p>Dibuat Oleh :</p>
+                    <p>test</p>
+                  </div>
+                  <div style="margin-top: 10px">
+                    <p>Platform:</p>
+                    <p>test</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="width: 80%; overflow-x: auto; padding: 20px; overflow-y: auto; height: 500px"
+              >
+                <table v-if="tableDatas.row.length > 0">
+                  <thead>
+                    <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
+                  </thead>
+                  <tbody>
+                    <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
+                      <tr>
+                        <td v-for="(colName, index) in tableDatas.column" :key="index">
+                          {{ row[colName] }}
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
@@ -181,6 +215,7 @@ export default {
   data() {
     return {
       listOfDataReference: ref([]),
+      listOfDataReferenceImport: ref([]),
       listOfSelectedReference: ref([]),
       selectedDataReferences: ref({}),
       isDragOver: false,
@@ -430,6 +465,7 @@ a.browse__placeholder {
 .settings_modal-container.fee {
   width: 90%;
   height: 90%;
+  overflow-y: auto;
 }
 
 .wrap {
@@ -568,7 +604,9 @@ a.browse__placeholder {
 .fab-icon {
   font-weight: bold;
 }
-
+.tableImport {
+  -ms-overflow-style: none;
+}
 .dashboard__card-container {
   -ms-overflow-style: none;
   white-space: nowrap;
@@ -582,16 +620,18 @@ a.browse__placeholder {
 .dashboard__card-container.expanded {
   overflow-x: scroll;
 }
-
+.tableImport,
 .dashboard__card-container::-webkit-scrollbar {
   height: 6px;
 }
 
+.tableImport,
 .dashboard__card-container::-webkit-scrollbar-track {
   background-color: lightgrey;
   border-radius: 2px;
 }
 
+.tableImport,
 .dashboard__card-container::-webkit-scrollbar-thumb {
   border-radius: 2px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
