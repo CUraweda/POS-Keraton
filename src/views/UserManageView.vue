@@ -17,12 +17,12 @@
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.role }}</td>
-            <td>Detail</td>
+            <td><button @click="openCategoryDialog(user)">Set Category</button></td>
           </tr>
         </tbody>
       </table>
 
-      <!-- Primary Dialog -->
+      <!-- Primary Dialog
       <transition name="dialog-fade">
         <div v-if="showDialog" class="dialog">
           <div class="card">
@@ -45,7 +45,7 @@
             </div>
           </div>
         </div>
-      </transition>
+      </transition> -->
 
       <!-- Secondary Dialog -->
       <transition name="dialog-fade">
@@ -53,19 +53,14 @@
           <div class="card" style="width: 40rem">
             <div style="display: flex; align-items: center; justify-content: space-between">
               <h5>Set Category</h5>
-              <ph-x
-                :size="30"
-                color="var(--color-primary)"
-                @click="closeCategoryDialog"
-                style="cursor: pointer"
-              />
+              <ph-x :size="30" color="var(--color-primary)" @click="closeCategoryDialog" style="cursor: pointer" />
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 0.5rem">
               <div>
                 <img src="../assets/images/bg-keraton.png" style="width: 10rem; height: 12rem" />
-                <h6 style="margin-top: 1rem">Nadif</h6>
-                <h6 style="margin-top: 1rem">NadifGaming@gmail.com</h6>
-                <button
+                <h6 style="margin-top: 1rem">{{ selectedUser.name }}</h6>
+                <h6 style="margin-top: 1rem">{{ selectedUser.email }}</h6>
+                <button @click="updateCategory"
                   style="
                     background: #ffd978;
                     color: black;
@@ -91,62 +86,19 @@
                       margin-top: 0.3rem;
                     "
                   >
-                    <div
+                    <div v-for="(selectedData, i) in selectedUser.shownCategory.id"
                       style="
                         background: #ffd978;
                         color: black;
                         padding: 0.1rem 0.5rem;
                         border-radius: 1rem;
-                      "
-                    >
-                      Test
-                    </div>
-                    <div
-                      style="
-                        background: #ffd978;
-                        color: black;
-                        padding: 0.1rem 0.5rem;
-                        border-radius: 1rem;
-                      "
-                    >
-                      Test
-                    </div>
-                    <div
-                      style="
-                        background: #ffd978;
-                        color: black;
-                        padding: 0.1rem 0.5rem;
-                        border-radius: 1rem;
-                      "
-                    >
-                      Test
-                    </div>
-                    <div
-                      style="
-                        background: #ffd978;
-                        color: black;
-                        padding: 0.1rem 0.5rem;
-                        border-radius: 1rem;
-                      "
-                    >
-                      Test
-                    </div>
-                    <div
-                      style="
-                        background: #ffd978;
-                        color: black;
-                        padding: 0.1rem 0.5rem;
-                        border-radius: 1rem;
-                      "
-                    >
-                      Test
+                      " :key="i">
+                      {{ selectedData }}
                     </div>
                   </div>
                 </div>
 
-                <div
-                  class="w-full"
-                  style="
+                <div class="w-full" style="
                     background: white;
                     margin-top: 1rem;
                     padding: 20px;
@@ -155,30 +107,11 @@
                     display: flex;
                     flex-direction: column;
                     gap: 1rem;
-                  "
-                >
-                  <label
-                    style="display: flex; align-items: center; justify-content: space-between"
-                    class="w-full"
-                  >
-                    <span style="margin-right: 0.5rem">Umum</span>
-                    <input type="checkbox" />
-                  </label>
-
-                  <label
-                    style="display: flex; align-items: center; justify-content: space-between"
-                    class="w-full"
-                  >
-                    <span style="margin-right: 0.5rem">Mancanegara</span>
-                    <input type="checkbox" />
-                  </label>
-
-                  <label
-                    style="display: flex; align-items: center; justify-content: space-between"
-                    class="w-full"
-                  >
-                    <span style="margin-right: 0.5rem">Suvenir</span>
-                    <input type="checkbox" />
+                  ">
+                  <label style="display: flex; align-items: center; justify-content: space-between" class="w-full"
+                    v-for="(category, i) in categoryDatas">
+                    <span style="margin-right: 0.5rem">{{ category.name }}</span>
+                    <input type="checkbox" :value="category.id" v-model="selectedUser.shownCategory.id" />
                   </label>
                 </div>
               </div>
@@ -193,8 +126,10 @@
 <script>
 import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
+import LoginHelper from '@/utilities/LoginHelper'
 
-const { DB_BASE_URL } = GlobalHelper
+const { getCookie } = LoginHelper
+const { DB_BASE_URL, USER_BASE_URL, CATEGORY_BASE_URL } = GlobalHelper
 
 export default {
   data() {
@@ -202,6 +137,7 @@ export default {
       showDialog: ref(false),
       showCategoryDialog: ref(false),
       userData: [],
+      categoryDatas: [],
       selectedUser: {}
     }
   },
@@ -210,21 +146,53 @@ export default {
   },
   methods: {
     async fetchData() {
-      const url = `${DB_BASE_URL.value}/keraton/user`
       try {
-        const response = await fetch(url)
-        if (!response.ok) {
-          throw new Error('Failed to fetch data')
-        }
-        this.userData = response.data.data.map((user) => ({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role
+        const categoryResponse = await fetch(`${DB_BASE_URL.value}/${CATEGORY_BASE_URL.value}/category-details`)
+        const response = await fetch(`${DB_BASE_URL.value}/${USER_BASE_URL.value}/get-user-data`, {
+          headers: {
+            Authorization: getCookie('token')
+          }
+        })
+        if (!response.ok) throw Error('Failed to fetch data')
+        if (!categoryResponse.ok) throw Error('Failed to fetch Category data')
+        const categoryData = await categoryResponse.json()
+        const responseData = await response.json()
+        this.userData = responseData.data.map((data) => ({
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          shownCategory: {
+            id: data.shownCategory?.id || []
+          }
         }))
+        this.categoryDatas = categoryData.data
       } catch (error) {
         console.error('Error fetching data:', error)
       }
+    },
+    async updateUser(body) {
+      try {
+        const { id } = this.selectedUser
+        if (!id) throw Error('Id didnt exist, please send id')
+        const response = await fetch(`${DB_BASE_URL.value}/${USER_BASE_URL.value}/update-user-data/${id}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            Authorization: getCookie('token'),
+            'Content-Type': 'application/json'
+          }
+        })
+        if (!response.ok) throw Error('Gagal mengupdate data')
+        this.fetchData()
+        this.showCategoryDialog = false 
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    updateCategory() {
+      const shownCategory = this.selectedUser.shownCategory
+      this.updateUser({ shownCategory })
     },
     openUserDialog(user) {
       this.selectedUser = user
@@ -233,12 +201,16 @@ export default {
     closeDialog() {
       this.showDialog = false
       this.showCategoryDialog = false
+      this.fetchData()
     },
-    openCategoryDialog() {
+    openCategoryDialog(userData) {
+      let userCopyData = userData
+      this.selectedUser = userCopyData
       this.showCategoryDialog = true
     },
     closeCategoryDialog() {
       this.showCategoryDialog = false
+      this.fetchData()
     }
   }
 }

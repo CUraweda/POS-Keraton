@@ -2,15 +2,13 @@
   <div style="width: 100%">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
-        <div
-          style="
+        <div style="
             display: flex;
             align-items: center;
             width: 100%;
             justify-content: space-between;
             padding: 5px;
-          "
-        >
+          ">
           <h5 class="fw-600">Upload</h5>
           <ph-x class="cursor-pointer" :size="20" weight="bold" @click="showUpload()" />
         </div>
@@ -18,24 +16,16 @@
           <div style="display: block; gap: 30px">
             <div class="dashboard__card-container" style="width: 100%">
               <button
-                v-for="(label, dataRefIndex) in listOfDataReference"
+                v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences"
                 :key="dataRefIndex"
-                @click="selectDataReferences(label.dataRef, dataRefIndex)"
+                @click="selectDataReferenceBackup(label)"
                 class="add__preview_button"
                 :style="{
-                  backgroundColor: label?.selected
-                    ? '#329873'
-                    : currentDataReference === label.dataRef
-                      ? '#fef08a'
-                      : '',
-                  color: label?.selected
-                    ? '#000'
-                    : currentDataReference === label.dataRef
-                      ? '#a16207'
-                      : ''
+                  backgroundColor: currentDataReferenceBackup === label ? '#fef08a' : '',
+                  color: currentDataReferenceBackup === label ? '#a16207' : ''
                 }"
               >
-                {{ label.label }}
+                {{ label }}
               </button>
             </div>
             <div style="display: flex; margin-top: 50px; gap: 10px">
@@ -43,7 +33,6 @@
                 <div
                   class="drag-area"
                   @click="browseFile"
-                  @drop.prevent="uploadFile"
                   @dragover.prevent="dragOver"
                   @dragenter="dragEnter"
                   @dragleave="dragLeave"
@@ -69,15 +58,15 @@
                 <div style="display: block; text-align: left; padding-top: 10px">
                   <div style="margin-top: 10px">
                     <p>Dibuat Tanggal:</p>
-                    <p>test</p>
+                    <p>{{ importJSONDatas?.createdAt || "YYYY-MM-DD"}}</p>
                   </div>
                   <div style="margin-top: 10px">
                     <p>Dibuat Oleh :</p>
-                    <p>test</p>
+                    <p>{{ importJSONDatas?.createdBy || "---" }}</p>
                   </div>
                   <div style="margin-top: 10px">
                     <p>Platform:</p>
-                    <p>test</p>
+                    <p>{{ importJSONDatas?.creatorData }}</p>
                   </div>
                 </div>
               </div>
@@ -85,30 +74,26 @@
               <div
                 style="width: 80%; overflow-x: auto; padding: 20px; overflow-y: auto; height: 500px"
               >
-                <table v-if="tableDatas.row.length > 0">
-                  <thead>
-                    <th v-for="(col, i) in tableDatas.column" :key="i">{{ col }}</th>
-                  </thead>
-                  <tbody>
-                    <template v-for="(row, rowIndex) in tableDatas.row" :key="rowIndex">
-                      <tr>
-                        <td v-for="(colName, index) in tableDatas.column" :key="index">
-                          {{ row[colName] }}
-                        </td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
+              <table v-if="importJSONDatas && tableImportDatas.row.length > 0">
+                <thead>
+                  <th v-for="(col, i) in tableImportDatas.column" :key="i">{{ col }}</th>
+                </thead>
+                <tbody>
+                  <template v-for="(row, rowIndex) in tableImportDatas.row" :key="rowIndex">
+                    <tr>
+                      <td v-for="(colName, index) in tableImportDatas.column" :key="index">
+                        {{ row[colName] }}
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
               </div>
             </div>
           </div>
 
-          <button
-            class="add__preview_button"
-            style="display: flex; align-items: center; gap: 2px; margin-top: 30px"
-            type="submit"
-            @click="showConfirmation()"
-          >
+          <button class="add__preview_button" style="display: flex; align-items: center; gap: 2px; margin-top: 30px"
+            type="submit" @click="showConfirmation()">
             <PhUpload :size="18" />
             <div>Upload</div>
           </button>
@@ -125,10 +110,7 @@
       </div>
     </div>
     <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
-      <div
-        class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
-        @click="navigateToSettings()"
-      >
+      <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="navigateToSettings()">
         <ph-caret-left size="24" weight="bold" />
         <p>Kembali</p>
       </div>
@@ -137,20 +119,15 @@
     </div>
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
-      <button
-        v-for="(label, dataRefIndex) in listOfDataReference"
-        :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef, dataRefIndex)"
-        class="add__preview_button"
-        :style="{
-          backgroundColor: label?.selected
-            ? '#329873'
-            : currentDataReference === label.dataRef
-              ? '#fef08a'
-              : '',
-          color: label?.selected ? '#000' : currentDataReference === label.dataRef ? '#a16207' : ''
-        }"
-      >
+      <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
+        @click="selectDataReferences(label.dataRef, dataRefIndex)" class="add__preview_button" :style="{
+      backgroundColor: label?.selected
+        ? '#329873'
+        : currentDataReference === label.dataRef
+          ? '#fef08a'
+          : '',
+      color: label?.selected ? '#000' : currentDataReference === label.dataRef ? '#a16207' : ''
+    }">
         {{ label.label }}
       </button>
     </div>
@@ -188,16 +165,11 @@
 
       <div v-if="floatingdetail" class="fab_detail">
         <div style="display: block; white-space: wrap">
-          <button
-            v-for="(label, dataRefIndex) in listOfDataReference"
-            :key="dataRefIndex"
-            @click="selectDataReferences(label.dataRef)"
-            class="add__preview_button_float wrap"
-            :style="{
-              backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
-              color: currentDataReference === label.dataRef ? '#a16207' : ''
-            }"
-          >
+          <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
+            @click="selectDataReferences(label.dataRef)" class="add__preview_button_float wrap" :style="{
+      backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
+      color: currentDataReference === label.dataRef ? '#a16207' : ''
+    }">
             {{ label.label }}
           </button>
         </div>
@@ -233,10 +205,18 @@ export default {
       confirmAlert: ref(false),
       currentDataReference: ref(),
       selectedDataRefIndex: ref(),
+      currentDataReferenceBackup: ref(),
       tableDatas: {
         column: [],
         row: []
-      }
+      },
+
+      //JSON IMPORT PART
+      importJSONDatas: ref(),
+      tableImportDatas: ref({
+        column: [],
+        row: []
+      })
     }
   },
   mounted() {
@@ -283,6 +263,13 @@ export default {
       this.currentDataReference = dataName
       this.fetchData()
     },
+    selectDataReferenceBackup(label){
+      this.currentDataReferenceBackup = label
+      const rawData = this.importJSONDatas.backups[label].backupDatas
+      console.log(rawData)
+      this.tableImportDatas.column = Object.keys(rawData[0])
+      this.tableImportDatas.row = rawData
+    },
     formatToListDataRef(arrayDatas) {
       return arrayDatas.map((item) => ({
         label: item,
@@ -303,13 +290,16 @@ export default {
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
       link.href = url
-      link.download = 'data.json'
+      link.download = `BACKUP-KERATON | ${new Date().toISOString()}.json`
 
       document.body.appendChild(link)
       link.click()
 
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
+    },
+    navigateToSettings() {
+      this.$router.push('/settings')
     },
     showConfirmation() {
       this.confirmAlert = !this.confirmAlert
@@ -323,22 +313,8 @@ export default {
     floating2() {
       this.floatingdetail = !this.floatingdetail
     },
-    navigateToSettings() {
-      this.$router.push('/settings')
-    },
-
-    handleFileChange() {
-      const file = fileInput.value.files[0]
-      if (file) {
-        emit('file-selected', file)
-      }
-    },
     browseFile() {
       this.$refs.fileInput.click()
-    },
-    handleFileChange(event) {
-      const file = event.target.files[0]
-      this.uploadFile(file)
     },
     dragEnter() {
       this.isDragOver = true
@@ -351,22 +327,25 @@ export default {
     dragOver() {
       this.isDragOver = true
     },
-    uploadFile(event) {
-      let file
-      if (event.dataTransfer) {
-        file = event.dataTransfer.files[0]
-      } else {
-        file = event
-      }
-      const imageURL = URL.createObjectURL(event)
-      this.guideSelectedImage = file
-      this.guideSelectedImageText = file.name
-      this.guideSelectedImageURL = imageURL
+    handleFileChange(event) {
+      const file = event.target.files[0]
+      if (!file && file.type != "application/json") throw Error('Please upload a json file')
       this.dragText = file.name
-      // Handle the file upload
-      console.log('File uploaded:', file)
-      this.isDragOver = false
-      // this.dragText = 'Drag & Drop to Upload File'
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+        const rawJSONData = JSON.parse(e.target.result)
+        console.log(rawJSONData)
+        const firstDataRef = rawJSONData.dataReferences[0]
+        this.currentDataReferenceBackup = firstDataRef
+        this.tableImportDatas.column = Object.keys(rawJSONData.backups[firstDataRef].backupDatas[0])
+        this.tableImportDatas.row = rawJSONData.backups[firstDataRef].backupDatas
+        this.importJSONDatas = rawJSONData
+        } catch (error) {
+          return console.log(error)
+        }
+      };
+      reader.readAsText(file);
     }
   }
 }
@@ -387,6 +366,7 @@ export default {
   border-radius: 0.5rem;
   box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
 }
+
 .drag-area {
   border: 2px dashed #000000;
   height: 193px;
@@ -452,6 +432,7 @@ a.browse__placeholder {
   flex-direction: column;
   align-items: center;
 }
+
 .settings_modal-container {
   position: fixed;
   padding: 50px;
@@ -462,6 +443,7 @@ a.browse__placeholder {
   padding: 2rem;
   border-radius: 0.5rem;
 }
+
 .settings_modal-container.fee {
   width: 90%;
   height: 90%;
@@ -525,6 +507,7 @@ a.browse__placeholder {
   border: none;
   cursor: pointer;
 }
+
 .fab_add3 {
   position: fixed;
   bottom: 230px;
@@ -542,6 +525,7 @@ a.browse__placeholder {
   border: none;
   cursor: pointer;
 }
+
 .fab_add2 {
   position: fixed;
   bottom: 90px;
@@ -559,6 +543,7 @@ a.browse__placeholder {
   border: none;
   cursor: pointer;
 }
+
 .fab_detail {
   position: fixed;
   bottom: 100px;
