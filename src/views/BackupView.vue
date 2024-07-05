@@ -2,13 +2,7 @@
   <div style="width: 100%">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
-        <div style="
-            display: flex;
-            align-items: center;
-            width: 100%;
-            justify-content: space-between;
-            padding: 5px;
-          ">
+        <div style="display: flex; align-items: center; width: 100%; justify-content: space-between">
           <h5 class="fw-600">Upload</h5>
           <ph-x class="cursor-pointer" :size="20" weight="bold" @click="showUpload()" />
         </div>
@@ -53,8 +47,8 @@
                 </div>
               </div>
 
-              <div style="width: 80%; overflow-x: auto; padding: 20px; overflow-y: auto; height: 500px">
-                <table v-if="importJSONDatas && tableImportDatas.row.length > 0">
+              <div class="c_container">
+                <table v-if="importJSONDatas && tableImportDatas.row.length > 0" class="dashboard__card-container2">
                   <thead>
                     <th v-for="(col, i) in tableImportDatas.column" :key="i">{{ col }}</th>
                   </thead>
@@ -111,7 +105,8 @@
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
       <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef, dataRefIndex, label.relationLoad)" class="add__preview_button" :style="{
+        @click="selectDataReferences(label.dataRef, dataRefIndex, label.relationLoad)" class="add__preview_button"
+        :style="{
       backgroundColor: label?.selected
         ? '#329873'
         : currentDataReference === label.dataRef
@@ -141,16 +136,19 @@
       <span class="material-symbols-outlined"> folder_open </span>
     </button>
     <div v-if="floating">
-      <button class="fab_add4" @click="addToSelectedBackup(currentDataReference)">
-        <span class="material-symbols-outlined"> assignment_turned_in </span>
+      <button class="icons fab_add5" name="Select All" @click="selectAll()">
+        <span class="material-symbols-outlined"> done_all </span>
       </button>
-      <button class="fab_add3" type="submit" @click="showConfirmation()">
+      <button class="icons fab_add4" name="Select" @click="addToSelectedBackup(currentDataReference)">
+        <span class="material-symbols-outlined"> check </span>
+      </button>
+      <button class="icons fab_add3" type="submit" @click="showConfirmation()" name="Download">
         <span class="material-symbols-outlined"> download_2 </span>
       </button>
-      <button class="fab_add2" type="submit" @click="showUpload()">
+      <button class="icons fab_add2" type="submit" @click="showUpload()" name="Upload">
         <span class="material-symbols-outlined"> upload_2 </span>
       </button>
-      <button class="fab_add" @click="floating2">
+      <button class="icons fab_add" @click="floating2" name="Sorting">
         <span class="material-symbols-outlined"> sort </span>
       </button>
 
@@ -245,6 +243,27 @@ export default {
         console.log(err)
       }
     },
+    async selectAll() {
+      try {
+        console.log('Is it working bruv')
+        console.log(this.listOfSelectedReference)
+        const promises = this.listOfDataReference.map(async (data, i) => {
+          console.log(data)
+          await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${data.dataRef}`).then( async (res) => {
+            const responseData = await res.json()
+            this.selectedDataReferences[data.dataRef] = {
+              databaseReferenceTabel: data.dataRef,
+              relationshipLoad: data.relationLoad,
+              backupDatas: responseData.data
+            }
+            this.listOfDataReference[i].selected = true
+          }).catch((err) => { console.log(err) })
+        })
+        await Promise.all(promises)
+      } catch (err) {
+        console.log(err)
+      }
+    },
     addToSelectedBackup(dataName) {
       this.listOfDataReference[this.selectedDataRefIndex || 0].selected = true
       this.selectedDataReferences[dataName] = {
@@ -275,7 +294,7 @@ export default {
       }))
     },
     formatToTableData(arrayDatas) {
-      if(!arrayDatas || arrayDatas.length < 1) return { column: [], row: [] }
+      if (!arrayDatas || arrayDatas.length < 1) return { column: [], row: [] }
       const firstReferenceData = arrayDatas[0]
       if (!firstReferenceData) throw new Error('No Data to process')
       const column = Object.keys(firstReferenceData)
@@ -354,7 +373,7 @@ export default {
     },
     handleFileChange(event) {
       const file = event.target.files[0]
-      if (!file && file.type != "application/json") throw Error('Please upload a json file')
+      if (!file && file.type != 'application/json') throw Error('Please upload a json file')
       this.dragText = file.name
       this.jsonFile = file
       const reader = new FileReader();
@@ -369,14 +388,98 @@ export default {
         } catch (error) {
           return console.log(error)
         }
-      };
-      reader.readAsText(file);
+      }
+      reader.readAsText(file)
     }
   }
 }
 </script>
 
 <style scoped>
+.icons:hover::after {
+  content: attr(name);
+  position: absolute;
+  left: 20%;
+  transform: translateX(-140%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-family: 'Poppins';
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  z-index: 9999;
+}
+
+.a_container {
+  display: flex;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.b_container {
+  width: 20%;
+  margin-top: 40px;
+}
+
+.c_container {
+  width: 80%;
+  overflow-x: auto;
+  padding: 20px;
+  overflow-y: auto;
+  height: 500px;
+  margin: 30px;
+}
+
+@media (max-width: 768px) {
+  .a_container {
+    display: block;
+  }
+
+  .b_container {
+    width: 100%;
+  }
+
+  .c_container {
+    width: 100%;
+    margin: 10px;
+  }
+}
+
+.dashboard__card-container2,
+.containerwrap {
+  -ms-overflow-style: none;
+  white-space: nowrap;
+  padding: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+  gap: 1rem;
+  flex: 1;
+}
+
+.dashboard__card-container2 {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) lightgrey;
+}
+
+.dashboard__card-container2.expanded {
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+
+.tableImport,
+.containerwrap .dashboard__card-container2::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tableImport,
+.containerwrap .dashboard__card-container2::-webkit-scrollbar-track {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+
 .input-image-preview {
   position: relative;
 }
@@ -465,14 +568,19 @@ a.browse__placeholder {
   left: 50%;
   transform: translate(-50%);
   background-color: #ffffff;
-  padding: 2rem;
   border-radius: 0.5rem;
 }
 
 .settings_modal-container.fee {
   width: 90%;
   height: 90%;
+  padding: 2rem;
+}
+
+.containerwrap {
   overflow-y: auto;
+  width: 100%;
+  height: 100%;
 }
 
 .wrap {
@@ -495,6 +603,24 @@ a.browse__placeholder {
 .fab_detail::-webkit-scrollbar-thumb {
   border-radius: 2px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.201);
+}
+
+.fab_add5 {
+  position: fixed;
+  bottom: 370px;
+  right: 35px;
+  width: 56px;
+  height: 56px;
+  background-color: #7105d7;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
 }
 
 .fab_add {
