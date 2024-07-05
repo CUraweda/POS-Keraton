@@ -241,6 +241,7 @@ export default {
         console.log(err)
       }
     },
+    
     navigateToSettings() {
       this.$router.push('/settings')
     },

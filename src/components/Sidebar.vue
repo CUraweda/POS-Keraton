@@ -141,6 +141,7 @@ watchEffect(() => {
               :size="24"
               weight="bold"
               name="Checkout"
+              class="icons"
               @mouseover="showTooltip"
               @mouseleave="hideTooltip"
             />
@@ -163,11 +164,14 @@ watchEffect(() => {
             :class="{ active: activeLink === 5 }"
             v-if="!isCurawedaAccount"
             style="cursor: pointer"
-            name="Settings"
-            @mouseover="showTooltip"
-            @mouseleave="hideTooltip"
           >
-            <ph-gear :size="24" weight="bold" :class="{ disabled: userData.role === 'CASHIER' }" />
+            <ph-gear
+              :size="24"
+              weight="bold"
+              :class="{ disabled: userData.role === 'CASHIER' }"
+              name="test"
+              class="icons"
+            />
           </a>
           <RouterLink
             to="/login"
@@ -194,6 +198,30 @@ a {
   text-decoration: none;
   transition: background-color 0.1s ease; /* Smooth transition for background color */
   color: #000;
+}
+
+.icons {
+  font-size: 32px;
+  position: relative;
+}
+.icons:hover {
+  opacity: 70%;
+  cursor: pointer;
+}
+.icons:hover::after {
+  content: attr(name);
+  position: absolute;
+  transform: translateX(50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-family: 'Poppins';
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  z-index: 9999;
 }
 
 nav {
