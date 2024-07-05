@@ -1,7 +1,12 @@
 <template>
   <div>
-    <button @click="showDialog = true">Open Dialog yahhh</button>
-
+    <div
+      class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
+      @click="navigateToSettings()"
+    >
+      <ph-caret-left size="24" weight="bold" />
+      <p>Kembali</p>
+    </div>
     <div class="database-logs__content pd-right-1 sm-top-2">
       <table>
         <thead>
@@ -17,7 +22,20 @@
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.role }}</td>
-            <td><button @click="openCategoryDialog(user)">Set Category</button></td>
+            <td>
+              <button
+                @click="openCategoryDialog(user)"
+                style="
+                  background: #ffd978;
+                  color: black;
+                  padding: 0.5rem 1rem;
+                  border-radius: 1rem;
+                  margin-top: 1rem;
+                "
+              >
+                Set Category
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -53,14 +71,20 @@
           <div class="card" style="width: 40rem">
             <div style="display: flex; align-items: center; justify-content: space-between">
               <h5>Set Category</h5>
-              <ph-x :size="30" color="var(--color-primary)" @click="closeCategoryDialog" style="cursor: pointer" />
+              <ph-x
+                :size="30"
+                color="var(--color-primary)"
+                @click="closeCategoryDialog"
+                style="cursor: pointer"
+              />
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 0.5rem">
               <div>
                 <img src="../assets/images/bg-keraton.png" style="width: 10rem; height: 12rem" />
                 <h6 style="margin-top: 1rem">{{ selectedUser.name }}</h6>
                 <h6 style="margin-top: 1rem">{{ selectedUser.email }}</h6>
-                <button @click="updateCategory"
+                <button
+                  @click="updateCategory"
                   style="
                     background: #ffd978;
                     color: black;
@@ -86,19 +110,24 @@
                       margin-top: 0.3rem;
                     "
                   >
-                    <div v-for="(selectedData, i) in selectedUser.shownCategory.id"
+                    <div
+                      v-for="(selectedData, i) in selectedUser.shownCategory.id"
                       style="
                         background: #ffd978;
                         color: black;
                         padding: 0.1rem 0.5rem;
                         border-radius: 1rem;
-                      " :key="i">
+                      "
+                      :key="i"
+                    >
                       {{ selectedData }}
                     </div>
                   </div>
                 </div>
 
-                <div class="w-full" style="
+                <div
+                  class="w-full"
+                  style="
                     background: white;
                     margin-top: 1rem;
                     padding: 20px;
@@ -107,11 +136,20 @@
                     display: flex;
                     flex-direction: column;
                     gap: 1rem;
-                  ">
-                  <label style="display: flex; align-items: center; justify-content: space-between" class="w-full"
-                    v-for="(category, i) in categoryDatas">
+                  "
+                >
+                  <label
+                    style="display: flex; align-items: center; justify-content: space-between"
+                    class="w-full"
+                    v-for="(category, i) in categoryDatas"
+                    :key="i"
+                  >
                     <span style="margin-right: 0.5rem">{{ category.name }}</span>
-                    <input type="checkbox" :value="category.id" v-model="selectedUser.shownCategory.id" />
+                    <input
+                      type="checkbox"
+                      :value="category.id"
+                      v-model="selectedUser.shownCategory.id"
+                    />
                   </label>
                 </div>
               </div>
@@ -147,7 +185,9 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const categoryResponse = await fetch(`${DB_BASE_URL.value}/${CATEGORY_BASE_URL.value}/category-details`)
+        const categoryResponse = await fetch(
+          `${DB_BASE_URL.value}/${CATEGORY_BASE_URL.value}/category-details`
+        )
         const response = await fetch(`${DB_BASE_URL.value}/${USER_BASE_URL.value}/get-user-data`, {
           headers: {
             Authorization: getCookie('token')
@@ -175,20 +215,26 @@ export default {
       try {
         const { id } = this.selectedUser
         if (!id) throw Error('Id didnt exist, please send id')
-        const response = await fetch(`${DB_BASE_URL.value}/${USER_BASE_URL.value}/update-user-data/${id}`, {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers: {
-            Authorization: getCookie('token'),
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${DB_BASE_URL.value}/${USER_BASE_URL.value}/update-user-data/${id}`,
+          {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+              Authorization: getCookie('token'),
+              'Content-Type': 'application/json'
+            }
           }
-        })
+        )
         if (!response.ok) throw Error('Gagal mengupdate data')
         this.fetchData()
-        this.showCategoryDialog = false 
+        this.showCategoryDialog = false
       } catch (err) {
         console.log(err)
       }
+    },
+    navigateToSettings() {
+      this.$router.push('/settings')
     },
     updateCategory() {
       const shownCategory = this.selectedUser.shownCategory
