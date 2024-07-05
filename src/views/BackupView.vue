@@ -15,29 +15,18 @@
         <div style="width: 100%; min-height: 100px; padding: 10px">
           <div style="display: block; gap: 30px">
             <div class="dashboard__card-container" style="width: 100%">
-              <button
-                v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences"
-                :key="dataRefIndex"
-                @click="selectDataReferenceBackup(label)"
-                class="add__preview_button"
-                :style="{
-                  backgroundColor: currentDataReferenceBackup === label ? '#fef08a' : '',
-                  color: currentDataReferenceBackup === label ? '#a16207' : ''
-                }"
-              >
-                {{ label }}
+              <button v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences" :key="dataRefIndex"
+                @click="selectDataReferenceBackup(label.dbName)" class="add__preview_button" :style="{
+      backgroundColor: currentDataReferenceBackup === label.dbName ? '#fef08a' : '',
+      color: currentDataReferenceBackup === label.dbName ? '#a16207' : ''
+    }">
+                {{ label.dbName }}
               </button>
             </div>
             <div style="display: flex; margin-top: 50px; gap: 10px">
               <div style="width: 20%; margin-top: 50px">
-                <div
-                  class="drag-area"
-                  @click="browseFile"
-                  @dragover.prevent="dragOver"
-                  @dragenter="dragEnter"
-                  @dragleave="dragLeave"
-                  :class="{ active: isDragOver }"
-                >
+                <div class="drag-area" @click="browseFile" @dragover.prevent="dragOver" @dragenter="dragEnter"
+                  @dragleave="dragLeave" :class="{ active: isDragOver }">
                   <a class="browse__placeholder">
                     <div>
                       <PhFile :size="48" weight="regular" class="icon" />
@@ -45,20 +34,13 @@
                     <header>
                       {{ dragText }}
                     </header>
-                    <input
-                      ref="fileInput"
-                      type="file"
-                      name="file"
-                      id="file"
-                      @change="handleFileChange"
-                      hidden
-                    />
+                    <input ref="fileInput" type="file" name="file" id="file" @change="handleFileChange" hidden />
                   </a>
                 </div>
                 <div style="display: block; text-align: left; padding-top: 10px">
                   <div style="margin-top: 10px">
                     <p>Dibuat Tanggal:</p>
-                    <p>{{ importJSONDatas?.createdAt || "YYYY-MM-DD"}}</p>
+                    <p>{{ importJSONDatas?.createdAt || "YYYY-MM-DD" }}</p>
                   </div>
                   <div style="margin-top: 10px">
                     <p>Dibuat Oleh :</p>
@@ -71,29 +53,28 @@
                 </div>
               </div>
 
-              <div
-                style="width: 80%; overflow-x: auto; padding: 20px; overflow-y: auto; height: 500px"
-              >
-              <table v-if="importJSONDatas && tableImportDatas.row.length > 0">
-                <thead>
-                  <th v-for="(col, i) in tableImportDatas.column" :key="i">{{ col }}</th>
-                </thead>
-                <tbody>
-                  <template v-for="(row, rowIndex) in tableImportDatas.row" :key="rowIndex">
-                    <tr>
-                      <td v-for="(colName, index) in tableImportDatas.column" :key="index">
-                        {{ row[colName] }}
-                      </td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
+              <div style="width: 80%; overflow-x: auto; padding: 20px; overflow-y: auto; height: 500px">
+                <table v-if="importJSONDatas && tableImportDatas.row.length > 0">
+                  <thead>
+                    <th v-for="(col, i) in tableImportDatas.column" :key="i">{{ col }}</th>
+                  </thead>
+                  <tbody>
+                    <template v-for="(row, rowIndex) in tableImportDatas.row" :key="rowIndex">
+                      <tr>
+                        <td v-for="(colName, index) in tableImportDatas.column" :key="index">
+                          {{ row[colName] }}
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
 
-          <button class="add__preview_button" style="display: flex; align-items: center; gap: 2px; margin-top: 30px"
-            type="submit" @click="showConfirmation()">
+          <button v-if="jsonFile" class="add__preview_button"
+            style="display: flex; align-items: center; gap: 2px; margin-top: 30px" type="submit"
+            @click="confirmAlertBackup = true">
             <PhUpload :size="18" />
             <div>Upload</div>
           </button>
@@ -109,6 +90,16 @@
         </div>
       </div>
     </div>
+    <div class="add__alert-confirmation_overlay" v-if="confirmAlertBackup">
+      <div class="add__alert-confirmation">
+        <h5>Apakah ada yakin menggunakan data {{ dragText }} untuk dibackup?</h5>
+        <p>Peringatan bahwa jika ada kesalahan, maka transfer data akan diberhentikan</p>
+        <div class="button-group">
+          <button @click="confirmAlertBackup = false">Cancel</button>
+          <button @click="backupDataToDB()">Yes</button>
+        </div>
+      </div>
+    </div>
     <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
       <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="navigateToSettings()">
         <ph-caret-left size="24" weight="bold" />
@@ -120,7 +111,7 @@
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
       <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef, dataRefIndex)" class="add__preview_button" :style="{
+        @click="selectDataReferences(label.dataRef, dataRefIndex, label.relationLoad)" class="add__preview_button" :style="{
       backgroundColor: label?.selected
         ? '#329873'
         : currentDataReference === label.dataRef
@@ -181,7 +172,8 @@
 <script>
 import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
-import { useRouter } from 'vue-router'
+import LoginHelper from '@/utilities/LoginHelper'
+const { getCookie } = LoginHelper
 const { DB_BASE_URL, showLoader } = GlobalHelper
 export default {
   data() {
@@ -201,10 +193,12 @@ export default {
         createdAt: new Date().toISOString(),
         creatorData: window.navigator.userAgent
       }),
+      confirmAlertBackup: ref(false),
       floating: ref(false),
       confirmAlert: ref(false),
       currentDataReference: ref(),
       selectedDataRefIndex: ref(),
+      currentRelationshipLoad: ref(),
       currentDataReferenceBackup: ref(),
       tableDatas: {
         column: [],
@@ -212,6 +206,7 @@ export default {
       },
 
       //JSON IMPORT PART
+      jsonFile: ref(),
       importJSONDatas: ref(),
       tableImportDatas: ref({
         column: [],
@@ -234,6 +229,7 @@ export default {
           const responseData = await responseListDataRef.json()
           this.listOfDataReference = this.formatToListDataRef(responseData.data)
           this.currentDataReference = this.listOfDataReference[0].dataRef
+          this.currentRelationshipLoad = this.listOfDataReference[0].relationshipLoad
         }
         if (this.currentDataReference) {
           const responseDataRef = await fetch(
@@ -241,7 +237,6 @@ export default {
           )
           if (!responseDataRef.ok) throw Error('Failed to fetch Data Reference')
           const responseData = await responseDataRef.json()
-          if (responseData.data.length < 1) throw Error('No Data in this data reference')
           this.tableDatas = this.formatToTableData(responseData.data)
         }
         showLoader.value = false
@@ -254,16 +249,18 @@ export default {
       this.listOfDataReference[this.selectedDataRefIndex || 0].selected = true
       this.selectedDataReferences[dataName] = {
         databaseReferenceTabel: dataName,
+        relationshipLoad: this.currentRelationshipLoad,
         backupDatas: this.tableDatas.row
       }
       console.log(this.selectedDataReferences)
     },
-    selectDataReferences(dataName, dataRefIndex) {
+    selectDataReferences(dataName, dataRefIndex, relationshipLoad) {
       this.selectedDataRefIndex = dataRefIndex
       this.currentDataReference = dataName
+      this.currentRelationshipLoad = relationshipLoad
       this.fetchData()
     },
-    selectDataReferenceBackup(label){
+    selectDataReferenceBackup(label) {
       this.currentDataReferenceBackup = label
       const rawData = this.importJSONDatas.backups[label].backupDatas
       console.log(rawData)
@@ -272,20 +269,44 @@ export default {
     },
     formatToListDataRef(arrayDatas) {
       return arrayDatas.map((item) => ({
-        label: item,
-        dataRef: item.charAt(0).toLowerCase() + item.slice(1)
+        label: item.name,
+        relationLoad: item.relationships,
+        dataRef: item.name.charAt(0).toLowerCase() + item.name.slice(1)
       }))
     },
     formatToTableData(arrayDatas) {
+      if(!arrayDatas || arrayDatas.length < 1) return { column: [], row: [] }
       const firstReferenceData = arrayDatas[0]
       if (!firstReferenceData) throw new Error('No Data to process')
       const column = Object.keys(firstReferenceData)
       return { column, row: arrayDatas }
     },
+    async backupDataToDB() {
+      try {
+        if (!this.jsonFile) throw Error('Please specify the JSON file')
+        const formData = new FormData();
+        formData.append('jsonFile', this.jsonFile);
+        const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
+          method: "POST",
+          body: formData,
+          headers: {
+            token: getCookie('token'),
+          }
+        })
+        if (!response.ok) throw Error('Failed to backup data')
+        this.confirmAlertBackup = false
+        this.confirmAlertUpload = false
+        this.fetchData()
+      } catch (err) {
+        console.log(err)
+      }
+    },
     backupData() {
-      this.currentBackups.dataReferences = Object.keys(this.selectedDataReferences)
+      this.currentBackups.dataReferences = Object.values(this.selectedDataReferences).map((data) => ({
+        dbName: data.databaseReferenceTabel,
+        load: data.relationshipLoad
+      }))
       this.currentBackups.backups = this.selectedDataReferences
-      console.log(this.currentBackups)
       const blob = new Blob([JSON.stringify(this.currentBackups)], { type: 'application/json' })
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
@@ -297,6 +318,10 @@ export default {
 
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
+
+      this.confirmAlert = false
+      this.listOfSelectedReference = []
+      this.selectedDataReferences = {}
     },
     navigateToSettings() {
       this.$router.push('/settings')
@@ -331,16 +356,16 @@ export default {
       const file = event.target.files[0]
       if (!file && file.type != "application/json") throw Error('Please upload a json file')
       this.dragText = file.name
+      this.jsonFile = file
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-        const rawJSONData = JSON.parse(e.target.result)
-        console.log(rawJSONData)
-        const firstDataRef = rawJSONData.dataReferences[0]
-        this.currentDataReferenceBackup = firstDataRef
-        this.tableImportDatas.column = Object.keys(rawJSONData.backups[firstDataRef].backupDatas[0])
-        this.tableImportDatas.row = rawJSONData.backups[firstDataRef].backupDatas
-        this.importJSONDatas = rawJSONData
+          const rawJSONData = JSON.parse(e.target.result)
+          const firstDataRef = rawJSONData.dataReferences[0].dbName
+          this.currentDataReferenceBackup = firstDataRef
+          this.tableImportDatas.column = Object.keys(rawJSONData.backups[firstDataRef].backupDatas[0])
+          this.tableImportDatas.row = rawJSONData.backups[firstDataRef].backupDatas
+          this.importJSONDatas = rawJSONData
         } catch (error) {
           return console.log(error)
         }
@@ -589,9 +614,11 @@ a.browse__placeholder {
 .fab-icon {
   font-weight: bold;
 }
+
 .tableImport {
   -ms-overflow-style: none;
 }
+
 .dashboard__card-container {
   -ms-overflow-style: none;
   white-space: nowrap;
@@ -605,6 +632,7 @@ a.browse__placeholder {
 .dashboard__card-container.expanded {
   overflow-x: scroll;
 }
+
 .tableImport,
 .dashboard__card-container::-webkit-scrollbar {
   height: 6px;

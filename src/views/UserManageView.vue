@@ -1,7 +1,5 @@
 <template>
   <div>
-    <button @click="showDialog = true">Open Dialog yahhh</button>
-
     <div class="database-logs__content pd-right-1 sm-top-2">
       <table>
         <thead>

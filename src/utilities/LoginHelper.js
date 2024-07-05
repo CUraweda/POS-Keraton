@@ -51,7 +51,7 @@ const authLogin = async (token) => {
     const res = await response.json()
     if (res.data) {
       userData.value = res.data
-      userCarts.value = Object.values(res.data.carts)
+      userCarts.value = Object.values(res.data.carts || {})
       showLoader.value = false
       return true
     } else {
