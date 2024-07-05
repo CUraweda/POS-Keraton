@@ -68,9 +68,9 @@
       <!-- Secondary Dialog -->
       <transition name="dialog-fade">
         <div v-if="showCategoryDialog" class="secondary-dialog">
-          <div class="card" style="width: 40rem">
+          <div class="card" style="width: fit-content; height: fit-content">
             <div style="display: flex; align-items: center; justify-content: space-between">
-              <h5>Set Category</h5>
+              <h6>Set Category</h6>
               <ph-x
                 :size="30"
                 color="var(--color-primary)"
@@ -78,24 +78,31 @@
                 style="cursor: pointer"
               />
             </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem">
+            <div style="display: flex; margin-top: 0.5rem; gap: 5rem">
               <div>
-                <img src="../assets/images/bg-keraton.png" style="width: 10rem; height: 12rem" />
-                <h6 style="margin-top: 1rem">{{ selectedUser.name }}</h6>
-                <h6 style="margin-top: 1rem">{{ selectedUser.email }}</h6>
-                <button
-                  @click="updateCategory"
-                  style="
-                    background: #ffd978;
-                    color: black;
-                    padding: 0.5rem 1rem;
-                    border-radius: 1rem;
-                    margin-top: 1rem;
-                    font-weight: bold;
-                  "
-                >
-                  Update
-                </button>
+                <img
+                  src="../assets/images/bg-keraton.png"
+                  style="width: 10rem; height: 12rem; border-radius: 0.2rem"
+                />
+                <div style="display: flex; flex-direction: column; height: 100%">
+                  <div>
+                    <div style="margin-top: 1rem">{{ selectedUser.name }}</div>
+                    <div style="margin-top: 1rem">{{ selectedUser.email }}</div>
+                  </div>
+
+                  <button
+                    @click="updateCategory"
+                    style="
+                      background: #ffd978;
+                      color: black;
+                      padding: 0.5rem 1rem;
+                      border-radius: 1rem;
+                      margin-top: 1rem;
+                    "
+                  >
+                    Update
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -106,6 +113,7 @@
                       display: flex;
                       align-items: center;
                       gap: 0.5rem;
+                      width: 15rem;
                       flex-wrap: wrap;
                       margin-top: 0.3rem;
                     "
@@ -115,8 +123,8 @@
                       style="
                         background: #ffd978;
                         color: black;
-                        padding: 0.1rem 0.5rem;
-                        border-radius: 1rem;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.4rem;
                       "
                       :key="i"
                     >
@@ -126,8 +134,8 @@
                 </div>
 
                 <div
-                  class="w-full"
                   style="
+                    width: 15rem;
                     background: white;
                     margin-top: 1rem;
                     padding: 20px;
