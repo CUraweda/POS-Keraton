@@ -56,6 +56,7 @@ const generateExcel = async () => {
     setMonthLocaleString()
     let rowIndex = 1;
     let currentTransactionId;
+    let ticketsSoldment = {}
 
     // Adding headers to the sheet data
     tableSheetData.push(["No.", "Tanggal", "Pelanggan", "Nama Tiket", "Ketersediaan Item", "Jenis Tiket", "Pembayaran", "Jumlah", "Harga", "Total", "Total Dibayar", "Dihapus"]);
@@ -63,7 +64,6 @@ const generateExcel = async () => {
     responseData.data.forEach((data, i) => {
       const row = [];
       let numTabel = "", total = "";
-
       // Check if it's a new transaction
       if (data.transactionId !== currentTransactionId) {
         numTabel = rowIndex;
@@ -84,11 +84,26 @@ const generateExcel = async () => {
       row.push(formatCurrency(total));
       row.push(data.transaction.deleted ? "✅" : "--")
       // IF the data.deleted is true then make all the cell to get filled with red 
-
-      currentTransactionId = data.transactionId;
+      
+      if(!ticketsSoldment[data.order.name]) ticketsSoldment[data.order.name] = {
+        name: data.order.name,
+        price: data.order.price,
+        soldAmount: 0,
+        revenueTotal: 0,
+        revenueKeraton: 0, 
+        revenueCuraweda: 0,
+      }
+      if(!data.transaction.deleted){
+        ticketsSoldment[data.order.name].soldAmount += data.amount
+        ticketsSoldment[data.order.name].revenueTotal += data.amount * data.order.price
+        ticketsSoldment[data.order.name].revenueKeraton += data.transaction.keratonIncome.COH + data.transaction.keratonIncome.CIA 
+        ticketsSoldment[data.order.name].revenueCuraweda += data.transaction.curawedaIncome.COH + data.transaction.curawedaIncome.CIA 
+        currentTransactionId = data.transactionId;
+      }
       tableSheetData.push(row);
     });
 
+    console.log(tableSheetData)
     // Create worksheet and add data to it
     const worksheet = XLSX.utils.aoa_to_sheet(tableSheetData);
 
@@ -99,10 +114,26 @@ const generateExcel = async () => {
       return { wch: maxLength + 2 }; // Adding padding for better spacing
     });
     worksheet['!cols'] = colWidths;
-
+    
     // Append worksheet to workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pendapatan Tiket Tahun 2024');
-
+    
+    // TICKET SHEET
+    const ticketSheetData = [['Nama Tiket', 'Harga Tiket', 'Total Penjualan', 'Revenue Penjualan', 'Revenue Keraton', 'Revenue Curaweda']]
+    for(let ticketData of Object.values(ticketsSoldment)){
+      ticketSheetData.push(Object.values(ticketData))
+    }
+    console.log(ticketSheetData)
+    const ticketSheets = XLSX.utils.aoa_to_sheet(ticketSheetData)
+    const ticketColWidth = ticketSheetData[0].map((_, colIndex) => {
+      const colValues = ticketSheetData.map(row => row[colIndex] ? row[colIndex].toString() : '');
+      const maxLength = Math.max(...colValues.map(val => val.length));
+      return { wch: maxLength + 2 }; // Adding padding for better spacing
+    });
+    ticketSheets['!cols'] = ticketColWidth
+    XLSX.utils.book_append_sheet(workbook, ticketSheets, "Penjualan Tiket Tahun 2024")
+    
+    
     // SUMMARY SHEET
     let yearlyTempData = yearlyData.value
     let monthlyTempData = monthlyData.value
@@ -149,7 +180,7 @@ const generateExcel = async () => {
     summaryTableData.push(['Total', ...monthlyTotals, monthlyTotals.reduce((a, b) => a + b, 0)])
 
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryTableData)
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary Transaksi')
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Rekapan Transaksi')
     
     // Write workbook to file
     XLSX.writeFile(workbook, `Pendapatan_Tiket ${new Date().toISOString()}.xlsx`);

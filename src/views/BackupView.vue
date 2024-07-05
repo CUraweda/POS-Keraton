@@ -245,10 +245,7 @@ export default {
     },
     async selectAll() {
       try {
-        console.log('Is it working bruv')
-        console.log(this.listOfSelectedReference)
         const promises = this.listOfDataReference.map(async (data, i) => {
-          console.log(data)
           await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${data.dataRef}`).then( async (res) => {
             const responseData = await res.json()
             this.selectedDataReferences[data.dataRef] = {
