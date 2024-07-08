@@ -197,7 +197,7 @@ export default {
       guideSelectedImageURL: ref(),
       dragText: ref('Drag & Drop to Upload File'),
       floatingdetail: ref(false),
-      confirmAlertUpload: ref(true),
+      confirmAlertUpload: ref(false),
       currentBackups: ref({
         createdBy: '',
         createdAt: new Date().toISOString(),
