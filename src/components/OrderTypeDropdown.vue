@@ -138,6 +138,8 @@ watchEffect(() => {
 
 .order-type__input-dropdown_menu.active {
   display: block;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .order-type__input-dropdown_menu p {

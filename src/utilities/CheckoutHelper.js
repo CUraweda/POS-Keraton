@@ -213,7 +213,7 @@ const totalTicketCount = computed(() => {
 
 //Payment Method Selection
 const listOfTaxes = ref({})
-const paymentSelection = ref('')
+const paymentSelection = ref('Cash')
 const paymentSelect = ref(false)
 const paymentTaxIdentifier = ref("cash")
 const showPaymentSelect = () => {
