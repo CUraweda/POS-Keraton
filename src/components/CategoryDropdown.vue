@@ -79,7 +79,13 @@ watchEffect(() => {
         <ph-caret-down :size="14" weight="bold" class="icon" />
       </div>
     </div>
-    <div name="" id="" class="category__input-dropdown_menu" :class="{ active: isDropdownOpen }">
+    <div
+      name=""
+      id=""
+      class="category__input-dropdown_menu"
+      :class="{ active: isDropdownOpen }"
+      style="overflow-y: auto"
+    >
       <p
         v-for="option in categoryOptions"
         :key="option.id"
@@ -115,28 +121,32 @@ input {
   border-radius: 0.5rem;
   padding: 0.5rem;
 }
+
 .category__input-dropdown input:focus {
-  border-color: var(--color-primary); /* Change the border color to green */
-  outline: none; /* Remove the default focus outline */
-  box-shadow: 0 0 0 2px var(--color-primary); /* Add a green box-shadow to indicate focus */
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 .category__input-dropdown .select-icon {
   position: absolute;
-  right: 10px; /* Adjust as needed based on select padding */
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
 }
+
 .arrow-icon {
   transition: all 300ms ease;
 }
-/* Rotate arrow icon when the card is expanded */
+
 .arrow-icon.active {
   transform: rotate(180deg);
 }
+
 .category__input-dropdown .select-icon i {
-  font-size: 18px; /* Adjust icon size as needed */
+  font-size: 18px;
 }
+
 .category__input-dropdown-container {
   width: 20rem;
   height: 2rem;
@@ -164,19 +174,23 @@ input {
 }
 
 .category__input-dropdown_menu.active {
-  max-height: 200px;
+  max-height: 200px; /* Adjust as needed */
+  overflow-y: auto; /* Enable scrolling */
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
 
 .category__input-dropdown_menu p {
   padding: 0.3rem 0.6rem;
 }
+
 .category__input-dropdown_menu p:hover {
   background-color: rgb(233, 233, 233);
 }
+
 .category__input-dropdown_menu p:hover:first-child {
   border-radius: 0.5rem 0.5rem 0 0;
 }
+
 .category__input-dropdown_menu p:hover:last-child {
   border-radius: 0 0 0.5rem 0.5rem;
 }
