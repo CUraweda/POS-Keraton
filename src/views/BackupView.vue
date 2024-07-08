@@ -2,38 +2,25 @@
   <div style="width: 100%">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
-        <div
-          style="display: flex; align-items: center; width: 100%; justify-content: space-between"
-        >
+        <div style="display: flex; align-items: center; width: 100%; justify-content: space-between">
           <h5 class="fw-600">Upload</h5>
           <ph-x class="cursor-pointer" :size="20" weight="bold" @click="showUpload()" />
         </div>
         <div style="width: 100%; min-height: 100px; padding: 10px">
           <div style="display: block; gap: 30px">
             <div class="dashboard__card-container" style="width: 100%">
-              <button
-                v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences"
-                :key="dataRefIndex"
-                @click="selectDataReferenceBackup(label.dbName)"
-                class="add__preview_button"
-                :style="{
-                  backgroundColor: currentDataReferenceBackup === label.dbName ? '#fef08a' : '',
-                  color: currentDataReferenceBackup === label.dbName ? '#a16207' : ''
-                }"
-              >
+              <button v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences" :key="dataRefIndex"
+                @click="selectDataReferenceBackup(label.dbName)" class="add__preview_button" :style="{
+      backgroundColor: currentDataReferenceBackup === label.dbName ? '#fef08a' : '',
+      color: currentDataReferenceBackup === label.dbName ? '#a16207' : ''
+    }">
                 {{ label.dbName }}
               </button>
             </div>
             <div style="display: flex; margin-top: 50px; gap: 10px">
               <div style="width: 20%; margin-top: 50px">
-                <div
-                  class="drag-area"
-                  @click="browseFile"
-                  @dragover.prevent="dragOver"
-                  @dragenter="dragEnter"
-                  @dragleave="dragLeave"
-                  :class="{ active: isDragOver }"
-                >
+                <div class="drag-area" @click="browseFile" @dragover.prevent="dragOver" @dragenter="dragEnter"
+                  @dragleave="dragLeave" :class="{ active: isDragOver }">
                   <a class="browse__placeholder">
                     <div>
                       <PhFile :size="48" weight="regular" class="icon" />
@@ -41,17 +28,13 @@
                     <header>
                       {{ dragText }}
                     </header>
-                    <input
-                      ref="fileInput"
-                      type="file"
-                      name="file"
-                      id="file"
-                      @change="handleFileChange"
-                      hidden
-                    />
+                    <input ref="fileInput" type="file" name="file" id="file" @change="handleFileChange" hidden />
                   </a>
                 </div>
                 <div style="display: block; text-align: left; padding-top: 10px">
+                  <div style="margin-top: 10px">
+                    <button @click="resetDatabase = !resetDatabase">{{ resetDatabase ? "Don't Reset Database" : "Reset Current Database" }}</button>
+                  </div>
                   <div style="margin-top: 10px">
                     <p>Dibuat Tanggal:</p>
                     <p>{{ importJSONDatas?.createdAt || 'YYYY-MM-DD' }}</p>
@@ -67,33 +50,19 @@
                 </div>
               </div>
               <div class="c_container">
-                <table
-                  v-if="importJSONDatas && tableImportDatas.row.length > 0"
-                  class="dashboard__card-container2"
-                >
+                <table v-if="importJSONDatas && tableImportDatas.row.length > 0" class="dashboard__card-container2">
                   <thead>
                     <tr>
-                      <template v-for="(col, i) in tableImportDatas.column" :key="i">
-                        <th v-if="isObject(col)" :key="i">
-                          {{ col.label }}
-                        </th>
-                        <th v-else>
+                      <th v-for="(col, colIndex) in tableImportDatas.column" :key="colIndex">
                           {{ col }}
-                        </th>
-                      </template>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     <template v-for="(row, rowIndex) in tableImportDatas.row" :key="rowIndex">
                       <tr>
                         <td v-for="(colName, index) in tableImportDatas.column" :key="index">
-                          <template v-if="isObject(row[colName])">
-                            <input v-model="row[colName].value" />
-                            <button @click="handleButtonClick(row, colName)">Submit</button>
-                          </template>
-                          <template v-else>
-                            {{ row[colName] }}
-                          </template>
+                            {{ row[colName]}}
                         </td>
                       </tr>
                     </template>
@@ -104,13 +73,9 @@
             </div>
           </div>
 
-          <button
-            v-if="jsonFile"
-            class="add__preview_button"
-            style="display: flex; align-items: center; gap: 2px; margin-top: 30px"
-            type="submit"
-            @click="confirmAlertBackup = true"
-          >
+          <button v-if="jsonFile" class="add__preview_button"
+            style="display: flex; align-items: center; gap: 2px; margin-top: 30px" type="submit"
+            @click="confirmAlertBackup = true">
             <PhUpload :size="18" />
             <div>Upload</div>
           </button>
@@ -137,10 +102,7 @@
       </div>
     </div>
     <div style="display: flex; width: 98%; justify-content: space-between; overflow-x: auto">
-      <div
-        class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
-        @click="navigateToSettings()"
-      >
+      <div class="breadcrumb flex align-items-center gap[0.5] cursor-pointer" @click="navigateToSettings()">
         <ph-caret-left size="24" weight="bold" />
         <p>Kembali</p>
       </div>
@@ -149,20 +111,16 @@
     </div>
     <h5 class="fw-600 sm-top-1"></h5>
     <div class="dashboard__card-container" style="width: 98%">
-      <button
-        v-for="(label, dataRefIndex) in listOfDataReference"
-        :key="dataRefIndex"
-        @click="selectDataReferences(label.dataRef, dataRefIndex, label.relationLoad)"
-        class="add__preview_button"
-        :style="{
-          backgroundColor: label?.selected
-            ? '#329873'
-            : currentDataReference === label.dataRef
-              ? '#fef08a'
-              : '',
-          color: label?.selected ? '#000' : currentDataReference === label.dataRef ? '#a16207' : ''
-        }"
-      >
+      <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
+        @click="selectDataReferences(label.dataRef, dataRefIndex, label.relationLoad, label.dependLoad, label.uniqueFields)"
+        class="add__preview_button" :style="{
+      backgroundColor: label?.selected
+        ? '#329873'
+        : currentDataReference === label.dataRef
+          ? '#fef08a'
+          : '',
+      color: label?.selected ? '#000' : currentDataReference === label.dataRef ? '#a16207' : ''
+    }">
         {{ label.label }}
       </button>
     </div>
@@ -207,16 +165,11 @@
 
       <div v-if="floatingdetail" class="fab_detail">
         <div style="display: block; white-space: wrap">
-          <button
-            v-for="(label, dataRefIndex) in listOfDataReference"
-            :key="dataRefIndex"
-            @click="selectDataReferences(label.dataRef)"
-            class="add__preview_button_float wrap"
-            :style="{
-              backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
-              color: currentDataReference === label.dataRef ? '#a16207' : ''
-            }"
-          >
+          <button v-for="(label, dataRefIndex) in listOfDataReference" :key="dataRefIndex"
+            @click="selectDataReferences(label.dataRef)" class="add__preview_button_float wrap" :style="{
+      backgroundColor: currentDataReference === label.dataRef ? '#fef08a' : '',
+      color: currentDataReference === label.dataRef ? '#a16207' : ''
+    }">
             {{ label.label }}
           </button>
         </div>
@@ -244,7 +197,7 @@ export default {
       guideSelectedImageURL: ref(),
       dragText: ref('Drag & Drop to Upload File'),
       floatingdetail: ref(false),
-      confirmAlertUpload: ref(false),
+      confirmAlertUpload: ref(true),
       currentBackups: ref({
         createdBy: '',
         createdAt: new Date().toISOString(),
@@ -255,6 +208,7 @@ export default {
       confirmAlert: ref(false),
       currentDataReference: ref(),
       selectedDataRefIndex: ref(),
+      currentUniquefields: ref(),
       currentRelationshipLoad: ref(),
       currentDataReferenceBackup: ref(),
       tableDatas: {
@@ -264,6 +218,8 @@ export default {
 
       //JSON IMPORT PART
       jsonFile: ref(),
+      resetDatabase: ref(false),
+      jsonChanging: true,
       importJSONDatas: ref(),
       tableImportDatas: ref({
         column: [],
@@ -278,9 +234,48 @@ export default {
     isObject(value) {
       return typeof value === 'object' && value !== null
     },
-    handleButtonClick(row, colName) {
-      console.log('Button clicked for row:', row, 'column:', colName)
-    },
+    // handleButtonClick(identifier, index, data, additional) {
+    //   try {
+    //     console.log(data)
+    //     switch (identifier) {
+    //       case "column":
+    //         if (newVal === oldVal) return this.tableImportDatas[index] = oldVal
+    //         currentColumnData[index] = newVal
+    //         this.tableImportDatas.column = currentColumnData
+    //         for (let rowDataIndex in this.tableImportDatas.row) {
+    //           const value = this.tableImportDatas[rowDataIndex][oldVal]
+    //           this.tableImportDatas[rowDataIndex][newVal] = value
+    //           delete this.tableImportDatas[rowDataIndex][oldVal]
+    //         }
+    //         console.log(this.tableImportDatas)
+    //         break;
+    //       case "row":
+    //         if (newVal === oldVal) return this.tableImport.row[i][additional] = oldVal
+    //         this.tableImportDatas.row[i][additional] = newVal
+    //         break;
+    //       default:
+    //         break;
+    //     }
+    //     this.jsonChanging = true
+    //   } catch (err) {
+    //     console.log(err)
+    //   }
+    // },
+    // changeToInput(ident, i, colName) {
+    //   let oldVal = ""
+    //   switch (ident) {
+    //     case "column":
+    //       oldVal = this.tableImportDatas.column[i]
+    //       this.tableImportDatas.column[i] = { oldVal, value: oldVal }
+    //       break;
+    //     case "row":
+    //       oldVal = this.tableImportDatas.row[i][colName]
+    //       this.tableImportDatas.row[i][colName] = { oldVal, value: oldVal }
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // },
     async fetchData() {
       showLoader.value = true
       try {
@@ -292,6 +287,8 @@ export default {
           const responseData = await responseListDataRef.json()
           this.listOfDataReference = this.formatToListDataRef(responseData.data)
           this.currentDataReference = this.listOfDataReference[0].dataRef
+          this.currentDependLoad = this.listOfDataReference[0].dependLoad
+          this.currentUniquefields = this.listOfDataReference[0].uniqueFields
           this.currentRelationshipLoad = this.listOfDataReference[0].relationshipLoad
         }
         if (this.currentDataReference) {
@@ -311,19 +308,17 @@ export default {
     async selectAll() {
       try {
         const promises = this.listOfDataReference.map(async (data, i) => {
-          await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${data.dataRef}`)
-            .then(async (res) => {
-              const responseData = await res.json()
-              this.selectedDataReferences[data.dataRef] = {
-                databaseReferenceTabel: data.dataRef,
-                relationshipLoad: data.relationLoad,
-                backupDatas: responseData.data
-              }
-              this.listOfDataReference[i].selected = true
-            })
-            .catch((err) => {
-              console.log(err)
-            })
+          await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/get-dataref/${data.dataRef}`).then(async (res) => {
+            const responseData = await res.json()
+            this.selectedDataReferences[data.dataRef] = {
+              databaseReferenceTabel: data.dataRef,
+              relationshipLoad: data.relationLoad,
+              dependLoad: data.dependLoad,
+              uniqueFields: data.uniqueFields,
+              backupDatas: responseData.data
+            }
+            this.listOfDataReference[i].selected = true
+          }).catch((err) => { console.log(err) })
         })
         await Promise.all(promises)
       } catch (err) {
@@ -335,20 +330,22 @@ export default {
       this.selectedDataReferences[dataName] = {
         databaseReferenceTabel: dataName,
         relationshipLoad: this.currentRelationshipLoad,
+        dependLoad: this.currentDependLoad,
+        uniqueFields: this.currentUniquefields,
         backupDatas: this.tableDatas.row
       }
-      console.log(this.selectedDataReferences)
     },
-    selectDataReferences(dataName, dataRefIndex, relationshipLoad) {
+    selectDataReferences(dataName, dataRefIndex, relationshipLoad, dependLoad, uniqueFields) {
       this.selectedDataRefIndex = dataRefIndex
       this.currentDataReference = dataName
       this.currentRelationshipLoad = relationshipLoad
+      this.currentDependLoad = dependLoad
+      this.currentUniquefields = uniqueFields
       this.fetchData()
     },
     selectDataReferenceBackup(label) {
       this.currentDataReferenceBackup = label
       const rawData = this.importJSONDatas.backups[label].backupDatas
-      console.log(rawData)
       this.tableImportDatas.column = Object.keys(rawData[0])
       this.tableImportDatas.row = rawData
     },
@@ -356,6 +353,8 @@ export default {
       return arrayDatas.map((item) => ({
         label: item.name,
         relationLoad: item.relationships,
+        dependLoad: item.depended,
+        uniqueFields: item.uniqueFields,
         dataRef: item.name.charAt(0).toLowerCase() + item.name.slice(1)
       }))
     },
@@ -371,6 +370,7 @@ export default {
         if (!this.jsonFile) throw Error('Please specify the JSON file')
         const formData = new FormData()
         formData.append('jsonFile', this.jsonFile)
+        formData.append('rdb', this.resetDatabase)
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
           method: 'POST',
           body: formData,
@@ -387,12 +387,12 @@ export default {
       }
     },
     backupData() {
-      this.currentBackups.dataReferences = Object.values(this.selectedDataReferences).map(
-        (data) => ({
-          dbName: data.databaseReferenceTabel,
-          load: data.relationshipLoad
-        })
-      )
+      this.currentBackups.dataReferences = Object.values(this.selectedDataReferences).map((data) => ({
+        dbName: data.databaseReferenceTabel,
+        load: data.relationshipLoad,
+        secondLoad: data.dependLoad,
+        uniqueFields: data.uniqueFields
+      }))
       this.currentBackups.backups = this.selectedDataReferences
       const blob = new Blob([JSON.stringify(this.currentBackups)], { type: 'application/json' })
       const link = document.createElement('a')
