@@ -66,7 +66,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="c_container">
                 <table
                   v-if="importJSONDatas && tableImportDatas.row.length > 0"
@@ -78,7 +77,7 @@
                         <th v-if="isObject(col)" :key="i">
                           {{ col.label }}
                         </th>
-                        <th v-else >
+                        <th v-else>
                           {{ col }}
                         </th>
                       </template>
@@ -189,13 +188,13 @@
       <button class="icons fab_add5" name="Select All" @click="selectAll()">
         <span class="material-symbols-outlined"> done_all </span>
       </button>
-      <button
+      <!-- <button
         class="icons fab_add4"
         name="Select"
         @click="addToSelectedBackup(currentDataReference)"
       >
         <span class="material-symbols-outlined"> check </span>
-      </button>
+      </button> -->
       <button class="icons fab_add3" type="submit" @click="showConfirmation()" name="Download">
         <span class="material-symbols-outlined"> download_2 </span>
       </button>
@@ -235,6 +234,7 @@ const { DB_BASE_URL, showLoader } = GlobalHelper
 export default {
   data() {
     return {
+      jsonChanges: ref(false),
       listOfDataReference: ref([]),
       listOfDataReferenceImport: ref([]),
       listOfSelectedReference: ref([]),
@@ -460,6 +460,21 @@ export default {
         }
       }
       reader.readAsText(file)
+    },
+    changeProperties(newPropName, oldPropName, refName) {
+      if (newPropName === oldPropName) {
+        if (this.importJSONDatas.backups[refName]) throw 'no reference data'
+        const referenceData = this.importJSONDatas.backups[refName].backupDatas.map((backup) => {
+          if (!backup.Data) throw 'No properties name'
+          return { ...backup, [newPropName]: backupData }
+        })
+        this.importJSONDatas.backup[refName].backupDatas = referenceData
+        tihs.jsonChanges = true
+      }
+    },
+    changeValue(value, propName, refName, refIndex) {
+      this.importJSONDatas.backup[refName].backupDatas[refIndex][propName] = value
+      tihs.jsonChanges = true
     }
   }
 }
