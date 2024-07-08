@@ -46,7 +46,7 @@ const fetchIncomeRevenue = async () => {
 
 const generateExcel = async () => {
   try {
-    const response = await fetch(`${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data`);
+    const response = await fetch(`${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data-all`);
     if (!response.ok) throw new Error('Failed to fetch data');
 
     const responseData = await response.json();
