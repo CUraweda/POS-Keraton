@@ -54,7 +54,7 @@
                   <thead>
                     <tr>
                       <th v-for="(col, colIndex) in tableImportDatas.column" :key="colIndex">
-                          {{ col }}
+                        {{ col }}
                       </th>
                     </tr>
                   </thead>
@@ -62,7 +62,7 @@
                     <template v-for="(row, rowIndex) in tableImportDatas.row" :key="rowIndex">
                       <tr>
                         <td v-for="(colName, index) in tableImportDatas.column" :key="index">
-                            {{ row[colName]}}
+                          {{ row[colName] }}
                         </td>
                       </tr>
                     </template>
@@ -386,6 +386,18 @@ export default {
         console.log(err)
       }
     },
+    convertISOToCustomFormat(isoDateString) {
+      const date = new Date(isoDateString);
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-based month
+      const year = date.getFullYear();
+
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+
+      return `${day}-${month}-${year} ${hours}:${minutes}`;
+    },
     backupData() {
       this.currentBackups.dataReferences = Object.values(this.selectedDataReferences).map((data) => ({
         dbName: data.databaseReferenceTabel,
@@ -398,7 +410,7 @@ export default {
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
       link.href = url
-      link.download = `BACKUP-KERATON | ${new Date().toISOString()}.json`
+      link.download = `BACKUP-KERATON | ${this.convertISOToCustomFormat(new Date().toISOString())}.json`
 
       document.body.appendChild(link)
       link.click()
