@@ -1,5 +1,14 @@
 <template>
   <div>
+    <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
+      <div class="add__alert-confirmation">
+        <h5>Apakah anda ingin merubah kategori ini?</h5>
+        <div class="button-group">
+          <button @click="confirmAlert = false">Cancel</button>
+          <button @click="updateCategory()">Yes</button>
+        </div>
+      </div>
+    </div>
     <div
       class="breadcrumb flex align-items-center gap[0.5] cursor-pointer"
       @click="navigateToSettings()"
@@ -91,7 +100,7 @@
                   </div>
 
                   <button
-                    @click="updateCategory"
+                    @click="setconfirm"
                     style="
                       background: #ffd978;
                       color: black;
@@ -180,6 +189,7 @@ const { DB_BASE_URL, USER_BASE_URL, CATEGORY_BASE_URL } = GlobalHelper
 export default {
   data() {
     return {
+      confirmAlert: ref(false),
       showDialog: ref(false),
       showCategoryDialog: ref(false),
       userData: [],
@@ -236,12 +246,15 @@ export default {
         )
         if (!response.ok) throw Error('Gagal mengupdate data')
         this.fetchData()
+        this.confirmAlert = !this.confirmAlert
         this.showCategoryDialog = false
       } catch (err) {
         console.log(err)
       }
     },
-    
+    setconfirm() {
+      this.confirmAlert = !this.confirmAlert
+    },
     navigateToSettings() {
       this.$router.push('/settings')
     },
@@ -408,5 +421,77 @@ td:hover:nth-child(3) {
   display: flex;
   justify-content: center;
   align-self: center;
+}
+
+.add__alert-confirmation_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh;
+  background-color: rgb(0, 0, 0, 0.2);
+  z-index: 9999;
+}
+
+.add__alert-confirmation {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translate(-50%);
+  background-color: #ffffff;
+  border: 1px solid rgba(255, 226, 154, 0.9);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.add__alert-confirmation .button-group {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: end;
+  margin-top: 1rem;
+}
+
+.add__alert-confirmation .button-group button {
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-primary);
+  filter: saturate(10);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.add__alert-confirmation .button-group button:first-child {
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #8f8f8f;
+  color: #ffffff;
+}
+
+.add__preview_button_float {
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 0;
+  font-size: 18px;
+  line-height: 28px;
+  box-shadow: #000;
+  /* background-color: #d9d9d9; */
+}
+
+.add__preview_button {
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 0;
+  margin-inline: 5px;
+  font-size: 18px;
+  line-height: 28px;
+  box-shadow: #000;
+  background-color: #d9d9d9;
 }
 </style>
