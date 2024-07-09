@@ -173,7 +173,7 @@ onUnmounted(() => {
   <main class="add pd-bottom-2">
     <section class="add__input">
       <InputFoto @file-selected="handleFileSelected" :selectedImageURL="selectedImageURL" />
-       <!-- <input type="file" v-model="image/"> -->
+      <!-- <input type="file" v-model="image/"> -->
       <div class="add__input-card_title">
         <h6>Judul</h6>
         <div class="input_wrapper">
@@ -238,7 +238,13 @@ onUnmounted(() => {
         <h6>Harga</h6>
         <div class="input-price">
           <p>Rp.</p>
-          <input type="number" name="price" id="price" v-model="orderPrice" @input="updatePrice(orderPrice)"/>
+          <input
+            type="number"
+            name="price"
+            id="price"
+            v-model="orderPrice"
+            @input="updatePrice(orderPrice)"
+          />
         </div>
       </div>
     </section>
@@ -346,7 +352,9 @@ onUnmounted(() => {
   background-color: white;
   border-radius: 0.5rem;
   display: none;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 200px;
+  overflow-x: hidden;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
   z-index: 200;
 }

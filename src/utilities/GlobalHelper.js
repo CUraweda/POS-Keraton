@@ -3,6 +3,7 @@ import { ref } from 'vue'
 const DB_BASE_URL = ref('http://localhost:3000')
 // const DB_BASE_URL = ref('https://api-prmn.curaweda.com:3031')
 const USER_BASE_URL = ref('keraton-pos/user')
+const BACKUP_BASE_URL = ref('keraton-pos/backup')
 const TRANSFER_URL = ref('curaweda-income')
 const ORDER_BASE_URL = ref('keraton-pos/order')
 const ORDERTYPE_BASE_URL = ref('keraton-pos/order-type')
@@ -53,6 +54,7 @@ export default {
   USER_BASE_URL,
   ORDER_BASE_URL,
   ORDERTYPE_BASE_URL,
+  BACKUP_BASE_URL,
   ORDERSUBTYPE_BASE_URL,
   CATEGORY_BASE_URL,
   TRANSACTION_BASE_URL,
