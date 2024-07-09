@@ -241,7 +241,7 @@ import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import LoginHelper from '@/utilities/LoginHelper'
 const { getCookie } = LoginHelper
-const { DB_BASE_URL, showLoader } = GlobalHelper
+const { DB_BASE_URL, BACKUP_BASE_URL, showLoader } = GlobalHelper
 export default {
   data() {
     return {
@@ -433,6 +433,7 @@ export default {
         const formData = new FormData()
         formData.append('jsonFile', this.jsonFile)
         formData.append('rdb', this.resetDatabase)
+
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
           method: 'POST',
           body: formData,
@@ -440,25 +441,27 @@ export default {
             token: getCookie('token')
           }
         })
+
         if (!response.ok) throw Error('Failed to backup data')
         this.confirmAlertBackup = false
         this.confirmAlertUpload = false
         this.fetchData()
       } catch (err) {
-        console.log(err)
+        console.log('Error in backupDataToDB:', err)
       }
     },
+
     convertISOToCustomFormat(isoDateString) {
-      const date = new Date(isoDateString);
+      const date = new Date(isoDateString)
 
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-based month
-      const year = date.getFullYear();
+      const day = String(date.getDate()).padStart(2, '0')
+      const month = String(date.getMonth() + 1).padStart(2, '0') // getMonth() returns 0-based month
+      const year = date.getFullYear()
 
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
 
-      return `${day}-${month}-${year} ${hours}:${minutes}`;
+      return `${day}-${month}-${year} ${hours}:${minutes}`
     },
     backupData() {
       this.currentBackups.dataReferences = Object.values(this.selectedDataReferences).map(
