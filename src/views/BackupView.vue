@@ -431,12 +431,12 @@ export default {
       try {
         if (!this.jsonFile) throw Error('Please specify the JSON file')
         const formData = new FormData()
-        formData.append('jsonFile', this.jsonFile)
-        formData.append('rdb', this.resetDatabase)
+        // formData.append('jsonFile', this.jsonFile)
+        // formData.append('rdb', this.resetDatabase)
 
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
           method: 'POST',
-          body: formData,
+          body: formData.append('jsonFile', this.jsonFile),
           headers: {
             token: getCookie('token')
           }

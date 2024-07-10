@@ -137,34 +137,37 @@ watchEffect(() => {
           </RouterLink>
           <RouterLink to="/checkout" :class="{ active: activeLink === 3 }">
             <ph-shopping-cart-simple
-            :size="24"
-            weight="bold"
-            name="Checkout"
-            class="icons"
-            @mouseover="showTooltip"
-            @mouseleave="hideTooltip"
+              :size="24"
+              weight="bold"
+              name="Checkout"
+              class="icons"
+              @mouseover="showTooltip"
+              @mouseleave="hideTooltip"
             />
           </RouterLink>
         </div>
-        <div class="navbar-links-container flex fd-col" v-if="isCurawedaAccount">
+        <!-- class="navbar-links-container flex fd-col" -->
+        <div v-if="isCurawedaAccount">
           <RouterLink
-          to="/report-curaweda"
+            to="/report-curaweda"
             :class="{ active: activeLink === 2 }"
             name="Report"
             @mouseover="showTooltip"
             @mouseleave="hideTooltip"
           >
-          <ph-currency-circle-dollar :size="24" weight="bold" />
-        </RouterLink>
-        <RouterLink to="/report" :class="{ active: activeLink === 2 }">
-          <ph-currency-circle-dollar
-            :size="24"
-            weight="bold"
-            name="Report"
-            @mouseover="showTooltip"
-            @mouseleave="hideTooltip"
-          />
-        </RouterLink>
+            <ph-currency-circle-dollar :size="24" weight="bold" />
+          </RouterLink>
+        </div>
+        <div v-else>
+          <RouterLink to="/report" :class="{ active: activeLink === 2 }">
+            <ph-currency-circle-dollar
+              :size="24"
+              weight="bold"
+              name="Report"
+              @mouseover="showTooltip"
+              @mouseleave="hideTooltip"
+            />
+          </RouterLink>
         </div>
         <div class="navbar-links__settings-container flex fd-col">
           <a
