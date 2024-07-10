@@ -31,7 +31,8 @@ watchEffect(() => {
   <AlertCard />
   <Sidebar v-if="loggedIn && showSidebar" />
   <!-- <SendProgress v-if="loggedIn && showSidebar"/> -->
-  <div :class="[loggedIn ? 'pd-block-2' : 'no-pd-block', showSidebar ? 'pd-left-8' : 'no-pd-left']">
+  <!-- showSidebar ? 'pd-left-8' : 'no-pd-left' -->
+  <div :class="[loggedIn ? 'pd-block-2 no-pd-left' : 'no-pd-block']">
     <RouterView />
   </div>
 </template>

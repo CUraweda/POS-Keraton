@@ -399,11 +399,11 @@ const submitOrder = () => {
       </div>
     </div>
     <div class="report-activity__container flex fd-col gap-1">
-      <div class="report-activity__head flex fd-row gap[1.5] align-items-center">
+      <div class="report-activity__head fd-row gap[1.5] align-items-center">
         <p class="report-activity__head-text">Aktivitas Terbaru</p>
         <div
           class="report-activity__head-dropdown-container"
-          style="display: flex; items-center; gap: 1rem; "
+          style="display: flex; align-items: center; gap: 1rem"
         >
           <input type="date" v-model="filterDate" style="width: 10rem" />
           <CategoryDropdown :categoryWidth="'280px'" @option-selected="updateCategory" />
@@ -572,6 +572,7 @@ input {
 .filter__input-dropdown_menu.active::-webkit-scrollbar-track {
   background-color: lightgrey;
   border-radius: 2px;
+  max-width: 1200px;
 }
 .filter__input-dropdown_menu.active::-webkit-scrollbar-thumb {
   border-radius: 2px;
@@ -639,7 +640,7 @@ input {
 
 .report__container {
   width: 100%;
-  max-width: 1200px;
+  /* max-width: 1200px; */
   margin: 0 auto;
   padding: 1rem;
 }
@@ -708,7 +709,7 @@ input {
 }
 
 .report-activity__head {
-  display: flex;
+  display: flexbox;
   align-items: center;
   width: 95%;
   margin: auto;

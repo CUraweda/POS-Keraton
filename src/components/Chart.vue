@@ -134,14 +134,8 @@ watch(
         </div>
       </div>
     </div>
-    <div id="chart" class="revenue-details__chart-container">
-      <apexchart
-        type="line"
-        height="240"
-        :width="400"
-        :options="chartOptions"
-        :series="dataSeries"
-      ></apexchart>
+    <div id="chart" class="revenue-details__chart-container" style="width: 100%">
+      <apexchart type="line" height="240" :options="chartOptions" :series="dataSeries"></apexchart>
     </div>
   </div>
 </template>
@@ -200,7 +194,7 @@ watch(
 }
 @media (max-width: 624px) {
   .revenue-details {
-    width: 325px;
+    width: 100%;
   }
 }
 
