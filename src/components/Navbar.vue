@@ -162,6 +162,7 @@ export default {
   position: absolute;
   background-color: white;
   border: 1px solid #ddd;
+  z-index: 9999999;
   padding: 10px;
 }
 
