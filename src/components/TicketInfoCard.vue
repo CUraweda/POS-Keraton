@@ -69,7 +69,7 @@ export default {
     formatToInfoCard(datas) {
       let infoCardData = {}
       for (let data of datas) {
-        const categoryName = data.order.category.name
+        const categoryName = data.order ? data.order.category.name : "Event"
         if (!infoCardData[categoryName])
           infoCardData[categoryName] = {
             name: categoryName,
