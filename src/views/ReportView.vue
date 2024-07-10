@@ -85,12 +85,12 @@ const toggleShow = () => {
 }
 const getPrint = async () => {
   isLoading.value = true
-  await router.replace('/rekap')
+  await router.push('/rekap')
   isLoading.value = false
 }
 const getPrintKeramaian = async () => {
   isLoadingKeramaian.value = true
-  await router.replace('/rekap-keramaian')
+  await router.push('/rekap-keramaian')
   isLoadingKeramaian.value = false
 }
 const toggleYearDropdown = () => {

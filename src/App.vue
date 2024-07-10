@@ -6,6 +6,7 @@ import LoginHelper from './utilities/LoginHelper'
 import WebLoader from './components/WebLoader.vue'
 import AlertCard from './components/AlertCard.vue'
 import Sidebar from './components/Sidebar.vue'
+import Navbar from './components/Navbar.vue'
 // import SendProgress from './components/SendProgress.vue'
 
 const { loggedIn, isAuthenticated } = LoginHelper
@@ -29,7 +30,8 @@ watchEffect(() => {
     <WebLoader />
   </div>
   <AlertCard />
-  <Sidebar v-if="loggedIn && showSidebar" />
+  <Sidebar v-if="loggedIn && showSidebar" class="sidebar" />
+  <Navbar v-if="loggedIn && showSidebar" />
   <!-- <SendProgress v-if="loggedIn && showSidebar"/> -->
   <!-- showSidebar ? 'pd-left-8' : 'no-pd-left' -->
   <div :class="[loggedIn ? 'pd-block-2 no-pd-left' : 'no-pd-block']">
@@ -56,5 +58,15 @@ watchEffect(() => {
 }
 .no-pd-left {
   padding: 0 !important;
+}
+
+.sidebar {
+  display: flex;
+}
+
+@media screen and (max-width: 700px) {
+  .sidebar {
+    display: none;
+  }
 }
 </style>

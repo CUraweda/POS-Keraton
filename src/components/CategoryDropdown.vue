@@ -13,7 +13,15 @@ const fetchCategory = async () => {
       throw new Error('Failed to fetch data')
     }
     const data = await response.json()
-    categoryOptions.value = data.data
+    categoryOptions.value.push({
+      id: 0,
+      name: "All"
+    })
+    categoryOptions.value.push(...data.data)
+    categoryOptions.value.push({
+      id: 0,
+      name: "Event"
+    })
     console.log(data)
     showLoader.value = false
   } catch (error) {

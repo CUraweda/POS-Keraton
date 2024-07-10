@@ -71,33 +71,35 @@ const generateExcel = async () => {
         rowIndex++;
       }
 
+      console.log(data)
+
       row.push(numTabel);
       row.push(data.transaction.plannedDate.split('T')[0]);
-      row.push(data.transaction.customer?.name || data.transaction.user.name);
-      row.push(data.order.name);
-      row.push(data.order.deleted ? "Tidak" : "Aktif")
-      row.push(data.order.category.name);
+      row.push(data.transaction.customer?.name || data.transaction.user?.name);
+      row.push(data.order?.name || data.event.name);
+      row.push(data.order ? (data.order.deleted ? "Tidak" : "Aktif") : (data.event.deleted ? "Tidak" : "Aktif"))
+      row.push(data.order?.category.name || "Event");
       row.push(data.transaction.method);
       row.push(data.amount);
-      row.push(formatCurrency(data.order.price));
-      row.push(formatCurrency(data.amount * data.order.price));
+      row.push(formatCurrency(data.order?.price || data.event.price));
+      row.push(formatCurrency(data.amount * (data.order?.price || data.event.price)));
       row.push(formatCurrency(total));
       row.push(data.transaction.deleted ? "✅" : "--")
       // IF the data.deleted is true then make all the cell to get filled with red 
-      
-      if(!ticketsSoldment[data.order.name]) ticketsSoldment[data.order.name] = {
-        name: data.order.name,
-        price: data.order.price,
+
+      if (!ticketsSoldment[data.order?.name || data.event.name]) ticketsSoldment[data.order?.name || data.event.name] = {
+        name: data.order?.name || data.event.name,
+        price: data.order?.price || data.event.price,
         soldAmount: 0,
         revenueTotal: 0,
-        revenueKeraton: 0, 
+        revenueKeraton: 0,
         revenueCuraweda: 0,
       }
-      if(!data.transaction.deleted){
-        ticketsSoldment[data.order.name].soldAmount += data.amount
-        ticketsSoldment[data.order.name].revenueTotal += data.amount * data.order.price
-        ticketsSoldment[data.order.name].revenueKeraton += data.transaction.keratonIncome.COH + data.transaction.keratonIncome.CIA 
-        ticketsSoldment[data.order.name].revenueCuraweda += data.transaction.curawedaIncome.COH + data.transaction.curawedaIncome.CIA 
+      if (!data.transaction.deleted) {
+        ticketsSoldment[data.order?.name || data.event.name].soldAmount += data.amount
+        ticketsSoldment[data.order?.name || data.event.name].revenueTotal += data.amount * (data.order?.price || data.event.price)
+        ticketsSoldment[data.order?.name || data.event.name].revenueKeraton += data.transaction.keratonIncome.COH + data.transaction.keratonIncome.CIA
+        ticketsSoldment[data.order?.name || data.event.name].revenueCuraweda += data.transaction.curawedaIncome.COH + data.transaction.curawedaIncome.CIA
         currentTransactionId = data.transactionId;
       }
       tableSheetData.push(row);
@@ -114,13 +116,13 @@ const generateExcel = async () => {
       return { wch: maxLength + 2 }; // Adding padding for better spacing
     });
     worksheet['!cols'] = colWidths;
-    
+
     // Append worksheet to workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pendapatan Tiket Tahun 2024');
-    
+
     // TICKET SHEET
     const ticketSheetData = [['Nama Tiket', 'Harga Tiket', 'Total Penjualan', 'Revenue Penjualan', 'Revenue Keraton', 'Revenue Curaweda']]
-    for(let ticketData of Object.values(ticketsSoldment)){
+    for (let ticketData of Object.values(ticketsSoldment)) {
       ticketSheetData.push(Object.values(ticketData))
     }
     console.log(ticketSheetData)
@@ -132,8 +134,8 @@ const generateExcel = async () => {
     });
     ticketSheets['!cols'] = ticketColWidth
     XLSX.utils.book_append_sheet(workbook, ticketSheets, "Penjualan Tiket Tahun 2024")
-    
-    
+
+
     // SUMMARY SHEET
     let yearlyTempData = yearlyData.value
     let monthlyTempData = monthlyData.value
@@ -156,8 +158,8 @@ const generateExcel = async () => {
       summaryTableData.push(rowData)
     })
     summaryTableData.push(['Total', ...yearlyTotals, yearlyTotals.reduce((a, b) => a + b, 0)])
-    
-    
+
+
     // MONTH SUMMARY
     summaryTableData.push(
       [''],
@@ -165,7 +167,7 @@ const generateExcel = async () => {
       ['Tanggal', ...monthlyCategory.value, 'Total']
     )
     const monthlyTotals = new Array(monthlyCategory.value.length).fill(0)
-    
+
     monthlyTempData.forEach((item) => {
       const rowData = [item.name]
       let total = 0
@@ -181,7 +183,7 @@ const generateExcel = async () => {
 
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryTableData)
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Rekapan Transaksi')
-    
+
     // Write workbook to file
     XLSX.writeFile(workbook, `Pendapatan_Tiket ${new Date().toISOString()}.xlsx`);
   } catch (err) {
@@ -365,13 +367,13 @@ const fetchTableDataReport = async () => {
     if (category.value && category.value !== '') {
       url += `category=${encodeURIComponent(category.value)}`
     }
-    if(filterDate.value) url += `date=${filterDate.value}`
+    if (filterDate.value) url += `date=${filterDate.value}`
     const response = await fetch(url)
     if (!response.ok) {
       throw new Error('Failed to fetch data Report')
     }
     const res = await response.json()
-    if (res.data) activityReportData.value = res.data.slice(0, 200)
+    if (res.data) activityReportData.value = res.data
   } catch (error) {
     console.error('Error fetching data Report:', error)
   }
