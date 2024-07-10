@@ -34,8 +34,8 @@ watchEffect(() => {
   <Navbar v-if="loggedIn && showSidebar" />
   <!-- <SendProgress v-if="loggedIn && showSidebar"/> -->
   <!-- showSidebar ? 'pd-left-8' : 'no-pd-left' -->
-  <div :class="[loggedIn ? 'pd-block-2 no-pd-left' : 'no-pd-block']">
-    <RouterView />
+  <div :class="[loggedIn ? 'pd-block-2 no-pd-left' : 'no-pd-block']" class="responsive-content">
+    <RouterView class="router-view" />
   </div>
 </template>
 
@@ -60,6 +60,10 @@ watchEffect(() => {
   padding: 0 !important;
 }
 
+.responsive-content {
+  margin-left: 6rem;
+}
+
 .sidebar {
   display: flex;
 }
@@ -67,6 +71,10 @@ watchEffect(() => {
 @media screen and (max-width: 700px) {
   .sidebar {
     display: none;
+  }
+
+  .responsive-content {
+    margin-left: 0;
   }
 }
 </style>
