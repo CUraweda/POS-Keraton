@@ -22,10 +22,10 @@ const determineActiveLink = () => {
     activeLink.value = 2 // Report link active
   } else if (path.includes('/checkout')) {
     activeLink.value = 3
-  } else if (path.includes('settings')) {
-    activeLink.value = 5
-  } else if (path.includes('reportCuraweda')) {
+  } else if (path.includes('/report-curaweda')) {
     activeLink.value = 4
+  } else if (path.includes('/settings')) {
+    activeLink.value = 5
   } else {
     activeLink.value = -1 // No specific link active
   }
@@ -57,7 +57,6 @@ onMounted(() => {
     userLogout()
     router.replace('/login')
   } else {
-    console.log(userData.value)
     isCurawedaAccount = userData.value.role === 'CURAWEDA'
     determineActiveLink()
   }
@@ -147,15 +146,24 @@ watchEffect(() => {
             />
           </RouterLink>
         </div>
-        <div class="navbar-links-container flex fd-col" v-if="isCurawedaAccount">
-          <RouterLink
-            to="/report-curaweda"
-            :class="{ active: activeLink === 2 }"
-            name="Report"
-            @mouseover="showTooltip"
-            @mouseleave="hideTooltip"
-          >
-            <ph-currency-circle-dollar :size="24" weight="bold" />
+        <div v-if="isCurawedaAccount" class="navbar-links-container flex fd-col">
+          <RouterLink to="/report-curaweda" :class="{ active: activeLink === 4 }">
+            <PhNotePencil
+              :size="24"
+              weight="bold"
+              name="reportCuraweda"
+              @mouseover="showTooltip"
+              @mouseleave="hideTooltip"
+            />
+          </RouterLink>
+          <RouterLink to="/report" :class="{ active: activeLink === 4 }">
+            <ph-currency-circle-dollar
+              :size="24"
+              weight="bold"
+              name="Report"
+              @mouseover="showTooltip"
+              @mouseleave="hideTooltip"
+            />
           </RouterLink>
         </div>
         <div class="navbar-links__settings-container flex fd-col">

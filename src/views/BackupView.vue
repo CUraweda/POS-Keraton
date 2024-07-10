@@ -53,7 +53,13 @@
                 </div>
                 <div style="display: block; text-align: left; padding-top: 10px">
                   <div style="margin-top: 10px">
-                    <button @click="resetDatabase = !resetDatabase">
+                    <button
+                      @click="resetDatabase = !resetDatabase"
+                      class="btn"
+                      :style="
+                        resetDatabase ? 'background-color: #15803d;' : 'background-color: #dc2626;'
+                      "
+                    >
                       {{ resetDatabase ? "Don't Reset Database" : 'Reset Current Database' }}
                     </button>
                   </div>
@@ -241,7 +247,7 @@ import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import LoginHelper from '@/utilities/LoginHelper'
 const { getCookie } = LoginHelper
-const { DB_BASE_URL, BACKUP_BASE_URL, showLoader } = GlobalHelper
+const { DB_BASE_URL, BACKUP_BASE_URL, showLoader, assignAlert } = GlobalHelper
 export default {
   data() {
     return {
@@ -431,12 +437,12 @@ export default {
       try {
         if (!this.jsonFile) throw Error('Please specify the JSON file')
         const formData = new FormData()
-        formData.append('jsonFile', this.jsonFile)
-        formData.append('rdb', this.resetDatabase)
+        // formData.append('jsonFile', this.jsonFile)
+        // formData.append('rdb', this.resetDatabase)
 
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
           method: 'POST',
-          body: formData,
+          body: formData.append('jsonFile', this.jsonFile),
           headers: {
             token: getCookie('token')
           }
@@ -446,6 +452,7 @@ export default {
         this.confirmAlertBackup = false
         this.confirmAlertUpload = false
         this.fetchData()
+        assignAlert(true, 'Sukses', 'success', `Berhasil mengubah data user`)
       } catch (err) {
         console.log('Error in backupDataToDB:', err)
       }
@@ -560,6 +567,14 @@ export default {
 </script>
 
 <style scoped>
+.btn {
+  width: 10.5rem;
+  height: 2rem;
+  color: white;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
 .icons:hover::after {
   content: attr(name);
   position: absolute;
