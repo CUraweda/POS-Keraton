@@ -87,43 +87,37 @@ watchEffect(() => {
   <div>
     <nav class="mobile-navbar">
       <button @click="toggleMenu" class="menu-button">☰</button>
-      <div v-if="menuOpen" class="menu">
-        <ul>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/invoice">Invoice</a></li>
-          <li>
-            <RouterLink to="/report" :class="{ active: activeLink === 2 }"> Report </RouterLink>
-          </li>
-          <li><a href="/checkout">Checkout</a></li>
-          <li>
-            <a
-              @click="toSettings()"
-              :class="{ active: activeLink === 5 }"
-              v-if="!isCurawedaAccount"
-              style="cursor: pointer"
-              >Settings</a
-            >
-          </li>
-          <li>
-            <div v-if="isCurawedaAccount" class="navbar-links-container flex fd-col">
+      <div v-if="menuOpen" class="menu-overlay" @click="toggleMenu">
+        <div class="menu" @click.stop>
+          <ul>
+            <li v-if="!isCurawedaAccount"><a href="/">Dashboard</a></li>
+            <li v-if="!isCurawedaAccount"><a href="/invoice">Invoice</a></li>
+            <li>
+              <RouterLink to="/report" :class="{ active: activeLink === 2 }">Report</RouterLink>
+            </li>
+            <li v-if="!isCurawedaAccount"><a href="/checkout">Checkout</a></li>
+            <li v-if="!isCurawedaAccount">
+              <a
+                @click="toSettings()"
+                :class="{ active: activeLink === 5 }"
+                v-if="!isCurawedaAccount"
+                style="cursor: pointer"
+              >
+                Settings
+              </a>
+            </li>
+            <li>
               <RouterLink to="/report-curaweda" :class="{ active: activeLink === 4 }">
                 Report Curaweda
               </RouterLink>
-              <RouterLink to="/report" :class="{ active: activeLink === 4 }"> Report </RouterLink>
-            </div>
-          </li>
-          <li>
-            <RouterLink
-              to="/login"
-              name="Logout"
-              @click="userLogout(), router.replace('/login')"
-              @mouseover="showTooltip"
-              @mouseleave="hideTooltip"
-            >
-              Logout</RouterLink
-            >
-          </li>
-        </ul>
+            </li>
+            <li>
+              <RouterLink to="/login" name="Logout" @click="userLogoutAndRedirect">
+                Logout
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   </div>
