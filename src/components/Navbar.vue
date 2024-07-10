@@ -159,6 +159,7 @@ export default {
 }
 
 .menu {
+  position: absolute;
   background-color: white;
   border: 1px solid #ddd;
   padding: 10px;
