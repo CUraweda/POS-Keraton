@@ -1,17 +1,128 @@
+<script setup>
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted, ref, watch, watchEffect } from 'vue'
+import LoginHelper from '@/utilities/LoginHelper'
+import GlobalHelper from '@/utilities/GlobalHelper'
+
+const { userData, userLogout } = LoginHelper
+
+const activeLink = ref(0)
+const router = useRouter()
+const route = useRoute()
+let isCurawedaAccount = ref(false)
+
+const determineActiveLink = () => {
+  const path = route.path
+  const name = route.name
+  if (path === '/') {
+    activeLink.value = 0 // Home link active
+  } else if (path.includes('/invoice')) {
+    activeLink.value = 1 // Add link active
+  } else if (path.includes('/report')) {
+    activeLink.value = 2 // Report link active
+  } else if (path.includes('/checkout')) {
+    activeLink.value = 3
+  } else if (path.includes('/report-curaweda')) {
+    activeLink.value = 4
+  } else if (path.includes('/settings')) {
+    activeLink.value = 5
+  } else {
+    activeLink.value = -1 // No specific link active
+  }
+}
+
+const reportCuraweda = () => {
+  if (userData.value.role === 'SUPER_ADMIN') {
+    router.push('/report-curaweda')
+  }
+}
+const toSettings = () => {
+  if (userData.value.role === 'CASHIER') {
+    GlobalHelper.assignAlert(
+      true,
+      'Error',
+      'danger',
+      'Kamu tidak memiliki akses yang cukup untuk membuka fitur ini!'
+    )
+  } else router.push('/settings')
+}
+watch(
+  () => route.path,
+  () => {
+    determineActiveLink()
+  }
+)
+onMounted(() => {
+  if (!userData.value) {
+    userLogout()
+    router.replace('/login')
+  } else {
+    isCurawedaAccount = userData.value.role === 'CURAWEDA'
+    determineActiveLink()
+  }
+})
+
+// const showTooltip = (event) => {
+//   const tooltip = document.getElementById('tooltip')
+//   tooltip.textContent = event.target.getAttribute('name')
+//   tooltip.style.display = 'block'
+//   tooltip.style.top = `${event.clientY + window.scrollY + 20}px`
+//   tooltip.style.left = `${event.clientX + window.scrollX + 20}px`
+// }
+
+// const hideTooltip = () => {
+//   const tooltip = document.getElementById('tooltip')
+//   tooltip.style.display = 'none'
+// }
+
+watchEffect(() => {
+  if (!userData.value) {
+    userLogout()
+    router.replace('/login')
+  }
+})
+</script>
+
 <template>
   <div>
     <nav class="mobile-navbar">
       <button @click="toggleMenu" class="menu-button">☰</button>
       <div v-if="menuOpen" class="menu">
         <ul>
-          <li><a href="#home">Pemandu</a></li>
-          <li><a href="#pesanan">Pesanan</a></li>
-          <li><a href="#backup">Backup Data</a></li>
-          <li><a href="#kategori">Kategori</a></li>
-          <li><a href="#tipe">Tipe</a></li>
-          <li><a href="#sub-tipe">Sub Tipe</a></li>
-          <li><a href="#catatan">Catatan Basis Data</a></li>
-          <li><a href="#manage-user">Manage User</a></li>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/invoice">Invoice</a></li>
+          <li>
+            <RouterLink to="/report" :class="{ active: activeLink === 2 }"> Report </RouterLink>
+          </li>
+          <li><a href="/checkout">Checkout</a></li>
+          <li>
+            <a
+              @click="toSettings()"
+              :class="{ active: activeLink === 5 }"
+              v-if="!isCurawedaAccount"
+              style="cursor: pointer"
+              >Settings</a
+            >
+          </li>
+          <li>
+            <div v-if="isCurawedaAccount" class="navbar-links-container flex fd-col">
+              <RouterLink to="/report-curaweda" :class="{ active: activeLink === 4 }">
+                Report Curaweda
+              </RouterLink>
+              <RouterLink to="/report" :class="{ active: activeLink === 4 }"> Report </RouterLink>
+            </div>
+          </li>
+          <li>
+            <RouterLink
+              to="/login"
+              name="Logout"
+              @click="userLogout(), router.replace('/login')"
+              @mouseover="showTooltip"
+              @mouseleave="hideTooltip"
+            >
+              Logout</RouterLink
+            >
+          </li>
         </ul>
       </div>
     </nav>
@@ -36,7 +147,7 @@ export default {
 <style scoped>
 .mobile-navbar {
   display: none;
-  background-color: #ffeb3b; /* Adjust the color to match your design */
+  background-color: #ffd978;
   padding: 10px;
 }
 
@@ -68,7 +179,7 @@ export default {
 }
 
 /* Responsive styles */
-@media (max-width: 768px) {
+@media (max-width: 700px) {
   .mobile-navbar {
     display: block;
   }
