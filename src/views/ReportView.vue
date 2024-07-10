@@ -646,10 +646,27 @@ input {
 }
 
 .report-information__container {
-  width: 100%;
+  width: 85%;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+@media (min-width: 1566px) {
+  .report-information__container {
+    width: 71%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+@media (min-width: 1866px) {
+  .report-information__container {
+    width: 61%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
 }
 
 .report-information__income-container,

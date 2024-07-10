@@ -189,6 +189,12 @@ watch(
 
 @media (max-width: 724px) {
   .revenue-details {
+    width: 590px;
+  }
+}
+
+@media (max-width: 724px) {
+  .revenue-details {
     width: 510px;
   }
 }
