@@ -106,15 +106,21 @@ watchEffect(() => {
                 Settings
               </a>
             </li>
-            <li>
+            <li v-if="isCurawedaAccount">
               <RouterLink to="/report-curaweda" :class="{ active: activeLink === 4 }">
                 Report Curaweda
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/login" name="Logout" @click="userLogoutAndRedirect">
-                Logout
-              </RouterLink>
+              <RouterLink
+                to="/login"
+                name="Logout"
+                @click="userLogout(), router.replace('/login')"
+                @mouseover="showTooltip"
+                @mouseleave="hideTooltip"
+              >
+                Logout</RouterLink
+              >
             </li>
           </ul>
         </div>
