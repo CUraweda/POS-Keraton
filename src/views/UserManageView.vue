@@ -184,7 +184,7 @@ import GlobalHelper from '@/utilities/GlobalHelper'
 import LoginHelper from '@/utilities/LoginHelper'
 
 const { getCookie } = LoginHelper
-const { DB_BASE_URL, USER_BASE_URL, CATEGORY_BASE_URL } = GlobalHelper
+const { DB_BASE_URL, USER_BASE_URL, CATEGORY_BASE_URL, assignAlert } = GlobalHelper
 
 export default {
   data() {
@@ -245,10 +245,13 @@ export default {
           }
         )
         if (!response.ok) throw Error('Gagal mengupdate data')
+
         this.fetchData()
         this.confirmAlert = !this.confirmAlert
         this.showCategoryDialog = false
+        assignAlert(true, 'Sukses', 'success', `Berhasil mengubah data user`)
       } catch (err) {
+        assignAlert(true, 'Error', 'danger', `Gagal mengubah data user: ${err.message}`)
         console.log(err)
       }
     },

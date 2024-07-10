@@ -57,7 +57,7 @@ const router = createRouter({
       path: '/report-curaweda',
       name: 'reportCuraweda',
       component: ReportCuraweda,
-      meta: { protected: true }
+      meta: { protected: true  }
     },
     {
       path: '/add',
