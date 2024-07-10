@@ -662,7 +662,7 @@ input {
 }
 @media (min-width: 1866px) {
   .report-information__container {
-    width: 61%;
+    width: 65%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -705,9 +705,20 @@ input {
     margin-left: 0px;
   }
 }
+.report-activity__container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 @media (max-width: 970px) {
   .report-revenue__chart-container {
     margin: 20px;
+  }
+
+  .report-activity__container {
+    width: 90%;
   }
 }
 
@@ -716,13 +727,6 @@ input {
   gap: 1rem;
   margin-top: 1rem;
   margin-right: 2rem;
-}
-
-.report-activity__container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .report-activity__head {

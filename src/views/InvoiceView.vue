@@ -75,7 +75,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <div class="invoice-container">
+  <div class="invoice-container" style="padding: 2rem">
     <div style="justify-content: space-between; display: flex; width: 100%">
       <div style="text-transform: capitalize; font-weight: 500; font-size: 1.875rem; width: 100%">
         {{ currentRoute }}
