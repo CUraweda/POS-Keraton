@@ -648,18 +648,10 @@ input {
 .report-information__container {
   display: flex;
   flex-direction: column;
-  width: 95%;
+  width: 70%;
   gap: 2rem;
 }
 
-@media (min-width: 1566px) {
-  .report-information__container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
 @media (min-width: 1866px) {
   .report-information__container {
     width: 63%;
