@@ -233,7 +233,7 @@ a {
 }
 
 nav {
-  position: absolute;
+  position: fixed;
   background-color: #ffd978;
   width: 103px;
   height: 100%;
