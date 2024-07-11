@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
       <div class="add__alert-confirmation">
         <h5>Apakah anda ingin merubah kategori ini?</h5>
@@ -288,6 +288,16 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    margin-left: 1rem;
+  }
+}
+
 .dialog {
   background: rgba(0, 0, 0, 0.5);
   position: fixed;

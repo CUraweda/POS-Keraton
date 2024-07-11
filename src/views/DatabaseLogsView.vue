@@ -266,7 +266,7 @@ onUnmounted(() => {
   margin-left: 8rem;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
   .container {
     margin-left: 0;
   }
