@@ -202,7 +202,7 @@
       <span class="material-symbols-outlined"> folder_open </span>
     </button>
     <div v-if="floating">
-      <button class="icons fab_add4" name="Select All" @click="selectAll()">
+      <button class="icons fab_add5" name="Select All" @click="selectAll()">
         <span class="material-symbols-outlined"> done_all </span>
       </button>
       <button
@@ -212,7 +212,6 @@
       >
         <span class="material-symbols-outlined"> check </span>
       </button>
-      -->
       <button class="icons fab_add3" type="submit" @click="showConfirmation()" name="Download">
         <span class="material-symbols-outlined"> download_2 </span>
       </button>
@@ -801,7 +800,7 @@ a.browse__placeholder {
   right: 35px;
   width: 56px;
   height: 56px;
-  background-color: #7105d7;
+  background-color: #05d744;
   border-radius: 50%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;

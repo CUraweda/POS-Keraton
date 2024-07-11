@@ -364,38 +364,40 @@ const submitOrder = () => {
           </div>
         </div>
       </div>
-      <div
-        class="report-revenue__icons flex fd-row align-self-f-end gap-1 pd-sd-1 pd-top-1 align-items-center"
-      >
-        <!-- <span
+      <div style="width: 90%">
+        <div
+          class="report-revenue__icons flex fd-row align-self-f-end gap-1 pd-sd-1 pd-top-1 align-items-center"
+        >
+          <!-- <span
           class="icons"
           name="Screenshot Grafik"
           @click="takeScreenshot('report__screenshot-target')"
         >
           <ph-camera :size="32" weight="bold" />
         </span> -->
-        <span
-          v-if="!isLoadingKeramaian"
-          class="icons"
-          name="Print Data Penjualan Tiket"
-          @click="getPrintKeramaian"
-        >
-          <ph-printer :size="32" weight="bold" />
-        </span>
-        <span v-else>loading...</span>
-        <!-- <span class="icons" name="Print Data Keramaian" @click="printDataKeramaian"
+          <span
+            v-if="!isLoadingKeramaian"
+            class="icons"
+            name="Print Data Penjualan Tiket"
+            @click="getPrintKeramaian"
+          >
+            <ph-printer :size="32" weight="bold" />
+          </span>
+          <span v-else>loading...</span>
+          <!-- <span class="icons" name="Print Data Keramaian" @click="printDataKeramaian"
           ><ph-printer :size="32" weight="bold"
         /></span> -->
-        <span v-if="!isLoading" class="icons" name="Print Data Pengunjung" @click="getPrint">
-          <ph-printer :size="32" weight="bold" />
-        </span>
-        <span v-else>loading...</span>
-        <!-- <span class="icons" name="Print Data Keramaian" @click="printData"
+          <span v-if="!isLoading" class="icons" name="Print Data Pengunjung" @click="getPrint">
+            <ph-printer :size="32" weight="bold" />
+          </span>
+          <span v-else>loading...</span>
+          <!-- <span class="icons" name="Print Data Keramaian" @click="printData"
           ><ph-printer :size="32" weight="bold"
         /></span> -->
-        <span class="icons" name="Ekspor ke Excel" @click="generateExcel">
-          <ph-microsoft-excel-logo :size="32" weight="fill" fill="green" />
-        </span>
+          <span class="icons" name="Ekspor ke Excel" @click="generateExcel">
+            <ph-microsoft-excel-logo :size="32" weight="fill" fill="green" />
+          </span>
+        </div>
       </div>
     </div>
     <div class="report-activity__container flex fd-col gap-1">
@@ -660,7 +662,7 @@ input {
 }
 @media (min-width: 1866px) {
   .report-information__container {
-    width: 100%;
+    width: 63%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -722,6 +724,7 @@ input {
   display: flex;
   gap: 1rem;
   width: 100%;
+  justify-content: flex-end;
   margin-top: 1rem;
 }
 
