@@ -171,11 +171,11 @@ onMounted(() => {
 
 <template>
   <main>
-    <div class="checkout__container flex">
-      <div class="checkout__form-container w-full">
+    <div class="checkout__container">
+      <div class="checkout__form-container">
         <div class="order-details__container">
           <form>
-            <div class="order-details__checkout flex fd-col gap[0.5]">
+            <div class="order-details__checkout">
               <h4>Pemesanan Langsung</h4>
               <div class="order-details__cashier flex fd-col">
                 <div class="order-details__content w-full flex gap[0.5]">
@@ -763,12 +763,12 @@ export default {
 
 <style scoped>
 .checkout__container {
-  margin-left: 7.2rem;
-  gap: 5rem;
-  justify-content: center;
+  justify-content: space-between;
+  margin-left: 9rem;
+  gap: 1rem;
+  flex-wrap: wrap;
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
 }
 
 @media screen and (max-width: 700px) {

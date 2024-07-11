@@ -696,11 +696,11 @@ input:focus {
 
 @media screen and (max-width: 600px) {
   .settings__menu {
-    margin-left: 0;
+    margin-left: 0.9rem;
   }
 
   .title {
-    margin-left: 0;
+    margin-left: 1rem;
   }
 }
 

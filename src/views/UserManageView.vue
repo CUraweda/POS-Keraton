@@ -16,7 +16,7 @@
       <ph-caret-left size="24" weight="bold" />
       <p>Kembali</p>
     </div>
-    <div class="database-logs__content pd-right-1 sm-top-2">
+    <div class="c_container pd-right-1 sm-top-2">
       <table>
         <thead>
           <tr>
@@ -296,6 +296,12 @@ export default {
   .container {
     margin-left: 1rem;
   }
+}
+
+.c_container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 .dialog {

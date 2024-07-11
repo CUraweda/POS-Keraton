@@ -153,9 +153,12 @@ onUnmounted(() => {
     <h5 class="fw-600 sm-top-1">Catatan Basis Data</h5>
 
     <div class="database-logs__content pd-right-1 sm-top-2">
-      <div class="flex align-items-center justify-content-sb pd-sd-2">
-        <div class="flex gap align-items-center gap[0.5]">
-          <div class="database-logs-search flex align-items-center">
+      <div
+        class="flex align-items-center justify-content-sb"
+        style="flex-wrap: wrap; gap: 10px; margin: 0 0.3rem"
+      >
+        <div class="flex gap align-items-center" style="gap: 0.5rem">
+          <div class="database-logs-search flex align-items-center" style="gap: 1rem">
             <i
               class="ri-search-line database-logs-search__icon flex align-items-center justify-content-center"
               :width="50"
@@ -198,38 +201,40 @@ onUnmounted(() => {
           <button class="action-filter__cta fw-600 pd-sd-1" @click="resetFilter">Reset</button>
         </div>
       </div>
-      <table>
-        <thead>
-          <th>User</th>
-          <th>Aksi</th>
-          <th>Aktivitas</th>
-          <th>Page</th>
-          <th>Status</th>
-          <th>Tanggal</th>
-        </thead>
-        <tbody>
-          <tr v-for="logData in paginatedData" :key="logData.user">
-            <td>{{ logData.user.email }}</td>
-            <td>{{ logData.action }}</td>
-            <td>{{ logData.activity }}</td>
-            <td>{{ logData.changedAt }}</td>
-            <td>
-              <div
-                class="logdata-status"
-                :class="{
-                  'status-success': logData.status === 'Success',
-                  'status-failed': logData.status === 'Failed'
-                }"
-              >
-                {{ logData.status }}
-              </div>
-            </td>
-            <td>
-              {{ `${splitDate(logData.createdDate)[0]} | ${splitDate(logData.createdDate)[1]}` }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="c_container">
+        <table>
+          <thead>
+            <th>User</th>
+            <th>Aksi</th>
+            <th>Aktivitas</th>
+            <th>Page</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+          </thead>
+          <tbody>
+            <tr v-for="logData in paginatedData" :key="logData.user">
+              <td>{{ logData.user.email }}</td>
+              <td>{{ logData.action }}</td>
+              <td>{{ logData.activity }}</td>
+              <td>{{ logData.changedAt }}</td>
+              <td>
+                <div
+                  class="logdata-status"
+                  :class="{
+                    'status-success': logData.status === 'Success',
+                    'status-failed': logData.status === 'Failed'
+                  }"
+                >
+                  {{ logData.status }}
+                </div>
+              </td>
+              <td>
+                {{ `${splitDate(logData.createdDate)[0]} | ${splitDate(logData.createdDate)[1]}` }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="pagination-container">
         <button
@@ -271,6 +276,13 @@ onUnmounted(() => {
     margin-left: 0;
   }
 }
+
+.c_container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
 .database-logs-search {
   width: 20rem;
   height: 2rem;
@@ -280,7 +292,6 @@ onUnmounted(() => {
   gap: 0.5rem;
   padding: 0.5rem;
   overflow: hidden;
-  margin-inline: 0.5rem;
 }
 .database-logs-search__input-field {
   flex: 1;
