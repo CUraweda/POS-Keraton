@@ -196,6 +196,7 @@ onMounted(() => {
 .invoice-container {
   font-family: 'Poppins', sans-serif;
   min-height: 100vh;
+  margin-left: 6rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -296,5 +297,11 @@ onMounted(() => {
 }
 .invoice-table__button:hover {
   background-color: #ffd477;
+}
+
+@media screen and (max-width: 700px) {
+  .invoice-container {
+    margin-left: 0;
+  }
 }
 </style>

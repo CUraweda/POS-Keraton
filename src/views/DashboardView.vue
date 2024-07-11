@@ -588,4 +588,14 @@ input[type='number'] {
 .popup-confimation__button-confirmation button:last-child:hover {
   background: #cd23349b;
 }
+
+.dashboard__container {
+  margin-left: 6rem;
+}
+
+@media screen and (max-width: 700px) {
+  .dashboard__container {
+    margin-left: 0;
+  }
+}
 </style>

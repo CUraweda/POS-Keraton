@@ -440,22 +440,20 @@ input[type='date'] {
 .jump-leave-active {
   transition: all 0.3s ease;
 } */
-/* 
+/*
 .jump-enter-from,
 .jump-leave-to {
   transform: translateY(-10px);
   opacity: 0;
- } 
+ }
 
 .jump-enter-to,
 .jump-leave-from {
   transform: translateY(0);
   opacity: 1;
-} 
-*/
-.report-information__container {
-  width: 1085px;
 }
+*/
+
 .report-information__income-revenue,
 .report-information__ticket-sold,
 .report-information__ticketing-container {
@@ -640,13 +638,10 @@ input {
 
 .report__container {
   width: 100%;
-  /* max-width: 1200px; */
-  margin: 0 auto;
-  padding: 1rem;
 }
 
 .report-information__container {
-  width: 85%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -654,7 +649,7 @@ input {
 
 @media (min-width: 1566px) {
   .report-information__container {
-    width: 71%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -662,7 +657,7 @@ input {
 }
 @media (min-width: 1866px) {
   .report-information__container {
-    width: 65%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -673,7 +668,6 @@ input {
 .report-information__ticketing-container {
   width: 100%;
   display: flex;
-  flex-direction: column;
   gap: 1rem;
 }
 
@@ -688,7 +682,6 @@ input {
 .report-revenue__container {
   width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 

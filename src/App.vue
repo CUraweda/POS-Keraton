@@ -60,10 +60,6 @@ watchEffect(() => {
   padding: 0 !important;
 }
 
-.responsive-content {
-  margin-left: 6rem;
-}
-
 .sidebar {
   display: flex;
 }
