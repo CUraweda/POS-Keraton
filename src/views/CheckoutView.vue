@@ -764,6 +764,7 @@ export default {
 <style scoped>
 .checkout__container {
   margin-left: 7.2rem;
+  gap: 5rem;
   justify-content: center;
   align-items: center;
   display: flex;
