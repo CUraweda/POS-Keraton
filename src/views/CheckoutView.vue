@@ -170,8 +170,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="pd-sd-2">
-    <div class="checkout__container w-full flex align-items-f-start justify-content-sb gap-2">
+  <main>
+    <div class="checkout__container flex">
       <div class="checkout__form-container w-full">
         <div class="order-details__container">
           <form>
@@ -630,7 +630,7 @@ onMounted(() => {
           </form>
         </div>
       </div>
-      <div class="checkout__details-container pd-2 w-full">
+      <div class="checkout__details-container w-full">
         <div class="checkout__details-content w-full">
           <form class="checkout__details-form" @submit.prevent="submitRingkasan">
             <p class="fs-h5">Ringkasan Booking</p>
@@ -763,7 +763,17 @@ export default {
 
 <style scoped>
 .checkout__container {
-  padding: 1.5rem;
+  margin-left: 7.2rem;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 700px) {
+  .checkout__container {
+    margin-left: 0;
+  }
 }
 main {
   font-family: 'Raleway';
@@ -1022,6 +1032,7 @@ input[type='number'] {
 }
 
 .checkout__details-container {
+  margin-top: 1rem;
   min-width: 24rem;
   max-width: 36rem;
   position: sticky;

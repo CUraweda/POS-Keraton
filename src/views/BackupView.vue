@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div class="container">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
         <div
@@ -10,7 +10,7 @@
         </div>
         <div style="width: 100%; min-height: 100px; padding: 10px">
           <div style="display: block; gap: 30px">
-            <div class="dashboard__card-container" style="width: 100%">
+            <div class="dashboard__card-container">
               <button
                 v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences"
                 :key="dataRefIndex"
@@ -568,6 +568,16 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 600px) {
+  .container {
+    margin-left: 0;
+  }
+}
+
 .btn {
   width: 10.5rem;
   height: 2rem;

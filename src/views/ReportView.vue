@@ -417,6 +417,15 @@ const submitOrder = () => {
 </template>
 
 <style scoped>
+.report__container {
+  margin-left: 6rem;
+}
+
+@media screen and (max-width: 700px) {
+  .report__container {
+    margin-left: 0;
+  }
+}
 input[type='date'] {
   border: 1px solid black;
   border-radius: 8px;
@@ -430,6 +439,7 @@ input[type='date'] {
 
 .report-information__income-revenue {
   cursor: pointer;
+  width: 100%;
 }
 
 .detail-section {
@@ -440,22 +450,20 @@ input[type='date'] {
 .jump-leave-active {
   transition: all 0.3s ease;
 } */
-/* 
+/*
 .jump-enter-from,
 .jump-leave-to {
   transform: translateY(-10px);
   opacity: 0;
- } 
+ }
 
 .jump-enter-to,
 .jump-leave-from {
   transform: translateY(0);
   opacity: 1;
-} 
-*/
-.report-information__container {
-  width: 1085px;
 }
+*/
+
 .report-information__income-revenue,
 .report-information__ticket-sold,
 .report-information__ticketing-container {
@@ -493,7 +501,6 @@ input[type='date'] {
   line-height: 28px;
 }
 .report-activity__table-container {
-  width: 100%;
   height: 374px;
   border-radius: 20px;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
@@ -518,7 +525,6 @@ input {
   -webkit-appearance: none;
   -moz-appearance: none;
   border: 0;
-  width: 100%;
   height: 100%;
   border-radius: 0.5rem;
   padding: 0.5rem;
@@ -547,7 +553,6 @@ input {
   position: absolute;
   top: 2.6rem;
   background-color: white;
-  width: 100%;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -638,23 +643,16 @@ input {
   color: #ffffff;
 }
 
-.report__container {
-  width: 100%;
-  /* max-width: 1200px; */
-  margin: 0 auto;
-  padding: 1rem;
-}
-
 .report-information__container {
-  width: 85%;
   display: flex;
   flex-direction: column;
+  width: 95%;
   gap: 2rem;
 }
 
 @media (min-width: 1566px) {
   .report-information__container {
-    width: 71%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -662,7 +660,7 @@ input {
 }
 @media (min-width: 1866px) {
   .report-information__container {
-    width: 65%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -673,7 +671,6 @@ input {
 .report-information__ticketing-container {
   width: 100%;
   display: flex;
-  flex-direction: column;
   gap: 1rem;
 }
 
@@ -688,7 +685,6 @@ input {
 .report-revenue__container {
   width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 
@@ -725,21 +721,20 @@ input {
 .report-revenue__icons {
   display: flex;
   gap: 1rem;
+  width: 100%;
   margin-top: 1rem;
-  margin-right: 2rem;
 }
 
 .report-activity__head {
   display: flexbox;
   align-items: center;
-  width: 95%;
+  width: 100%;
   margin: auto;
   justify-content: space-between;
 }
 
 .filter__input-dropdown {
   position: relative;
-  width: 100%;
   max-width: 200px;
   border: 1px solid black;
   border-radius: 0.5rem;
@@ -747,7 +742,6 @@ input {
 }
 
 .filter__input-dropdown input {
-  width: 100%;
   padding: 0.5rem;
   border: none;
   border-radius: 0.5rem;
@@ -757,7 +751,6 @@ input {
 .filter__input-dropdown_menu {
   position: absolute;
   top: 2.6rem;
-  width: 100%;
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -777,10 +770,6 @@ input {
     justify-content: space-between;
   }
 
-  .report-information__income-container,
-  .report-information__ticketing-container {
-    width: 90%;
-  }
 
   .report-revenue__chart-container {
     flex-direction: row;

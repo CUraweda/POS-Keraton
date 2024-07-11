@@ -1,117 +1,136 @@
 <template>
-  <h2 style="font-weight: bold; text-align: center">Report Curaweda</h2>
-  <div style="
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-    ">
-    <div class="flex h-full" style="gap: 1rem">
-      <div class="ticket-info-card__container flex fd-col pd-1">
-        <p class="ticket-info-card__title">Revenue Total</p>
-        <span class="ticket-info-card__details align-self-center">{{
-          formatCurrency(revenueTotal)
-        }}</span>
-      </div>
-      <div style="background: black; width: 0.1rem"></div>
-    </div>
-
-    <div style="
+  <div class="container">
+    <h2 style="font-weight: bold; text-align: center">Report Curaweda</h2>
+    <div
+      style="
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
         align-items: center;
         gap: 1rem;
-        flex-wrap: wrap;
-      ">
-      <div class="ticket-info-card__container flex fd-col pd-1">
-        <p class="ticket-info-card__title">Revenue Keraton "COH"</p>
-        <span class="ticket-info-card__details align-self-center">{{
+        margin-top: 1rem;
+      "
+    >
+      <div class="flex h-full" style="gap: 1rem">
+        <div class="ticket-info-card__container flex fd-col pd-1">
+          <p class="ticket-info-card__title">Revenue Total</p>
+          <span class="ticket-info-card__details align-self-center">{{
+            formatCurrency(revenueTotal)
+          }}</span>
+        </div>
+        <div style="background: black; width: 0.1rem"></div>
+      </div>
+
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        "
+      >
+        <div class="ticket-info-card__container flex fd-col pd-1">
+          <p class="ticket-info-card__title">Revenue Keraton "COH"</p>
+          <span class="ticket-info-card__details align-self-center">{{
             formatCurrency(revenueKeraton.COH)
           }}</span>
-      </div>
+        </div>
 
-      <div class="ticket-info-card__container flex fd-col pd-1">
-        <p class="ticket-info-card__title">Revenue Keraton "CIA"</p>
-        <span class="ticket-info-card__details align-self-center">{{
+        <div class="ticket-info-card__container flex fd-col pd-1">
+          <p class="ticket-info-card__title">Revenue Keraton "CIA"</p>
+          <span class="ticket-info-card__details align-self-center">{{
             formatCurrency(revenueKeraton.CIA)
           }}</span>
+        </div>
       </div>
-    </div>
-    <div class="flex h-full" style="gap: 1rem">
-      <div style="background: black; width: 0.1rem"></div>
-      <div class="ticket-info-card__container flex fd-col pd-1">
-        <p class="ticket-info-card__title">Revenue Curaweda "COH"</p>
-        <span class="ticket-info-card__details align-self-center">{{
+      <div class="flex h-full" style="gap: 1rem">
+        <div style="background: black; width: 0.1rem"></div>
+        <div class="ticket-info-card__container flex fd-col pd-1">
+          <p class="ticket-info-card__title">Revenue Curaweda "COH"</p>
+          <span class="ticket-info-card__details align-self-center">{{
             formatCurrency(revenueCuraweda.COH)
           }}</span>
-      </div>
-      <div class="ticket-info-card__container flex fd-col pd-1">
-        <p class="ticket-info-card__title">Revenue Curaweda "CIA"</p>
-        <span class="ticket-info-card__details align-self-center">{{
+        </div>
+        <div class="ticket-info-card__container flex fd-col pd-1">
+          <p class="ticket-info-card__title">Revenue Curaweda "CIA"</p>
+          <span class="ticket-info-card__details align-self-center">{{
             formatCurrency(revenueCuraweda.CIA)
           }}</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <h2 style="font-weight: bold; text-align: center; margin-top: 10rem">History Report Curaweda</h2>
+    <h2 style="font-weight: bold; text-align: center; margin-top: 10rem">
+      History Report Curaweda
+    </h2>
 
-  <div style="margin-bottom: 1rem">
-    <label for="filter-date" style="font-weight: bold; margin-right: 1rem">Filter by Date:</label>
-    <div style="display: flex; align-items: center; gap: 1rem">
-      <label for="filter-date" style="font-weight: bold; margin-right: 0.1rem">From:</label>
-      <input type="date" id="filter-date-from" v-model="filterDateFrom" @change="filterRecords"
-        class="datepicker-input" />
-      <label for="filter-date" style="font-weight: bold; margin-right: 0.1rem">To:</label>
-      <input type="date" id="filter-date-to" v-model="filterDateTo" @change="filterRecords" class="datepicker-input" />
+    <div style="margin-bottom: 1rem">
+      <label for="filter-date" style="font-weight: bold; margin-right: 1rem">Filter by Date:</label>
+      <div style="display: flex; align-items: center; gap: 1rem">
+        <label for="filter-date" style="font-weight: bold; margin-right: 0.1rem">From:</label>
+        <input
+          type="date"
+          id="filter-date-from"
+          v-model="filterDateFrom"
+          @change="filterRecords"
+          class="datepicker-input"
+        />
+        <label for="filter-date" style="font-weight: bold; margin-right: 0.1rem">To:</label>
+        <input
+          type="date"
+          id="filter-date-to"
+          v-model="filterDateTo"
+          @change="filterRecords"
+          class="datepicker-input"
+        />
+      </div>
     </div>
+
+    <table class="history-report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Revenue Keraton "COH"</th>
+          <th>Revenue Keraton "CIA"</th>
+          <th>Revenue Curaweda "COH"</th>
+          <th>Revenue Curaweda "CIA"</th>
+          <th>Total Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="record in historyRecords" :key="record.date">
+          <td>{{ record.date }}</td>
+          <td>{{ formatCurrency(record.revenueKeraton.COH) }}</td>
+          <td>{{ formatCurrency(record.revenueKeraton.CIA) }}</td>
+          <td>{{ formatCurrency(record.revenueCuraweda.COH) }}</td>
+          <td>{{ formatCurrency(record.revenueCuraweda.CIA) }}</td>
+          <td>{{ formatCurrency(record.totalRevenue) }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 style="font-weight: bold; text-align: center; margin-top: 10rem">History Transaction</h2>
+
+    <table class="history-report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Amount</th>
+          <th>Pay Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(trans, i) in transactionRecords" :key="i">
+          <td>{{ trans.date }}</td>
+          <td>{{ formatTimeString(trans.time) }}</td>
+          <td>{{ formatCurrency(trans.paymentAmount) }}</td>
+          <td>{{ trans.paymentMethod }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <table class="history-report-table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Revenue Keraton "COH"</th>
-        <th>Revenue Keraton "CIA"</th>
-        <th>Revenue Curaweda "COH"</th>
-        <th>Revenue Curaweda "CIA"</th>
-        <th>Total Revenue</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="record in historyRecords" :key="record.date">
-        <td>{{ record.date }}</td>
-        <td>{{ formatCurrency(record.revenueKeraton.COH) }}</td>
-        <td>{{ formatCurrency(record.revenueKeraton.CIA) }}</td>
-        <td>{{ formatCurrency(record.revenueCuraweda.COH) }}</td>
-        <td>{{ formatCurrency(record.revenueCuraweda.CIA) }}</td>
-        <td>{{ formatCurrency(record.totalRevenue) }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h2 style="font-weight: bold; text-align: center; margin-top: 10rem">History Transaction</h2>
-
-  <table class="history-report-table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Amount</th>
-        <th>Pay Method</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(trans, i) in transactionRecords" :key="i">
-        <td>{{ trans.date }}</td>
-        <td>{{ formatTimeString(trans.time) }}</td>
-        <td>{{ formatCurrency(trans.paymentAmount) }}</td>
-        <td>{{ trans.paymentMethod }}</td>
-      </tr>
-    </tbody>
-  </table>
 </template>
 
 <script>
@@ -142,7 +161,7 @@ export default {
       handler() {
         this.fetchTabel()
       }
-    },
+    }
   },
   mounted() {
     this.fetchData()
@@ -179,12 +198,10 @@ export default {
     },
     async fetchTabelTransaksi() {
       try {
-        const response = await fetch(
-          `${DB_BASE_URL.value}/keraton-pos/curaweda-income/`
-        )
+        const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/curaweda-income/`)
         if (!response.ok) throw Error('Failed to fetch Data')
         const responseData = await response.json()
-        this.transactionRecords = responseData.data.map(trans => ({
+        this.transactionRecords = responseData.data.map((trans) => ({
           date: trans.createdAt.split('T')[0],
           time: trans.createdAt.split('T')[1],
           ...trans
@@ -194,8 +211,8 @@ export default {
       }
     },
     formatTimeString(timeString) {
-      const [hours, minutes] = timeString.split(':');
-      return `${hours}.${minutes}`;
+      const [hours, minutes] = timeString.split(':')
+      return `${hours}.${minutes}`
     },
     formatTabelRecord(datas) {
       let tableRaw = {}
@@ -249,6 +266,15 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  margin-left: 7rem;
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    margin-left: 0;
+  }
+}
 p,
 span {
   cursor: default;
