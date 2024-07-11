@@ -205,13 +205,14 @@
       <button class="icons fab_add4" name="Select All" @click="selectAll()">
         <span class="material-symbols-outlined"> done_all </span>
       </button>
-      <!-- <button
+      <button
         class="icons fab_add4"
         name="Select"
         @click="addToSelectedBackup(currentDataReference)"
       >
         <span class="material-symbols-outlined"> check </span>
-      </button> -->
+      </button>
+      -->
       <button class="icons fab_add3" type="submit" @click="showConfirmation()" name="Download">
         <span class="material-symbols-outlined"> download_2 </span>
       </button>
