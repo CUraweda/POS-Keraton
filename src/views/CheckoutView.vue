@@ -18,7 +18,7 @@ const {
   showPaymentSelect,
   selectPayment,
   addTicket,
-asalKota,
+  asalKota,
   reduceTicket,
   custName,
   custEmail,
@@ -762,6 +762,9 @@ export default {
 </script>
 
 <style scoped>
+.checkout__container {
+  padding: 1.5rem;
+}
 main {
   font-family: 'Raleway';
 }
