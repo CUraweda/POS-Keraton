@@ -84,7 +84,7 @@ const generateExcel = async () => {
       row.push(formatCurrency(data.order?.price || data.event.price));
       row.push(formatCurrency(data.amount * (data.order?.price || data.event.price)));
       row.push(formatCurrency(total));
-      row.push(data.transaction.deleted ? "✅" : "--")
+      row.push(data.transaction.deleted ? "Ya" : "Tidak")
       // IF the data.deleted is true then make all the cell to get filled with red 
 
       if (!ticketsSoldment[data.order?.name || data.event.name]) ticketsSoldment[data.order?.name || data.event.name] = {
