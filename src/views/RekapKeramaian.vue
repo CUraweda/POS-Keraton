@@ -29,8 +29,8 @@
     <table class="history-report-table" style="margin-top: 2rem">
       <thead>
         <tr>
+          <th>Tipe</th>
           <th v-for="(header, i) in yearlyCategory" :key="i">{{ header }}</th>
-          <th>Total</th>
           <!-- <th>Mancanegara 'Dalam Negri</th> -->
         </tr>
       </thead>
@@ -46,8 +46,8 @@
     <table class="history-report-table" style="margin-top: 2rem">
       <thead>
         <tr>
+          <th>Tipe</th>
           <th v-for="(header, i) in monthlyCategory" :key="i">{{ header }}</th>
-          <th>Total</th>
           <!-- <th>Mancanegara 'Dalam Negri</th> -->
         </tr>
       </thead>
@@ -114,7 +114,7 @@ export default {
     this.currentMonth = today.getMonth() + 1
     this.monthName = today.toLocaleString('id-ID', { month: 'long' })
     this.fetchData().then(() => {
-      window.print()
+      // window.print()
     })
     // window.location.reload()
   },
@@ -134,6 +134,7 @@ export default {
         this.yearlyCategory = resYear.data.yearlyCategory
         this.yearlyData = resYear.data.yearlyData
         this.monthlyCategory = resMonth.data.monthlyCategory
+        console.log(this.monthlyCategory)
         this.monthlyData = resMonth.data.monthlyData
       } catch (err) {
         console.log(err)
