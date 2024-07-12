@@ -149,111 +149,140 @@ onUnmounted(() => {
     <ph-caret-left size="24" weight="bold" />
     <p>Kembali</p>
   </div>
-  <h5 class="fw-600 sm-top-1">Catatan Basis Data</h5>
+  <div class="container">
+    <h5 class="fw-600 sm-top-1">Catatan Basis Data</h5>
 
-  <div class="database-logs__content pd-right-1 sm-top-2">
-    <div class="flex align-items-center justify-content-sb pd-sd-2">
-      <div class="flex gap align-items-center gap[0.5]">
-        <div class="database-logs-search flex align-items-center">
-          <i
-            class="ri-search-line database-logs-search__icon flex align-items-center justify-content-center"
-            :width="50"
-          ></i>
-          <input
-            type="text"
-            class="database-logs-search__input-field"
-            v-model="rawSearch"
-            placeholder="Cari..."
-          />
-          <ph-x v-if="rawSearch" class="cursor-pointer" @click="resetSearch()" :size="16"></ph-x>
-        </div>
-        <button class="database-logs__content_cta-search" @click="searchLogs">
-          <ph-magnifying-glass size="18" weight="bold" />
-        </button>
-      </div>
-      <div class="flex gap align-items-center gap[0.5]">
-        <div class="action-filter__input-dropdown">
-          <input
-            readonly
-            @click="toggleDropdown"
-            :value="selectedAction"
-            placeholder="Pilih Filter"
-          />
-          <div class="select-icon" @click="toggleDropdown">
-            <div class="arrow-icon" :class="{ active: isOpen }">
-              <ph-caret-down :size="14" weight="bold" class="icon" />
-            </div>
-          </div>
-          <div class="action-filter__input-dropdown_menu" :class="{ active: isOpen }">
-            <p v-for="(list, index) in actionArray" :key="index" @click="selectOption(list.action)">
-              {{ list.action }}
-            </p>
-          </div>
-        </div>
-        <button class="action-filter__cta fw-600 pd-sd-1" @click="resetFilter">Reset</button>
-      </div>
-    </div>
-    <table>
-      <thead>
-        <th>User</th>
-        <th>Aksi</th>
-        <th>Aktivitas</th>
-        <th>Page</th>
-        <th>Status</th>
-        <th>Tanggal</th>
-      </thead>
-      <tbody>
-        <tr v-for="logData in paginatedData" :key="logData.user">
-          <td>{{ logData.user.email }}</td>
-          <td>{{ logData.action }}</td>
-          <td>{{ logData.activity }}</td>
-          <td>{{ logData.changedAt }}</td>
-          <td>
-            <div
-              class="logdata-status"
-              :class="{
-                'status-success': logData.status === 'Success',
-                'status-failed': logData.status === 'Failed'
-              }"
-            >
-              {{ logData.status }}
-            </div>
-          </td>
-          <td>{{ `${splitDate(logData.createdDate)[0]} | ${splitDate(logData.createdDate)[1]}` }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="pagination-container">
-      <button
-        class="pagination-button"
-        @click="changePage(currentPage - 1)"
-        :class="{ invisible: currentPage === 1 }"
+    <div class="database-logs__content pd-right-1 sm-top-2">
+      <div
+        class="flex align-items-center justify-content-sb"
+        style="flex-wrap: wrap; gap: 10px; margin: 0 0.3rem"
       >
-        <ph-caret-left />
-      </button>
-      <div class="pagination-numbers">
+        <div class="flex gap align-items-center" style="gap: 0.5rem">
+          <div class="database-logs-search flex align-items-center" style="gap: 1rem">
+            <i
+              class="ri-search-line database-logs-search__icon flex align-items-center justify-content-center"
+              :width="50"
+            ></i>
+            <input
+              type="text"
+              class="database-logs-search__input-field"
+              v-model="rawSearch"
+              placeholder="Cari..."
+            />
+            <ph-x v-if="rawSearch" class="cursor-pointer" @click="resetSearch()" :size="16"></ph-x>
+          </div>
+          <button class="database-logs__content_cta-search" @click="searchLogs">
+            <ph-magnifying-glass size="18" weight="bold" />
+          </button>
+        </div>
+        <div class="flex gap align-items-center gap[0.5]">
+          <div class="action-filter__input-dropdown">
+            <input
+              readonly
+              @click="toggleDropdown"
+              :value="selectedAction"
+              placeholder="Pilih Filter"
+            />
+            <div class="select-icon" @click="toggleDropdown">
+              <div class="arrow-icon" :class="{ active: isOpen }">
+                <ph-caret-down :size="14" weight="bold" class="icon" />
+              </div>
+            </div>
+            <div class="action-filter__input-dropdown_menu" :class="{ active: isOpen }">
+              <p
+                v-for="(list, index) in actionArray"
+                :key="index"
+                @click="selectOption(list.action)"
+              >
+                {{ list.action }}
+              </p>
+            </div>
+          </div>
+          <button class="action-filter__cta fw-600 pd-sd-1" @click="resetFilter">Reset</button>
+        </div>
+      </div>
+      <div class="c_container">
+        <table>
+          <thead>
+            <th>User</th>
+            <th>Aksi</th>
+            <th>Aktivitas</th>
+            <th>Page</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+          </thead>
+          <tbody>
+            <tr v-for="logData in paginatedData" :key="logData.user">
+              <td>{{ logData.user.email }}</td>
+              <td>{{ logData.action }}</td>
+              <td>{{ logData.activity }}</td>
+              <td>{{ logData.changedAt }}</td>
+              <td>
+                <div
+                  class="logdata-status"
+                  :class="{
+                    'status-success': logData.status === 'Success',
+                    'status-failed': logData.status === 'Failed'
+                  }"
+                >
+                  {{ logData.status }}
+                </div>
+              </td>
+              <td>
+                {{ `${splitDate(logData.createdDate)[0]} | ${splitDate(logData.createdDate)[1]}` }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-container">
         <button
-          v-for="page in visiblePages"
-          :key="page"
-          @click="changePage(page)"
-          :class="{ active: page === currentPage }"
+          class="pagination-button"
+          @click="changePage(currentPage - 1)"
+          :class="{ invisible: currentPage === 1 }"
         >
-          {{ page }}
+          <ph-caret-left />
+        </button>
+        <div class="pagination-numbers">
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="changePage(page)"
+            :class="{ active: page === currentPage }"
+          >
+            {{ page }}
+          </button>
+        </div>
+        <button
+          class="pagination-button"
+          @click="changePage(currentPage + 1)"
+          :class="{ invisible: currentPage === totalPages }"
+        >
+          <ph-caret-right />
         </button>
       </div>
-      <button
-        class="pagination-button"
-        @click="changePage(currentPage + 1)"
-        :class="{ invisible: currentPage === totalPages }"
-      >
-        <ph-caret-right />
-      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
+.container {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    margin-left: 0;
+  }
+}
+
+.c_container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
 .database-logs-search {
   width: 20rem;
   height: 2rem;
@@ -263,7 +292,6 @@ onUnmounted(() => {
   gap: 0.5rem;
   padding: 0.5rem;
   overflow: hidden;
-  margin-inline: 0.5rem;
 }
 .database-logs-search__input-field {
   flex: 1;

@@ -170,12 +170,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="pd-sd-2">
-    <div class="checkout__container w-full flex align-items-f-start justify-content-sb gap-2">
-      <div class="checkout__form-container w-full">
+  <main>
+    <div class="checkout__container">
+      <div class="checkout__form-container">
         <div class="order-details__container">
           <form>
-            <div class="order-details__checkout flex fd-col gap[0.5]">
+            <div class="order-details__checkout">
               <h4>Pemesanan Langsung</h4>
               <div class="order-details__cashier flex fd-col">
                 <div class="order-details__content w-full flex gap[0.5]">
@@ -630,7 +630,7 @@ onMounted(() => {
           </form>
         </div>
       </div>
-      <div class="checkout__details-container pd-2 w-full">
+      <div class="checkout__details-container w-full">
         <div class="checkout__details-content w-full">
           <form class="checkout__details-form" @submit.prevent="submitRingkasan">
             <p class="fs-h5">Ringkasan Booking</p>
@@ -763,7 +763,18 @@ export default {
 
 <style scoped>
 .checkout__container {
-  padding: 1.5rem;
+  justify-content: space-between;
+  margin-left: 9rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  display: flex;
+}
+
+@media screen and (max-width: 700px) {
+  .checkout__container {
+    margin-left: 0;
+  }
 }
 main {
   font-family: 'Raleway';
@@ -1022,6 +1033,7 @@ input[type='number'] {
 }
 
 .checkout__details-container {
+  margin-top: 1rem;
   min-width: 24rem;
   max-width: 36rem;
   position: sticky;

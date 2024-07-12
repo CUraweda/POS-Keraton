@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div class="container">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
         <div
@@ -10,7 +10,7 @@
         </div>
         <div style="width: 100%; min-height: 100px; padding: 10px">
           <div style="display: block; gap: 30px">
-            <div class="dashboard__card-container" style="width: 100%">
+            <div class="dashboard__card-container">
               <button
                 v-for="(label, dataRefIndex) in importJSONDatas?.dataReferences"
                 :key="dataRefIndex"
@@ -202,16 +202,16 @@
       <span class="material-symbols-outlined"> folder_open </span>
     </button>
     <div v-if="floating">
-      <button class="icons fab_add4" name="Select All" @click="selectAll()">
+      <button class="icons fab_add5" name="Select All" @click="selectAll()">
         <span class="material-symbols-outlined"> done_all </span>
       </button>
-      <!-- <button
+      <button
         class="icons fab_add4"
         name="Select"
         @click="addToSelectedBackup(currentDataReference)"
       >
         <span class="material-symbols-outlined"> check </span>
-      </button> -->
+      </button>
       <button class="icons fab_add3" type="submit" @click="showConfirmation()" name="Download">
         <span class="material-symbols-outlined"> download_2 </span>
       </button>
@@ -567,6 +567,16 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 600px) {
+  .container {
+    margin-left: 0;
+  }
+}
+
 .btn {
   width: 10.5rem;
   height: 2rem;
@@ -790,7 +800,7 @@ a.browse__placeholder {
   right: 35px;
   width: 56px;
   height: 56px;
-  background-color: #7105d7;
+  background-color: #05d744;
   border-radius: 50%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;

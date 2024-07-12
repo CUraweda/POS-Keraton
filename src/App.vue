@@ -56,9 +56,9 @@ watchEffect(() => {
 .no-pd-block {
   padding-block: 0 !important;
 }
-.no-pd-left {
+/* .no-pd-left {
   padding: 0 !important;
-}
+} */
 
 .sidebar {
   display: flex;

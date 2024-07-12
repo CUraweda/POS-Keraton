@@ -294,7 +294,7 @@ const confirm = () => {
       </div>
     </div>
 
-    <h4 class="fw-600 sm-bottom-1">Pengaturan</h4>
+    <h4 class="fw-600 sm-bottom-1 title">Pengaturan</h4>
 
     <section class="admin">
       <div class="settings__menu">
@@ -684,9 +684,24 @@ input:focus {
 }
 
 .settings__menu {
+  margin-left: 8rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 170px));
   gap: 2.1rem;
+}
+
+.title {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 600px) {
+  .settings__menu {
+    margin-left: 0.9rem;
+  }
+
+  .title {
+    margin-left: 1rem;
+  }
 }
 
 .settings__menu-items {

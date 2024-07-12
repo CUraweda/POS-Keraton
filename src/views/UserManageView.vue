@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
       <div class="add__alert-confirmation">
         <h5>Apakah anda ingin merubah kategori ini?</h5>
@@ -16,7 +16,7 @@
       <ph-caret-left size="24" weight="bold" />
       <p>Kembali</p>
     </div>
-    <div class="database-logs__content pd-right-1 sm-top-2">
+    <div class="c_container pd-right-1 sm-top-2">
       <table>
         <thead>
           <tr>
@@ -288,6 +288,22 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    margin-left: 1rem;
+  }
+}
+
+.c_container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
 .dialog {
   background: rgba(0, 0, 0, 0.5);
   position: fixed;
