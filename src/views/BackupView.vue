@@ -452,7 +452,7 @@ export default {
         this.confirmAlertBackup = false
         this.confirmAlertUpload = false
         this.fetchData()
-        assignAlert(true, 'Sukses', 'success', `Berhasil mengubah data user`)
+        assignAlert(true, 'Sukses', 'success', `Berhasil Membackup Data `)
       } catch (err) {
         console.log('Error in backupDataToDB:', err)
       }

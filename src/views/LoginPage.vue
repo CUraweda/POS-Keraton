@@ -54,39 +54,41 @@ watch(loggedIn, (newValue) => {
       </div>
       <div class="login-container__data w-full">
         <div class="txtLogin">LOGIN</div>
-        <div class="login-textfield">
-          <input
-            type="text"
-            placeholder="Username"
-            class="input-field"
-            v-model="username"
-            id="username"
-            required
-            autocomplete="username"
-          />
-          <div class="password-input-container">
+        <form @submit.prevent="checkLogin">
+          <div class="login-textfield">
             <input
-              :type="passwordFieldType"
-              placeholder="Password"
+              type="text"
+              placeholder="Username"
               class="input-field"
-              v-model="password"
-              id="password"
+              v-model="username"
+              id="username"
               required
-              autocomplete="password"
+              autocomplete="username"
             />
-
-            <button @click="toggleShowPassword" class="password-toggle-btn">
-              <component
-                :is="showPasswordText === 'Hide Password' ? 'ph-eye-slash' : 'ph-eye'"
-                :size="24"
-                :color="'#545454'"
+            <div class="password-input-container">
+              <input
+                :type="passwordFieldType"
+                placeholder="Password"
+                class="input-field"
+                v-model="password"
+                id="password"
+                required
+                autocomplete="password"
               />
-            </button>
+
+              <button @click="toggleShowPassword" class="password-toggle-btn">
+                <component
+                  :is="showPasswordText === 'Hide Password' ? 'ph-eye-slash' : 'ph-eye'"
+                  :size="24"
+                  :color="'#545454'"
+                />
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="login-button">
-          <button class="login-btn" @click="checkLogin()" @keydown.enter="checkLogin">Login</button>
-        </div>
+          <div class="login-button">
+            <button class="login-btn" type="submit">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

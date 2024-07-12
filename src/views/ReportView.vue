@@ -648,7 +648,7 @@ input {
 .report-information__container {
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: 92%;
   gap: 2rem;
 }
 

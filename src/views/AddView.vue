@@ -195,7 +195,7 @@ onUnmounted(() => {
       </div>
       <div class="add__input-ticket_subtype">
         <h6>Tipe Tiket</h6>
-        <div class="flex gap-1">
+        <div class="flex gap-1" style="flex-wrap: wrap">
           <!-- Ticket Type Dropdown -->
 
           <OrderTypeDropdown
@@ -289,10 +289,25 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.add {
+  margin-left: 8rem;
+}
+
+@media screen and (max-width: 700px) {
+  .add {
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .add {
+    flex-wrap: wrap;
+  }
+}
 .subtype__input-dropdown {
   position: relative;
   height: 2rem;
-  width: 15rem;
   border-radius: 0.5rem;
   border: 1px solid rgb(126, 126, 126);
   opacity: 0.7;
@@ -302,7 +317,6 @@ onUnmounted(() => {
 .subtype__input-dropdown.active {
   position: relative;
   height: 2rem;
-  width: 15rem;
   border-radius: 0.5rem;
   border: 1px solid black;
   opacity: 1;
@@ -311,7 +325,6 @@ onUnmounted(() => {
 
 .subtype__input-dropdown input.active,
 .ticket-type__input-dropdown input {
-  width: 100%;
   height: 100%;
   border: 0;
   border-radius: 0.5rem;
@@ -320,7 +333,6 @@ onUnmounted(() => {
   cursor: pointer;
 }
 .subtype__input-dropdown input {
-  width: 100%;
   height: 100%;
   border: 0;
   border-radius: 0.5rem;
@@ -359,11 +371,6 @@ onUnmounted(() => {
   z-index: 200;
 }
 
-.subtype__input-dropdown_menu.active,
-.ticket-type__input-dropdown_menu.active {
-  display: block;
-}
-
 .subtype__input-dropdown_menu p,
 .ticket-type__input-dropdown_menu p {
   padding: 0.3rem 0.6rem;
@@ -386,26 +393,25 @@ onUnmounted(() => {
 
 .add {
   display: flex;
-  width: 100%;
   gap: 10rem;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 /* input container */
 .add__input {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 100%;
 }
 
 /* input | title textarea */
 .title-input,
 /* input | desc textarea */
 .desc-input {
-  min-width: 320px;
   width: 100%;
   resize: none;
-  /* Disable textarea resizing */
   border: none;
   padding: 0.5rem;
   box-sizing: border-box;
@@ -473,9 +479,8 @@ textarea:focus {
 
 /* preview | card container */
 .add__preview-card_container {
+  width: 100%;
   margin-top: 1rem;
-  width: calc(100% - 8rem);
-  min-width: 449px;
   height: 30rem;
   background-color: #ffffff;
   border-radius: 0.8rem;
@@ -601,48 +606,5 @@ textarea:focus {
   background-color: #d9d9d9;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-}
-
-@media screen and (max-width: 1200px) {
-  .add {
-    gap: 4rem;
-    padding-right: 1rem;
-  }
-}
-
-@media screen and (max-width: 1000px) {
-  .add {
-    gap: 2rem;
-  }
-}
-
-/* tablets */
-@media screen and (max-width: 768px) {
-  .add {
-    flex-direction: column;
-    /* Change to column layout */
-    align-items: center;
-    gap: 4rem;
-  }
-
-  .add__preview {
-    margin-top: 1rem;
-    width: 100%;
-  }
-}
-
-/* For phones */
-@media screen and (max-width: 480px) {
-  .add__preview {
-    margin-top: 1rem;
-    /* Add space between sections */
-    order: 1;
-    /* Move below the input section */
-  }
-
-  .add__input {
-    width: 100%;
-    /* Take full width */
-  }
 }
 </style>

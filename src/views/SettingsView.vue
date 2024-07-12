@@ -418,9 +418,9 @@ const confirm = () => {
           <div
             class="order-detail__guide-select-content_modal-content relative"
             :class="{ grid: guideSelectors }"
+            v-if="guideSelectors"
           >
             <div
-              v-if="guideSelectors"
               v-for="(guide, index) in guideData"
               :key="index"
               class="order-detail__guide-select-content_guide-selector flex"
