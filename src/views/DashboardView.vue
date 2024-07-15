@@ -428,7 +428,7 @@ onUnmounted(() => {
 .dashboard-add__button {
   background-color: #eeeded;
   width: 120px;
-  height: 120px;
+  height: 160px;
   color: #000000;
   border-radius: 8px;
   font-size: 15px;

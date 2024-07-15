@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
+    <div class="add__alert-confirmation_overlay" style="padding: 5px" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
         <div
           style="display: flex; align-items: center; width: 100%; justify-content: space-between"
@@ -437,12 +437,12 @@ export default {
       try {
         if (!this.jsonFile) throw Error('Please specify the JSON file')
         const formData = new FormData()
-        // formData.append('jsonFile', this.jsonFile)
-        // formData.append('rdb', this.resetDatabase)
+        formData.append('jsonFile', this.jsonFile)
+        formData.append('rdb', this.resetDatabase)
 
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
           method: 'POST',
-          body: formData.append('jsonFile', this.jsonFile),
+          body: formData,
           headers: {
             token: getCookie('token')
           }
@@ -763,6 +763,7 @@ a.browse__placeholder {
 .settings_modal-container.fee {
   width: 90%;
   height: 90%;
+  overflow-y: scroll;
   padding: 2rem;
 }
 

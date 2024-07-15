@@ -178,21 +178,24 @@ onMounted(() => {
             <div class="order-details__checkout">
               <h4>Pemesanan Langsung</h4>
               <div class="order-details__cashier flex fd-col">
-                <div class="order-details__content w-full flex gap[0.5]">
+                <div class="order-details__content w-full gap[0.5]" style="flex-wrap: wrap">
                   <ph-devices :size="24" weight="bold" color="#e6be58" />
                   <p>Detail Kasir</p>
                 </div>
-                <div class="order-details__content w-full flex gap[0.5] align-items-center">
+                <div
+                  class="order-details__content w-full gap[0.5] align-items-center"
+                  style="flex-wrap: wrap"
+                >
                   <p class="fs-h5 fw-700">{{ userData.name }}</p>
                   <p>({{ userData.email }})</p>
                 </div>
               </div>
               <div class="order-details__customer">
-                <div class="order-details__content w-full flex gap[0.5]">
+                <div class="order-details__content w-full gap[0.5]" style="flex-wrap: wrap">
                   <ph-user :size="24" weight="bold" color="#e6be58" />
                   <p>Detail Pelanggan</p>
                 </div>
-                <div class="order-details__customer-input flex gap-1">
+                <div class="order-details__customer-input gap-1" style="display: flex; width: 100%">
                   <div class="customer-details__input-placeholder">
                     <input
                       type="text"
@@ -200,6 +203,7 @@ onMounted(() => {
                       rows="1"
                       v-model="custName"
                       id="name"
+                      style="width: 100%"
                       autocomplete="name"
                     />
                     <label for="name">Nama Pelanggan</label>
@@ -210,6 +214,7 @@ onMounted(() => {
                       required
                       rows="1"
                       v-model="custEmail"
+                      style="width: 100%"
                       id="email"
                       autocomplete="email"
                     />
@@ -768,12 +773,14 @@ export default {
   gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
+  padding: 1rem;
   display: flex;
 }
 
 @media screen and (max-width: 700px) {
   .checkout__container {
     margin-left: 0;
+    overflow-x: scroll;
   }
 }
 main {
@@ -829,6 +836,11 @@ main {
   position: relative;
 }
 
+@media (max-width: 768px) {
+  .customer-details__input-placeholder {
+    position: block;
+  }
+}
 .order-details__ticket-value {
   font-family: 'Manrope';
 }

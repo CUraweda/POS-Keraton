@@ -215,7 +215,7 @@ onMounted(() => {
 .invoice-search__icon {
   align-items: center;
   justify-content: center;
-  width: 50px;
+  width: 20px;
   display: flex;
 }
 .invoice-search__input-field {
