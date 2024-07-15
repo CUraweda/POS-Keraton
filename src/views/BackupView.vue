@@ -571,9 +571,10 @@ export default {
   margin-left: 8rem;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
   .container {
     margin-left: 0;
+    padding-inline: 1rem;
   }
 }
 
@@ -1131,7 +1132,7 @@ a.browse__placeholder {
   outline: 0;
   margin-top: 1rem;
   width: 100%;
-  box-shadow: 1px 5px 10px 1px #0000012c;
+  /* box-shadow: 1px 5px 10px 1px #0000012c; */
   border-radius: 0.5rem;
 
   /* border-top-left-radius: 0.5rem;

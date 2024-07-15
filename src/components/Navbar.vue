@@ -5,7 +5,6 @@ import LoginHelper from '@/utilities/LoginHelper'
 import GlobalHelper from '@/utilities/GlobalHelper'
 
 const { userData, userLogout } = LoginHelper
-
 const activeLink = ref(0)
 const router = useRouter()
 const route = useRoute()
@@ -90,12 +89,18 @@ watchEffect(() => {
       <div v-if="menuOpen" class="menu-overlay" @click="toggleMenu">
         <div class="menu" @click.stop>
           <ul>
-            <li v-if="!isCurawedaAccount"><a href="/">Dashboard</a></li>
-            <li v-if="!isCurawedaAccount"><a href="/invoice">Invoice</a></li>
+            <li v-if="!isCurawedaAccount">
+              <RouterLink to="/" :class="{ active: activeLink === 0 }">Dashboard</RouterLink>
+            </li>
+            <li v-if="!isCurawedaAccount">
+              <RouterLink to="/invoice" :class="{ active: activeLink === 1 }">Invoice</RouterLink>
+            </li>
             <li>
               <RouterLink to="/report" :class="{ active: activeLink === 2 }">Report</RouterLink>
             </li>
-            <li v-if="!isCurawedaAccount"><a href="/checkout">Checkout</a></li>
+            <li v-if="!isCurawedaAccount">
+              <RouterLink to="/checkout" :class="{ active: activeLink === 3 }">Checkout</RouterLink>
+            </li>
             <li v-if="!isCurawedaAccount">
               <a
                 @click="toSettings()"
