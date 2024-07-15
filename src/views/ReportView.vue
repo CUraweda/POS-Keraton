@@ -648,13 +648,52 @@ input {
 .report-information__container {
   display: flex;
   flex-direction: column;
-  width: 92%;
+  width: 68%;
   gap: 2rem;
 }
-
-@media (min-width: 1866px) {
+@media (max-width: 1800px) {
   .report-information__container {
-    width: 63%;
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+@media (max-width: 1550px) {
+  .report-information__container {
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+@media (max-width: 1350px) {
+  .report-information__container {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+@media (max-width: 1099px) {
+  .report-information__container {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+@media (max-width: 924px) {
+  .report-information__container {
+    width: 78%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+@media (max-width: 800px) {
+  .report-information__container {
+    width: 90%;
     display: flex;
     flex-direction: column;
     gap: 2rem;

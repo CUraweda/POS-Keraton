@@ -86,7 +86,7 @@ watchEffect(() => {
   <div>
     <nav class="mobile-navbar">
       <button @click="toggleMenu" class="menu-button">☰</button>
-      <div v-if="menuOpen" class="menu-overlay" @click="toggleMenu">
+      <div v-if="menuOpen" class="menu-overlay" @click.self="toggleMenu">
         <div class="menu" @click.stop>
           <ul>
             <li v-if="!isCurawedaAccount">
