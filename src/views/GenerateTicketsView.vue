@@ -508,6 +508,13 @@ onMounted(() => {
                   </div>
                   <div style="width: 100%; margin: auto">
                     <h5 style="font-size: 10px">www.KeratonKesepuhanCirebon.com</h5>
+                    <h5 style="font-size: 10px">
+                      *Tiket yang sudah dibeli tidak dapat ditukar atau dikembalikan<br />Berlaku
+                      hanya pada tanggal yang tertera pada tiket ini
+                    </h5>
+                    <h5>
+                      *Any purchashed ticket cannot that be returned or refund.</br> Valid only on the date stated on this ticket 
+                    </h5>
                   </div>
                 </div>
               </section>

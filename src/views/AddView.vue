@@ -221,6 +221,7 @@ onUnmounted(() => {
             </div>
             <div
               class="ticket-type__input-dropdown_menu"
+              :style="{ display: isSubtypeDropdownOpen ? 'block' : 'none' }"
               :class="{ active: isSubtypeDropdownOpen }"
             >
               <p
