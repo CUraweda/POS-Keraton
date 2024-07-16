@@ -292,6 +292,7 @@ onUnmounted(() => {
 <style scoped>
 .add {
   margin-left: 8rem;
+  padding: 1rem;
 }
 
 @media screen and (max-width: 700px) {

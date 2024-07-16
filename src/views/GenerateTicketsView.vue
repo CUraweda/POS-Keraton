@@ -513,7 +513,8 @@ onMounted(() => {
                       hanya pada tanggal yang tertera pada tiket ini
                     </h5>
                     <h5>
-                      *Any purchashed ticket cannot that be returned or refund.</br> Valid only on the date stated on this ticket 
+                      *Any purchashed ticket cannot that be returned or refund. <br />
+                      Valid only on the date stated on this ticket
                     </h5>
                   </div>
                 </div>
