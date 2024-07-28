@@ -62,6 +62,7 @@ const checkData = async () => {
     selectedYear.value = currentYear
     selectedMonth.value = currentMonth
     setMonthLocaleString()
+    await fetchTableDataReport({})
     await fetchYearlyChartData()
     await fetchOrderInfoCardData()
     await fetchMonthlyChartData()
@@ -71,8 +72,9 @@ const checkData = async () => {
   }
 }
 
-const startDate = ref('')
-const endDate = ref('')
+const startDate = ref()
+const endDate = ref()
+const tableDataFilter = ref({})
 const isLoadingKeramaian = ref(false)
 const isLoading = ref(false)
 const inputValue = ref('')
@@ -125,21 +127,21 @@ const selectMonthOption = (month) => {
 //   try {
 //     const canvas = await html2canvas(element)
 //     canvas.toBlob((blob) => {
-//       const url = URL.createObjectURL(blob)
-//       const a = document.createElement('a')
-//       a.href = url
-//       a.download = `Report Tahun ${selectedYear.value} Bulan ${selectedMonthName.value}.png`
+  //       const url = URL.createObjectURL(blob)
+  //       const a = document.createElement('a')
+  //       a.href = url
+  //       a.download = `Report Tahun ${selectedYear.value} Bulan ${selectedMonthName.value}.png`
 //       document.body.appendChild(a)
 //       a.click()
 //       window.URL.revokeObjectURL(url)
 //       console.log('Screenshot saved as image file!')
 //     }, 'image/png')
 //   } catch (error) {
-//     console.error('Error saving screenshot as image file:', error)
-//   }
-// }
-const incomeRevenueClass = () => {
-  const length = incomeRevenue.value.toString().length
+  //     console.error('Error saving screenshot as image file:', error)
+  //   }
+  // }
+  const incomeRevenueClass = () => {
+    const length = incomeRevenue.value.toString().length
   if (length > 18) {
     return 'fs-h5'
   } else if (length > 15) {
@@ -156,6 +158,14 @@ watch(
   (newVal) => {
     filterDate.value = newVal
     fetchTableDataReport()
+  },
+  () => startDate.value, (newVal) => {
+    tableDataFilter['startDate'] = newVal
+    fetchTableDataReport()
+  },
+  () => endDate.value, (newVal) => {
+    tableDataFilter['endDate'] = newVal
+    fetchTableDataReport()
   }
 )
 
@@ -165,6 +175,7 @@ onUnmounted(() => {
 
 onMounted(() => {
   checkData()
+  fetchTableDataReport()
   window.addEventListener('click', closeDropdownOnClickOutside)
   setMonthLocaleString()
 })
@@ -206,16 +217,18 @@ const filterData = () => {
   fetchTableDataReport({ startDate: startDate.value, endDate: endDate.value })
 }
 
-onMounted(() => {
-  fetchTableDataReport()
-})
 // watch([startDate, endDate], ([newStartDate, newEndDate]) => {
-//   fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
+  //   fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
 // })
-
-watch(filterDate, (newFilterDate) => {
-  fetchTableDataReport({ filterDate: newFilterDate })
+watch(startDate, (newFilterDate) => {
+  tableDataFilter.value['startDate'] = newFilterDate
+  fetchTableDataReport(tableDataFilter.value)
 })
+watch(endDate, (newFilterDate) => {
+  tableDataFilter.value['endDate'] = newFilterDate
+  fetchTableDataReport(tableDataFilter.value)
+})
+
 </script>
 
 <template>

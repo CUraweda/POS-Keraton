@@ -125,7 +125,6 @@ const generateExcel = async () => {
     for (let ticketData of Object.values(ticketsSoldment)) {
       ticketSheetData.push(Object.values(ticketData))
     }
-    console.log(ticketSheetData)
     const ticketSheets = XLSX.utils.aoa_to_sheet(ticketSheetData)
     const ticketColWidth = ticketSheetData[0].map((_, colIndex) => {
       const colValues = ticketSheetData.map(row => row[colIndex] ? row[colIndex].toString() : '');
@@ -137,6 +136,8 @@ const generateExcel = async () => {
 
 
     // SUMMARY SHEET
+
+    console.log(monthlyData)
     let yearlyTempData = yearlyData.value
     let monthlyTempData = monthlyData.value
     const summaryTableData = [
@@ -361,22 +362,21 @@ const updateCategory = (value) => {
   fetchTableDataReport()
 }
 
-const fetchTableDataReport = async ({ startDate, endDate, filterDate }) => {
+const fetchTableDataReport = async ( filter = { startDate, endDate }) => {
   try {
+    console.log(filter)
     let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`
-
-    if (category.value && category.value !== '') {
-      url += `category=${encodeURIComponent(category.value)}`
+    if (category.value && category.value !== '') url += `&category=${encodeURIComponent(category.value)}&`
+    if(filter.startDate){
+      filter.startDate = filter.startDate.split('T')[0]
+      url += `startDate=${filter.startDate}&`
     }
-
-    if (filterDate) {
-      url += `date=${filterDate}`
-    }
-
+    if(filter.endDate){
+      filter.endDate = filter.endDate.split('T')[0]
+      url += `&endDate=${filter.endDate}&`
+    } 
     const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error('Failed to fetch data Report')
-    }
+    if (!response.ok)  throw new Error('Failed to fetch data Report')
 
     const res = await response.json()
     if (res.data) {

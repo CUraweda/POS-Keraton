@@ -100,6 +100,7 @@ onMounted(() => {
         <thead>
           <tr class="invoice-table__row-header">
             <th class="invoice-table__header">No.</th>
+            <th class="invoice-table__header">UID</th>
             <th class="invoice-table__header">Nama</th>
             <th class="invoice-table__header">Pembelian</th>
             <th class="invoice-table__header">Tanggal</th>
@@ -111,6 +112,7 @@ onMounted(() => {
           <template v-for="(item, indexItem) in dataInvoice" :key="indexItem">
             <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
               <td class="invoice-table__data">{{ indexItem + 1 }}</td>
+              <td class="invoice-table__data">{{ item.id }}</td>
               <td class="invoice-table__data">
                 {{ item.customer ? item.customer.name : item.user.name }}
               </td>
