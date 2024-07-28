@@ -209,13 +209,13 @@ const filterData = () => {
 onMounted(() => {
   fetchTableDataReport()
 })
-// watch([startDate, endDate], ([newStartDate, newEndDate]) => {
-//   fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
-// })
-
-watch(filterDate, (newFilterDate) => {
-  fetchTableDataReport({ filterDate: newFilterDate })
+watch([startDate, endDate], ([newStartDate, newEndDate]) => {
+  fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
 })
+
+// watch(filterDate, (newFilterDate) => {
+//   fetchTableDataReport({ filterDate: newFilterDate })
+// })
 </script>
 
 <template>
@@ -432,10 +432,10 @@ watch(filterDate, (newFilterDate) => {
           "
         >
           <div style="display: flex; width: 100%; flex-wrap: wrap; align-items: center; gap: 10px">
-            <form @submit.prevent="filterData">
+            <!-- <form @submit.prevent="filterData">
               <label for="filterDate" style="margin-inline: 10px">Select Date:</label>
               <input type="date" v-model="filterDate" id="filterDate" style="width: 10rem" />
-            </form>
+            </form> -->
 
             <CategoryDropdown :categoryWidth="'280px'" @option-selected="updateCategory" />
             <form
@@ -818,17 +818,29 @@ input {
 }
 
 @media (min-width: 1087px) {
+  .fs-display {
+    font-size: 50px;
+  }
+}
+
+@media (min-width: 1080px) and (max-width: 2199px) {
   .report-information__container {
     flex-direction: row;
     justify-content: space-between;
   }
-
-  .report-information__income-container,
-  .report-information__ticketing-container {
-    /* width: 50%; */
+}
+@media (min-width: 2200px) and (max-width: 3460px) {
+  .report-information__container {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 78%;
   }
-  .fs-display {
-    font-size: 50px;
+}
+@media (min-width: 3461px) {
+  .report-information__container {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 52%;
   }
 }
 @media (max-width: 704px) {

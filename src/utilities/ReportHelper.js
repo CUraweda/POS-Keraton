@@ -365,6 +365,10 @@ const fetchTableDataReport = async ({ startDate, endDate, filterDate }) => {
   try {
     let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`
 
+    if (startDate && endDate) {
+      url += `startdate=${startDate}&enddate=${endDate}`
+    }
+
     if (category.value && category.value !== '') {
       url += `category=${encodeURIComponent(category.value)}`
     }
