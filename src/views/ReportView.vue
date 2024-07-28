@@ -445,10 +445,10 @@ watch(endDate, (newFilterDate) => {
           "
         >
           <div style="display: flex; width: 100%; flex-wrap: wrap; align-items: center; gap: 10px">
-            <form @submit.prevent="filterData">
+            <!-- <form @submit.prevent="filterData">
               <label for="filterDate" style="margin-inline: 10px">Select Date:</label>
               <input type="date" v-model="filterDate" id="filterDate" style="width: 10rem" />
-            </form>
+            </form> -->
 
             <CategoryDropdown :categoryWidth="'280px'" @option-selected="updateCategory" />
             <form
@@ -831,17 +831,30 @@ input {
 }
 
 @media (min-width: 1087px) {
+  .fs-display {
+    font-size: 50px;
+  }
+}
+
+@media (min-width: 1080px) and (max-width: 1900px) {
   .report-information__container {
     flex-direction: row;
     justify-content: space-between;
   }
+}
 
-  .report-information__income-container,
-  .report-information__ticketing-container {
-    /* width: 50%; */
+@media (min-width: 1900px) and (max-width: 2500px) {
+  .report-information__container {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 109rem;
   }
-  .fs-display {
-    font-size: 50px;
+}
+@media (min-width: 2500px) {
+  .report-information__container {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 109rem;
   }
 }
 @media (max-width: 704px) {
