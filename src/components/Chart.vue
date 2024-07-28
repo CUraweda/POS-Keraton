@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-
+const today = new Date()
+const todayDay = today.getDate()
 const { targetDate, dataSeries, dataCategory, widthcart } = defineProps([
   'targetDate',
   'dataSeries',
@@ -27,13 +28,15 @@ const chartOptions = ref({
       enabled: true,
       type: 'x'
     },
-    width: 460,
+    width: '100%', // Sesuaikan dengan lebar kontainer
+    height: 'auto', // Sesuaikan dengan tinggi kontainer
     events: {
       beforeResetZoom: (chartContext, opts) => {
         return {
           xaxis: {
             min: dataCategory.length - 13,
-            max: dataCategory.length
+            // max: dataCategory.length
+            max: todayDay
           }
         }
       },
@@ -45,6 +48,12 @@ const chartOptions = ref({
           }
         }
       }
+    },
+    padding: {
+      left: 10,
+      right: 10,
+      top: 10,
+      bottom: 10
     }
   },
   dataLabels: {
@@ -69,13 +78,17 @@ const chartOptions = ref({
       color: '#000000',
       height: 1,
       maxWidth: 10,
-      offsetX: 0
+      offsetX: 0,
+      style: {
+        spacing: 100000
+      }
     },
     tooltip: {
       enabled: false
     },
     min: 1,
-    max: 13
+    // max: 31
+    max: todayDay
   },
   yaxis: {
     axisBorder: {
@@ -101,7 +114,25 @@ const chartOptions = ref({
   },
   legend: {
     show: false
-  }
+  },
+  responsive: [
+    {
+      breakpoint: 1000, // Sesuaikan dengan breakpoint yang diinginkan
+      options: {
+        chart: {
+          width: '100%'
+        }
+      }
+    },
+    {
+      breakpoint: 600,
+      options: {
+        chart: {
+          width: '100%'
+        }
+      }
+    }
+  ]
 })
 
 watch(
@@ -135,72 +166,40 @@ watch(
       </div>
     </div>
     <div id="chart" class="revenue-details__chart-container" style="width: 100%">
-      <apexchart type="line" height="240" :options="chartOptions" :series="dataSeries"></apexchart>
+      <apexchart
+        type="line"
+        height="340"
+        width="800"
+        :options="chartOptions"
+        :series="dataSeries"
+      ></apexchart>
     </div>
   </div>
 </template>
 
 <style>
 .revenue-details {
-  width: 565px;
-  padding: 1rem;
+  width: fit-content;
+  padding: 2rem;
   border-radius: 20px;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
   overflow-x: auto; /* Tambahkan overflow agar dapat digulir */
 }
-
-@media (min-width: 1500px) {
+@media screen and (max-width: 1000px) {
   .revenue-details {
-    width: 565px;
-  }
-}
-@media (max-width: 1400px) {
-  .revenue-details {
-    width: 535px;
+    width: 560px;
   }
 }
 
-@media (max-width: 1250px) {
+@media screen and (max-width: 700px) {
   .revenue-details {
-    width: 499px;
-  }
-}
-@media (max-width: 1200px) {
-  .revenue-details {
-    width: 665px;
+    width: 450px;
   }
 }
 
-@media (max-width: 924px) {
+@media screen and (max-width: 500px) {
   .revenue-details {
-    width: 720px;
-  }
-}
-@media (max-width: 900px) {
-  .revenue-details {
-    width: 665px;
-  }
-}
-@media (max-width: 828px) {
-  .revenue-details {
-    width: 565px;
-  }
-}
-
-@media (max-width: 724px) {
-  .revenue-details {
-    width: 590px;
-  }
-}
-
-@media (max-width: 724px) {
-  .revenue-details {
-    width: 510px;
-  }
-}
-@media (max-width: 624px) {
-  .revenue-details {
-    width: 100%;
+    width: 85%;
   }
 }
 

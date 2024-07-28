@@ -361,19 +361,27 @@ const updateCategory = (value) => {
   fetchTableDataReport()
 }
 
-const fetchTableDataReport = async () => {
+const fetchTableDataReport = async ({ startDate, endDate, filterDate }) => {
   try {
     let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`
+
     if (category.value && category.value !== '') {
       url += `category=${encodeURIComponent(category.value)}`
     }
-    if (filterDate.value) url += `date=${filterDate.value}`
+
+    if (filterDate) {
+      url += `date=${filterDate}`
+    }
+
     const response = await fetch(url)
     if (!response.ok) {
       throw new Error('Failed to fetch data Report')
     }
+
     const res = await response.json()
-    if (res.data) activityReportData.value = res.data
+    if (res.data) {
+      activityReportData.value = res.data
+    }
   } catch (error) {
     console.error('Error fetching data Report:', error)
   }
@@ -399,8 +407,25 @@ const fetchOrderInfoCardData = async () => {
     console.error('Error fetching data:', error)
   }
 }
+const exportToExcel = () => {
+  const data = activityReportData.value.map((item, index) => ({
+    No: index + 1,
+    Pembelian: item.order ? item.order.name : item.event.name,
+    Kategori: item.order ? item.order.category.name : 'Event',
+    Tanggal: item.transaction.plannedDate,
+    Jumlah: item.amount,
+    Total: (item.order ? item.order.price : item.event.price) * item.amount,
+  }))
+
+  const ws = XLSX.utils.json_to_sheet(data)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Report')
+
+  XLSX.writeFile(wb, 'Report.xlsx')
+}
 
 export default {
+  exportToExcel,
   incomeRevenue,
   fetchIncomeRevenue,
   generateExcel,

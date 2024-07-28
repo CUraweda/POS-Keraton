@@ -1,37 +1,23 @@
-<script setup>
-import 'swiper/swiper-bundle.css'
-import { onMounted, ref } from 'vue'
-import { Virtual, Navigation, Pagination } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import ReportHelper from '@/utilities/ReportHelper'
-import GlobalHelper from '@/utilities/GlobalHelper'
-
-// const getSlidesView = () => {
-//   const length = orderInfoCardData.value.length
-//   if (length > 3) return 3
-//   else return length
-// }
-</script>
-
 <template>
-  <Swiper
-    :modules="[Virtual, Pagination, Navigation]"
-    :space-between="10"
-    :slides-per-view="cardLength"
-    pagination
-    navigation
-    virtual
-  >
-    <SwiperSlide v-for="(item, index) in infoCardDatas" :key="index">
-      <div class="ticket-info-card__container flex fd-col pd-1" v-if="statusTransaksi">
-        <p class="ticket-info-card__title">{{ item.name }}</p>
-        <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
-        <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
-      </div>
+  <div>
+    <div class="ticket-info-card__wrapper" ref="cardWrapper">
+      <div v-for="(item, index) in infoCardDatas" :key="index">
+        <button @click="scrollLeft">
+          <span class="material-symbols-outlined"> arrow_back_ios </span>
+        </button>
+        <div class="ticket-info-card__container fd-col pd-1" v-if="statusTransaksi">
+          <p class="ticket-info-card__title">{{ item.name }}</p>
+          <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
+          <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
+          <button @click="scrollRight">
+            <span class="material-symbols-outlined"> arrow_forward_ios </span>
+          </button>
+        </div>
 
-      <div v-else>Tidak Ada Transaksi</div>
-    </SwiperSlide>
-  </Swiper>
+        <div v-else>Tidak Ada Transaksi</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -69,7 +55,7 @@ export default {
     formatToInfoCard(datas) {
       let infoCardData = {}
       for (let data of datas) {
-        const categoryName = data.order ? data.order.category.name : "Event"
+        const categoryName = data.order ? data.order.category.name : 'Event'
         if (!infoCardData[categoryName])
           infoCardData[categoryName] = {
             name: categoryName,
@@ -81,6 +67,12 @@ export default {
     },
     handleCard() {
       this.statusTransaksi = this.infoCardDatas.length > 0
+    },
+    scrollLeft() {
+      this.$refs.cardWrapper.scrollLeft -= 250 // Sesuaikan nilai dengan lebar card
+    },
+    scrollRight() {
+      this.$refs.cardWrapper.scrollLeft += 250 // Sesuaikan nilai dengan lebar card
     }
   }
 }
@@ -91,13 +83,52 @@ p,
 span {
   cursor: default;
 }
+/* .ticket-info-card__wrapper {
+  display: flex;
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  width: 250px;
+} */
 
+.ticket-info-card__wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ticket-info-card__wrapper::-webkit-scrollbar-track {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
 .ticket-info-card__container {
+  margin: 10px;
+  padding-inline: 20px;
+  width: 220px;
   height: 186px;
+  display: flex;
   background: linear-gradient(to bottom, rgba(255, 226, 154, 0.9), rgba(254, 209, 96, 0.9));
   border-radius: 15px;
 }
 
+@media screen and (max-width: 1087px) {
+  .ticket-info-card__wrapper {
+    display: block;
+    overflow-x: unset;
+  }
+  .ticket-info-card__container {
+    display: block;
+    text-align: center;
+    width: 100%;
+    margin: 0 0 10px 0;
+  }
+}
+
+@media screen and (min-width: 1087px) {
+  .ticket-info-card__wrapper {
+    width: 480px;
+    display: flex;
+    overflow-x: scroll;
+    -ms-overflow-style: none;
+  }
+}
 .ticket-info-card__title {
   font-size: 12px;
   line-height: 18px;

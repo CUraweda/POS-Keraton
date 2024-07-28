@@ -48,7 +48,8 @@ const {
   generateExcel,
   printData,
   updateCategory,
-  totalSum
+  totalSum,
+  exportToExcel
 } = ReportHelper
 
 const checkData = async () => {
@@ -70,6 +71,8 @@ const checkData = async () => {
   }
 }
 
+const startDate = ref('')
+const endDate = ref('')
 const isLoadingKeramaian = ref(false)
 const isLoading = ref(false)
 const inputValue = ref('')
@@ -198,6 +201,21 @@ const submitOrder = () => {
   confirmAlert.value = false
   transfer()
 }
+
+const filterData = () => {
+  fetchTableDataReport({ startDate: startDate.value, endDate: endDate.value })
+}
+
+onMounted(() => {
+  fetchTableDataReport()
+})
+// watch([startDate, endDate], ([newStartDate, newEndDate]) => {
+//   fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
+// })
+
+watch(filterDate, (newFilterDate) => {
+  fetchTableDataReport({ filterDate: newFilterDate })
+})
 </script>
 
 <template>
@@ -286,7 +304,7 @@ const submitOrder = () => {
       </div>
       <div class="report-information__ticketing-container w-half flex fd-col gap[0.5] pd-2">
         <h5>Tiket terjual</h5>
-        <div class="report-information__ticketing-card flex fd-row gap[1.5] pd-left-1">
+        <div class="report-information__ticketing-card">
           <TicketInfoCard />
         </div>
       </div>
@@ -404,15 +422,63 @@ const submitOrder = () => {
       <div class="report-activity__head fd-row gap[1.5] align-items-center">
         <p class="report-activity__head-text">Aktivitas Terbaru</p>
         <div
-          class="report-activity__head-dropdown-container"
-          style="display: flex; align-items: center; gap: 1rem"
+          style="
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+          "
         >
-          <input type="date" v-model="filterDate" style="width: 10rem" />
-          <CategoryDropdown :categoryWidth="'280px'" @option-selected="updateCategory" />
+          <div style="display: flex; width: 100%; flex-wrap: wrap; align-items: center; gap: 10px">
+            <form @submit.prevent="filterData">
+              <label for="filterDate" style="margin-inline: 10px">Select Date:</label>
+              <input type="date" v-model="filterDate" id="filterDate" style="width: 10rem" />
+            </form>
+
+            <CategoryDropdown :categoryWidth="'280px'" @option-selected="updateCategory" />
+            <form
+              @submit.prevent="filterData"
+              style="
+                gap: 10px;
+                display: flex-wrap;
+                flex-wrap: wrap;
+                text-align: center;
+                align-items: center;
+              "
+            >
+              <label for="startDate" style="margin-inline: 10px">Start Date:</label>
+              <input type="date" v-model="startDate" id="startDate" />
+
+              <label for="endDate" style="margin-inline: 10px">End Date:</label>
+              <input type="date" v-model="endDate" id="endDate" />
+
+              <button
+                type="submit"
+                style="
+                  background-color: var(--color-primary);
+                  height: fit-content;
+                  border-radius: 5px;
+                  padding: 8px;
+                  font-weight: 600;
+                  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.062);
+                  margin-inline: 10px;
+                "
+              >
+                Filter
+              </button>
+            </form>
+          </div>
+          <div>
+            <span class="icons" name="Export to Excel" @click="exportToExcel">
+              <ph-microsoft-excel-logo :size="32" weight="fill" fill="green" />
+            </span>
+          </div>
         </div>
-      </div>
-      <div class="report-activity__table-container">
-        <TableReport />
+        <div class="report-activity__table-container">
+          <TableReport :data="activityReportData" />
+        </div>
       </div>
     </div>
   </div>
@@ -447,24 +513,6 @@ input[type='date'] {
 .detail-section {
   margin-top: 10px;
 }
-
-/* .jump-enter-active,
-.jump-leave-active {
-  transition: all 0.3s ease;
-} */
-/*
-.jump-enter-from,
-.jump-leave-to {
-  transform: translateY(-10px);
-  opacity: 0;
- }
-
-.jump-enter-to,
-.jump-leave-from {
-  transform: translateY(0);
-  opacity: 1;
-}
-*/
 
 .report-information__income-revenue,
 .report-information__ticket-sold,
@@ -648,56 +696,8 @@ input {
 .report-information__container {
   display: flex;
   flex-direction: column;
-  width: 68%;
+  width: fit-content;
   gap: 2rem;
-}
-@media (max-width: 1800px) {
-  .report-information__container {
-    width: 75%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
-@media (max-width: 1550px) {
-  .report-information__container {
-    width: 85%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
-@media (max-width: 1350px) {
-  .report-information__container {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
-@media (max-width: 1099px) {
-  .report-information__container {
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
-@media (max-width: 924px) {
-  .report-information__container {
-    width: 78%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
-@media (max-width: 800px) {
-  .report-information__container {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
 }
 
 .report-information__income-container,
@@ -721,19 +721,6 @@ input {
   align-items: center;
 }
 
-.report-revenue__chart-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-@media (min-width: 1200px) {
-  .report-revenue__chart-container {
-    flex-direction: row;
-    justify-content: center;
-    margin-left: 0px;
-  }
-}
 .report-activity__container {
   width: 90%;
   display: flex;
@@ -741,14 +728,11 @@ input {
   gap: 1rem;
 }
 
-@media (max-width: 970px) {
-  .report-revenue__chart-container {
-    margin: 20px;
-  }
-
-  .report-activity__container {
-    width: 90%;
-  }
+.report-revenue__chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .report-revenue__icons {
@@ -797,19 +781,32 @@ input {
   display: block;
 }
 
-/* Responsive styles */
-/* @media (min-width: 768px) {
+@media (max-width: 1087px) {
   .report-information__container {
-    flex-direction: row;
-    justify-content: space-between;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
-
-
+}
+@media (min-width: 1900px) {
   .report-revenue__chart-container {
     flex-direction: row;
     justify-content: center;
+    margin-left: 0px;
   }
-} */
+}
+
+@media (max-width: 970px) {
+  .report-revenue__chart-container {
+    margin: 20px;
+  }
+
+  .report-activity__container {
+    width: 90%;
+  }
+}
+
 @media (min-width: 1200px) {
   .report-activity__table-container {
     width: 100%;
@@ -820,7 +817,7 @@ input {
   }
 }
 
-@media (min-width: 924px) {
+@media (min-width: 1087px) {
   .report-information__container {
     flex-direction: row;
     justify-content: space-between;
@@ -828,7 +825,7 @@ input {
 
   .report-information__income-container,
   .report-information__ticketing-container {
-    width: 50%;
+    /* width: 50%; */
   }
   .fs-display {
     font-size: 50px;
@@ -849,7 +846,6 @@ input {
   }
 }
 
-/* Tombol styling */
 .arrow-button {
   background-color: #007bff;
   border: none;
