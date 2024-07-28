@@ -823,24 +823,25 @@ input {
   }
 }
 
-@media (min-width: 1080px) and (max-width: 2199px) {
+@media (min-width: 1080px) and (max-width: 1900px) {
   .report-information__container {
     flex-direction: row;
     justify-content: space-between;
   }
 }
-@media (min-width: 2200px) and (max-width: 3460px) {
+
+@media (min-width: 1900px) and (max-width: 2500px) {
   .report-information__container {
     flex-direction: row;
     justify-content: space-between;
-    width: 78%;
+    width: 109rem;
   }
 }
-@media (min-width: 3461px) {
+@media (min-width: 2500px) {
   .report-information__container {
     flex-direction: row;
     justify-content: space-between;
-    width: 52%;
+    width: 109rem;
   }
 }
 @media (max-width: 704px) {
