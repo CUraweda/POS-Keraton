@@ -127,21 +127,21 @@ const selectMonthOption = (month) => {
 //   try {
 //     const canvas = await html2canvas(element)
 //     canvas.toBlob((blob) => {
-  //       const url = URL.createObjectURL(blob)
-  //       const a = document.createElement('a')
-  //       a.href = url
-  //       a.download = `Report Tahun ${selectedYear.value} Bulan ${selectedMonthName.value}.png`
+//       const url = URL.createObjectURL(blob)
+//       const a = document.createElement('a')
+//       a.href = url
+//       a.download = `Report Tahun ${selectedYear.value} Bulan ${selectedMonthName.value}.png`
 //       document.body.appendChild(a)
 //       a.click()
 //       window.URL.revokeObjectURL(url)
 //       console.log('Screenshot saved as image file!')
 //     }, 'image/png')
 //   } catch (error) {
-  //     console.error('Error saving screenshot as image file:', error)
-  //   }
-  // }
-  const incomeRevenueClass = () => {
-    const length = incomeRevenue.value.toString().length
+//     console.error('Error saving screenshot as image file:', error)
+//   }
+// }
+const incomeRevenueClass = () => {
+  const length = incomeRevenue.value.toString().length
   if (length > 18) {
     return 'fs-h5'
   } else if (length > 15) {
@@ -159,11 +159,13 @@ watch(
     filterDate.value = newVal
     fetchTableDataReport()
   },
-  () => startDate.value, (newVal) => {
+  () => startDate.value,
+  (newVal) => {
     tableDataFilter['startDate'] = newVal
     fetchTableDataReport()
   },
-  () => endDate.value, (newVal) => {
+  () => endDate.value,
+  (newVal) => {
     tableDataFilter['endDate'] = newVal
     fetchTableDataReport()
   }
@@ -218,7 +220,7 @@ const filterData = () => {
 }
 
 // watch([startDate, endDate], ([newStartDate, newEndDate]) => {
-  //   fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
+//   fetchTableDataReport({ startDate: newStartDate, endDate: newEndDate })
 // })
 watch(startDate, (newFilterDate) => {
   tableDataFilter.value['startDate'] = newFilterDate
@@ -228,7 +230,6 @@ watch(endDate, (newFilterDate) => {
   tableDataFilter.value['endDate'] = newFilterDate
   fetchTableDataReport(tableDataFilter.value)
 })
-
 </script>
 
 <template>
@@ -344,11 +345,11 @@ watch(endDate, (newFilterDate) => {
               placeholder="Pilih Tahun"
               id="filter-year"
             />
-            <div class="select-icon">
+            <!-- <div class="select-icon">
               <div class="arrow-icon" :class="{ active: yearDropdownOpen }">
                 <ph-caret-down :size="14" weight="bold" class="icon" />
               </div>
-            </div>
+            </div> -->
             <div class="filter__input-dropdown_menu" :class="{ active: yearDropdownOpen }">
               <p
                 v-for="(year, index) in targetYears"
@@ -377,11 +378,11 @@ watch(endDate, (newFilterDate) => {
               placeholder="Pilih Bulan"
               id="filter-month"
             />
-            <div class="select-icon">
+            <!-- <div class="select-icon">
               <div class="arrow-icon" :class="{ active: monthDropdownOpen }">
                 <ph-caret-down :size="14" weight="bold" class="icon" />
               </div>
-            </div>
+            </div> -->
             <div class="filter__input-dropdown_menu" :class="{ active: monthDropdownOpen }">
               <p
                 v-for="(month, index) in targetMonths"
@@ -467,7 +468,7 @@ watch(endDate, (newFilterDate) => {
               <label for="endDate" style="margin-inline: 10px">End Date:</label>
               <input type="date" v-model="endDate" id="endDate" />
 
-              <button
+              <!-- <button
                 type="submit"
                 style="
                   background-color: var(--color-primary);
@@ -480,7 +481,7 @@ watch(endDate, (newFilterDate) => {
                 "
               >
                 Filter
-              </button>
+              </button> -->
             </form>
           </div>
           <div>
@@ -571,7 +572,6 @@ input[type='date'] {
 }
 .filter__input-dropdown {
   height: 2rem;
-  width: 15rem;
   border-radius: 0.5rem;
   appearance: none;
   -webkit-appearance: none;
@@ -599,6 +599,8 @@ input {
 }
 .filter__input-dropdown .select-icon {
   position: absolute;
+  width: 100%;
+
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
@@ -729,7 +731,6 @@ input {
 }
 
 .report-revenue__container {
-  width: 100%;
   display: flex;
   align-items: center;
 }

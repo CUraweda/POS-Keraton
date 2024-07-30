@@ -1,52 +1,43 @@
-import { ref } from 'vue'
-import GlobalHelper from './GlobalHelper'
+import { ref, computed } from 'vue'
+import GlobalHelper from '@/utilities/GlobalHelper'
 
 const { DB_BASE_URL, TRANSACTION_BASE_URL, showLoader } = GlobalHelper
 
-/* InvoiceView Helper */
 const dataInvoice = ref([])
+const lengthdata = ref(0)
 const data = ref([])
 const listOfTaxes = ref({ cash: [], nonCash: [] })
-
+const currentPage = ref(1)
+const pageSize = ref(10)
+const totalPages = ref(0)
 const getSearchQuery = (query) => {
   getSearchQuery.value = query
 }
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return dataInvoice.value.slice(start, end)
+})
+
 
 const fetchTransactionList = async () => {
+  showLoader.value = true
   try {
-    let url = `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/detail-invoice`
-    if (searchQuery.value) {
-      url += `?search=${encodeURIComponent(searchQuery.value)}`
-    }
+    let url = `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/detail-invoice?search=${encodeURIComponent(searchQuery.value)}&limit=100000`
+    // if (searchQuery.value) {
+    //   url += `}`
+    // }
     const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error('Failed to fetch data')
-    }
+    if (!response.ok) throw new Error('Failed to fetch data')
     const res = await response.json()
     dataInvoice.value = res.data
-    showLoader.value = false
+    totalPages.value = Math.ceil(dataInvoice.value.length / pageSize.value)
   } catch (error) {
     console.error('Error fetching data:', error)
+  } finally {
+    showLoader.value = false
   }
 }
-
-// const searchList = async (search) => {
-//   let url = `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/detail-invoice`
-//   const response = await fetch(url)
-//   if (!response.ok) {
-//     throw new Error('Failed to fetch data')
-//   }
-//   const res = await response.json()
-//   data.value = res.data
-//   console.log(data.value)
-//   if (search) {
-//     data.value = res.data.filter(item => {
-//       return item.customer.name.toLowerCase().includes(search.toLowerCase());
-//     });
-//     console.log(data.value)
-//   }
-// }
-
 const fetchTaxes = async () => {
   try {
     const response = await fetch(`${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/list-tax`)
@@ -110,7 +101,7 @@ const mapInvoiceDetails = (data) => {
   return []
 }
 
-const searchQuery = ref(null)
+const searchQuery = ref("")
 console.log(searchQuery)
 const resetSearch = () => {
   searchQuery.value = ''
@@ -220,6 +211,10 @@ const deleteTransaction = async (id) => {
   }
 }
 export default {
+  currentPage,
+  pageSize,
+  paginatedData,
+  totalPages,
   dataInvoice,
   getSearchQuery,
   fetchTransactionList,

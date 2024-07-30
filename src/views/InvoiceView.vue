@@ -1,61 +1,87 @@
 <script setup>
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, watch, ref, computed } from 'vue'
+import invoiceDetail from '@/components/InvoiceDetail.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
-import InvoiceDetail from '@/components/InvoiceDetail.vue'
 import InvoiceHelper from '@/utilities/InvoiceHelper'
 import LoginHelper from '@/utilities/LoginHelper'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-
-// Akses rute saat ini
 const currentRoute = route.name
-
+const { DB_BASE_URL, TRANSACTION_BASE_URL, showLoader } = GlobalHelper
+// Destructure methods and refs from InvoiceHelper
 const {
   dataInvoice,
+  paginatedData,
   getSearchQuery,
-  data,
-  fetchTransactionList,
   searchQuery,
-  resetSearch,
+  fetchTransactionList,
   deleteTransaction,
   fetchTaxes,
   mapInvoiceOrders,
-  selectedItem,
   splitDate,
-  detailPopup,
-  showDetail
+  showDetail,
+  currentPage,
+  pageSize,
+  totalPages
 } = InvoiceHelper
 
-const { userData, userLogout } = LoginHelper
+const { userData } = LoginHelper
 
-watch(
-  () => searchQuery.value,
-  (newValue) => {
-    if (typeof newValue === 'string') {
-      searchQuery.value = newValue.toLowerCase()
-      fetchTransactionList()
-      getSearchQuery(searchQuery.value)
-      // searchList(searchQuery.value)
-    }
+// Pagination state
+
+// Watch for search query changes and fetch data
+watch(searchQuery, (newValue) => {
+  if (typeof newValue === 'string') {
+    searchQuery.value = newValue.toLowerCase()
+    fetchTransactionList({ page: currentPage.value, limit: pageSize.value })
+    getSearchQuery(searchQuery.value)
   }
-)
+})
+// Define methods for pagination
+const fetchData = async () => {
+  GlobalHelper.showLoader.value = true
+  await fetchTransactionList({ page: currentPage.value, limit: pageSize.value })
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    fetchData()
+  }
+}
+
+const nextPage = () => {
+  console.log('test')
+  if (currentPage.value < totalPages.value) {
+    console.log('test')
+
+    currentPage.value++
+    fetchData()
+    console.log('test')
+  }
+}
+
+const confirmAlert = ref(false)
 const idData = ref(null)
 const name = ref(null)
-const confirmAlert = ref(false)
+
 const confirmDelete = (data) => {
   idData.value = data.id
   name.value = data.customer.name
   confirmAlert.value = true
 }
+
 const confirm = () => {
   confirmAlert.value = false
   deleteTransaction(idData.value)
 }
+
+// Fetch data and taxes on component mount
 onMounted(() => {
-  GlobalHelper.showLoader.value = true
-  fetchTransactionList()
+  fetchData()
   fetchTaxes()
+  fetchTransactionList()
 })
 </script>
 
@@ -94,56 +120,76 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Invoice -->
-    <div class="invoice-table" style="overflow-x: auto">
-      <table>
-        <thead>
-          <tr class="invoice-table__row-header">
-            <th class="invoice-table__header">No.</th>
-            <th class="invoice-table__header">UID</th>
-            <th class="invoice-table__header">Nama</th>
-            <th class="invoice-table__header">Pembelian</th>
-            <th class="invoice-table__header">Tanggal</th>
-            <th class="invoice-table__header">Jadwal</th>
-            <th class="invoice-table__header">Email</th>
-          </tr>
-        </thead>
-        <tbody v-if="dataInvoice">
-          <template v-for="(item, indexItem) in dataInvoice" :key="indexItem">
-            <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
-              <td class="invoice-table__data">{{ indexItem + 1 }}</td>
-              <td class="invoice-table__data">{{ item.id }}</td>
-              <td class="invoice-table__data">
-                {{ item.customer ? item.customer.name : item.user.name }}
-              </td>
-              <td class="invoice-table__data">{{ mapInvoiceOrders(item) }}</td>
-              <td class="invoice-table__data">{{ splitDate(item.plannedDate)[0] }}</td>
-              <td class="invoice-table__data">{{ splitDate(item.plannedDate)[1] }}</td>
-              <td class="invoice-table__data">
-                {{ item.customer ? item.customer.email : item.user.email }} <br />
-                <div style="display: flex; gap: 10px; justify-content: center">
-                  <button class="btn-primary invoice-table__button" @click="showDetail(item)">
-                    Detail
-                  </button>
-                  <button
-                    class="btn-primary invoice-table__button"
-                    @click="confirmDelete(item)"
-                    v-if="userData.role !== 'CASHIER'"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
+    <div style="overflow-x: auto; width: 100%">
+      <div class="invoice-table" style="overflow-x: auto">
+        <table>
+          <thead>
+            <tr class="invoice-table__row-header">
+              <th class="invoice-table__header">No.</th>
+              <th class="invoice-table__header">UID</th>
+              <th class="invoice-table__header">Nama</th>
+              <th class="invoice-table__header">Pembelian</th>
+              <th class="invoice-table__header">Tanggal</th>
+              <th class="invoice-table__header">Jadwal</th>
+              <th class="invoice-table__header">Email</th>
             </tr>
-          </template>
-        </tbody>
-        <tbody v-else>
-          Data Tidak ada
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <template v-for="(item, indexItem) in paginatedData" :key="indexItem">
+              <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
+                <td class="invoice-table__data">
+                  {{ indexItem + 1 + (currentPage - 1) * pageSize }}
+                </td>
+                <td class="invoice-table__data">{{ item.id }}</td>
+                <td class="invoice-table__data">
+                  {{ item.customer ? item.customer.name : item.user.name }}
+                </td>
+                <td class="invoice-table__data">{{ mapInvoiceOrders(item) }}</td>
+                <td class="invoice-table__data">{{ splitDate(item.plannedDate)[0] }}</td>
+                <td class="invoice-table__data">{{ splitDate(item.plannedDate)[1] }}</td>
+                <td class="invoice-table__data">
+                  {{ item.customer ? item.customer.email : item.user.email }} <br />
+                  <div style="display: flex; gap: 10px; justify-content: center">
+                    <button class="btn-primary invoice-table__button" @click="showDetail(item)">
+                      Detail
+                    </button>
+                    <button
+                      class="btn-primary invoice-table__button"
+                      @click="confirmDelete(item)"
+                      v-if="userData.role !== 'CASHIER'"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+          <!-- <tbody v-else>
+            <tr>
+              <td colspan="7">Data Tidak ada</td>
+            </tr>
+          </tbody> -->
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-controls">
+        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+      </div>
+
+      <!-- Confirm Delete Dialog -->
+      <div v-if="confirmAlert" class="confirm-dialog">
+        <p>Are you sure you want to delete {{ name }}?</p>
+        <button @click="confirm">Yes</button>
+        <button @click="confirmAlert = false">No</button>
+      </div>
     </div>
   </div>
-  <InvoiceDetail :selectedItem="selectedItem" ref="detailPopup" />
+
+  <invoiceDetail :selectedItem="selectedItem" ref="detailPopup" />
 </template>
 
 <style scoped>

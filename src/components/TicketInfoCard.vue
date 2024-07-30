@@ -1,21 +1,29 @@
 <template>
   <div>
-    <div class="ticket-info-card__wrapper" ref="cardWrapper">
-      <div v-for="(item, index) in infoCardDatas" :key="index">
-        <button @click="scrollLeft">
-          <span class="material-symbols-outlined"> arrow_back_ios </span>
-        </button>
-        <div class="ticket-info-card__container fd-col pd-1" v-if="statusTransaksi">
-          <p class="ticket-info-card__title">{{ item.name }}</p>
-          <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
-          <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
-          <button @click="scrollRight">
-            <span class="material-symbols-outlined"> arrow_forward_ios </span>
-          </button>
+    <div class="ticket-info-card">
+      <button @click="scrollLeft" class="scroll-left">
+        <span class="material-symbols-outlined"> arrow_back_ios </span>
+      </button>
+      <div
+        class="ticket-info-card__wrapper"
+        ref="cardWrapper"
+        style="position: relative; overflow-x: scroll; padding-inline: auto"
+      >
+        <div v-for="(item, index) in infoCardDatas" :key="index">
+          <div
+            class="ticket-info-card__container fd-col pd-1"
+            v-if="statusTransaksi || infoCardDatas.length > 0"
+          >
+            <p class="ticket-info-card__title">{{ item.name }}</p>
+            <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
+            <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
+          </div>
+          <div v-else>Tidak Ada Transaksi</div>
         </div>
-
-        <div v-else>Tidak Ada Transaksi</div>
       </div>
+      <button @click="scrollRight" class="scroll-right">
+        <span class="material-symbols-outlined"> arrow_forward_ios </span>
+      </button>
     </div>
   </div>
 </template>
@@ -31,7 +39,7 @@ export default {
     return {
       infoCardDatas: [],
       cardLength: 0,
-      statusTransaksi: false
+      statusTransaksi: ref(false)
     }
   },
   mounted() {
@@ -107,8 +115,29 @@ span {
   background: linear-gradient(to bottom, rgba(255, 226, 154, 0.9), rgba(254, 209, 96, 0.9));
   border-radius: 15px;
 }
-
+.scroll-left {
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  cursor: pointer;
+}
+.scroll-right {
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  cursor: pointer;
+}
 @media screen and (max-width: 1087px) {
+  .ticket-info-card {
+    display: block;
+  }
+  .scroll-left {
+    display: none;
+  }
+
+  .scroll-right {
+    display: none;
+  }
   .ticket-info-card__wrapper {
     display: block;
     overflow-x: unset;
@@ -121,9 +150,25 @@ span {
   }
 }
 
-@media screen and (min-width: 1087px) {
+@media screen and (min-width: 1900px) {
+  .ticket-info-card {
+    display: flex;
+  }
   .ticket-info-card__wrapper {
-    width: 480px;
+    padding-inline: auto;
+    width: 45rem;
+    display: flex;
+    overflow-x: scroll;
+    -ms-overflow-style: none;
+  }
+}
+
+@media (min-width: 1087px) and (max-width: 1899px) {
+  .ticket-info-card {
+    display: flex;
+  }
+  .ticket-info-card__wrapper {
+    width: 30rem;
     display: flex;
     overflow-x: scroll;
     -ms-overflow-style: none;

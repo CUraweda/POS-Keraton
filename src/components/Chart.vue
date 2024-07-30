@@ -28,8 +28,8 @@ const chartOptions = ref({
       enabled: true,
       type: 'x'
     },
-    width: '100%', // Sesuaikan dengan lebar kontainer
-    height: 'auto', // Sesuaikan dengan tinggi kontainer
+    width: '100%',
+    height: 'auto',
     events: {
       beforeResetZoom: (chartContext, opts) => {
         return {
@@ -88,7 +88,8 @@ const chartOptions = ref({
     },
     min: 1,
     // max: 31
-    max: todayDay
+    // max: todayDay
+    max: dataCategory.length
   },
   yaxis: {
     axisBorder: {
@@ -185,6 +186,13 @@ watch(
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
   overflow-x: auto; /* Tambahkan overflow agar dapat digulir */
 }
+
+@media (min-width: 1200px) and (max-width: 1900px) {
+  .revenue-details {
+    padding: 5rem;
+  }
+}
+
 @media screen and (max-width: 1000px) {
   .revenue-details {
     width: 560px;
