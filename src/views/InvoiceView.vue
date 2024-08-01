@@ -175,9 +175,13 @@ onMounted(() => {
 
       <!-- Pagination Controls -->
       <div class="pagination-controls">
-        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+        <button @click="prevPage" :disabled="currentPage === 1" class="btn-pagination">
+          Previous
+        </button>
         <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn-pagination">
+          Next
+        </button>
       </div>
 
       <!-- Confirm Delete Dialog -->
@@ -193,6 +197,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.btn-pagination {
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: black;
+  background-color: var(--color-primary);
+  color: rgb(69, 69, 69);
+  margin-inline: 0.5rem;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
 .add__alert-confirmation_overlay {
   position: fixed;
   top: 0;

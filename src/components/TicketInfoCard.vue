@@ -1,29 +1,29 @@
 <template>
   <div>
     <div class="ticket-info-card">
-      <button @click="scrollLeft" class="scroll-left">
-        <span class="material-symbols-outlined"> arrow_back_ios </span>
-      </button>
-      <div
-        class="ticket-info-card__wrapper"
-        ref="cardWrapper"
-        style="position: relative; overflow-x: scroll; padding-inline: auto"
-      >
-        <div v-for="(item, index) in infoCardDatas" :key="index">
-          <div
-            class="ticket-info-card__container fd-col pd-1"
-            v-if="statusTransaksi || infoCardDatas.length > 0"
-          >
-            <p class="ticket-info-card__title">{{ item.name }}</p>
-            <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
-            <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
+      <div v-if="statusTransaksi">
+        <button @click="scrollLeft" class="scroll-left">
+          <span class="material-symbols-outlined"> arrow_back_ios </span>
+        </button>
+        <div
+          v-if="statusTransaksi"
+          class="ticket-info-card__wrapper"
+          ref="cardWrapper"
+          style="position: relative; overflow-x: scroll; padding-inline: auto"
+        >
+          <div v-for="(item, index) in infoCardDatas" :key="index">
+            <div class="ticket-info-card__container fd-col pd-1">
+              <p class="ticket-info-card__title">{{ item.name }}</p>
+              <span class="ticket-info-card__details align-self-center">{{ item.sum }}</span>
+              <p class="ticket-info-card__desc align-self-f-end">/ tiket</p>
+            </div>
           </div>
-          <div v-else>Tidak Ada Transaksi</div>
         </div>
+        <button @click="scrollRight" class="scroll-right">
+          <span class="material-symbols-outlined"> arrow_forward_ios </span>
+        </button>
       </div>
-      <button @click="scrollRight" class="scroll-right">
-        <span class="material-symbols-outlined"> arrow_forward_ios </span>
-      </button>
+      <div v-else style="margin-inline: 3rem; width: 30rem">Tidak Ada Transaksi</div>
     </div>
   </div>
 </template>
@@ -55,7 +55,9 @@ export default {
         const responseData = await response.json()
         this.infoCardDatas = this.formatToInfoCard(responseData.data)
         this.cardLength = this.infoCardDatas.length
-        this.handleCard()
+
+        // this.statusTransaksi.value = this.cardLength > 0
+        handleCard()
       } catch (err) {
         console.log(err)
       }
@@ -75,6 +77,7 @@ export default {
     },
     handleCard() {
       this.statusTransaksi = this.infoCardDatas.length > 0
+      console.log(this.statusTransaksi)
     },
     scrollLeft() {
       this.$refs.cardWrapper.scrollLeft -= 250 // Sesuaikan nilai dengan lebar card
