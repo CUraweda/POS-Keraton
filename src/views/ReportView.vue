@@ -48,6 +48,7 @@ const {
   generateExcel,
   printData,
   updateCategory,
+  tableDataFilter,
   totalSum,
   exportToExcel
 } = ReportHelper
@@ -74,9 +75,9 @@ const checkData = async () => {
 
 const startDate = ref()
 const endDate = ref()
-const tableDataFilter = ref({})
 const isLoadingKeramaian = ref(false)
 const isLoading = ref(false)
+const optiondropdown = ref(null)
 const inputValue = ref('')
 const confirmAlert = ref(false)
 const router = useRouter()
@@ -154,19 +155,25 @@ const incomeRevenueClass = () => {
 }
 
 watch(
-  () => filterDate.value,
+  () => optiondropdown.value,
   (newVal) => {
-    filterDate.value = newVal
+    tableDataFilter.value['optiondropdown'] = newVal
     fetchTableDataReport()
-  },
+  }
+)
+
+watch(
   () => startDate.value,
   (newVal) => {
-    tableDataFilter['startDate'] = newVal
+    tableDataFilter.value['startDate'] = newVal
     fetchTableDataReport()
-  },
+  }
+)
+
+watch(
   () => endDate.value,
   (newVal) => {
-    tableDataFilter['endDate'] = newVal
+    tableDataFilter.value['endDate'] = newVal
     fetchTableDataReport()
   }
 )
@@ -451,7 +458,11 @@ watch(endDate, (newFilterDate) => {
               <input type="date" v-model="filterDate" id="filterDate" style="width: 10rem" />
             </form> -->
 
-            <CategoryDropdown :categoryWidth="'280px'" @option-selected="updateCategory" />
+            <CategoryDropdown
+              :categoryWidth="'280px'"
+              @option-selected="updateCategory"
+              v-model="optiondropdown"
+            />
             <form
               @submit.prevent="filterData"
               style="

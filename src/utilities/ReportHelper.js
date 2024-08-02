@@ -362,30 +362,38 @@ const updateCategory = (value) => {
   fetchTableDataReport()
 }
 
-const fetchTableDataReport = async ( filter = { startDate, endDate }) => {
-  try {
-    console.log(filter)
-    let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`
-    if (category.value && category.value !== '') url += `&category=${encodeURIComponent(category.value)}&`
-    if(filter.startDate){
-      filter.startDate = filter.startDate.split('T')[0]
-      url += `startDate=${filter.startDate}&`
-    }
-    if(filter.endDate){
-      filter.endDate = filter.endDate.split('T')[0]
-      url += `&endDate=${filter.endDate}&`
-    } 
-    const response = await fetch(url)
-    if (!response.ok)  throw new Error('Failed to fetch data Report')
+const tableDataFilter = ref({
+  startDate: null,
+  endDate: null,
+  optiondropdown: null
+})
 
-    const res = await response.json()
+const fetchTableDataReport = async (filter = tableDataFilter.value) => {
+  try {
+    console.log(filter);
+    let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`;
+    if (category.value) {
+      url += `&category=${encodeURIComponent(category.value)}&`;
+
+    } if (filter.startDate) {
+      filter.startDate = filter.startDate.split('T')[0];
+      url += `startDate=${filter.startDate}&`;
+    }
+    if (filter.endDate) {
+      filter.endDate = filter.endDate.split('T')[0];
+      url += `&endDate=${filter.endDate}&`;
+    }
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch data Report');
+
+    const res = await response.json();
     if (res.data) {
-      activityReportData.value = res.data
+      activityReportData.value = res.data;
     }
   } catch (error) {
-    console.error('Error fetching data Report:', error)
+    console.error('Error fetching data Report:', error);
   }
-}
+};
 
 /* TicketInfoCard Helper */
 const orderInfoCardData = ref([])
@@ -444,6 +452,7 @@ export default {
   targetMonths,
   monthlyCategory,
   monthlyData,
+  tableDataFilter,
   filterDate,
   changeSelectedMonth,
   fetchTargetMonths,
