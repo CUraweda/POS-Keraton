@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch, ref, computed } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 import invoiceDetail from '@/components/InvoiceDetail.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import InvoiceHelper from '@/utilities/InvoiceHelper'
@@ -9,6 +9,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const currentRoute = route.name
 const { DB_BASE_URL, TRANSACTION_BASE_URL, showLoader } = GlobalHelper
+
 // Destructure methods and refs from InvoiceHelper
 const {
   dataInvoice,
@@ -29,20 +30,28 @@ const {
 const { userData } = LoginHelper
 
 // Pagination state
+const limitOptions = [10, 20, 50, 70, 100, 'All']
+const selectedLimit = ref(limitOptions[0])
 
+const fetchData = async () => {
+  const limit = selectedLimit.value === 'All' ? 1000000 : selectedLimit.value
+  await fetchTransactionList({ page: currentPage.value, limit })
+}
 // Watch for search query changes and fetch data
 watch(searchQuery, (newValue) => {
   if (typeof newValue === 'string') {
     searchQuery.value = newValue.toLowerCase()
-    fetchTransactionList({ page: currentPage.value, limit: pageSize.value })
+    fetchTransactionList({ page: currentPage.value, limit: selectedLimit.value })
     getSearchQuery(searchQuery.value)
   }
 })
+
 // Define methods for pagination
-const fetchData = async () => {
-  GlobalHelper.showLoader.value = true
-  await fetchTransactionList({ page: currentPage.value, limit: pageSize.value })
-}
+// const fetchData = async () => {
+//   GlobalHelper.showLoader.value = true
+//   await fetchTransactionList({ page: currentPage.value, limit: selectedLimit.value })
+//   GlobalHelper.showLoader.value = false
+// }
 
 const prevPage = () => {
   if (currentPage.value > 1) {
@@ -52,13 +61,9 @@ const prevPage = () => {
 }
 
 const nextPage = () => {
-  console.log('test')
   if (currentPage.value < totalPages.value) {
-    console.log('test')
-
     currentPage.value++
     fetchData()
-    console.log('test')
   }
 }
 
@@ -77,11 +82,15 @@ const confirm = () => {
   deleteTransaction(idData.value)
 }
 
+const handleLimitChange = async (event) => {
+  selectedLimit.value = event.target.value
+  currentPage.value = 1 // Reset to first page when limit changes
+  await fetchData()
+}
+
 // Fetch data and taxes on component mount
 onMounted(() => {
   fetchData()
-  fetchTaxes()
-  fetchTransactionList()
 })
 </script>
 
@@ -89,12 +98,6 @@ onMounted(() => {
   <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
     <div class="add__alert-confirmation">
       <h5>Apakah yakin ingin menghapus invoice dengan nama {{ name }}?</h5>
-      <!-- <input
-        type="number"
-        v-model="inputValue"
-        style="border-width: 2px"
-        placeholder="Masukkan nominal..."
-      /> -->
       <div class="button-group">
         <button @click="confirmAlert = false">Cancel</button>
         <button @click="confirm()">Yes</button>
@@ -120,6 +123,23 @@ onMounted(() => {
       </div>
     </div>
 
+    <div class="report-activity__filters">
+      <label for="limit-select" class="limit-select-label">Items per page:</label>
+      <div class="dropdown-container">
+        <select
+          id="limit-select"
+          v-model="selectedLimit"
+          @change="handleLimitChange"
+          class="dropdown category__input-dropdown"
+        >
+          <option v-for="option in limitOptions" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </select>
+        <span class="dropdown-arrow">&#9662;</span>
+      </div>
+    </div>
+
     <div style="overflow-x: auto; width: 100%">
       <div class="invoice-table" style="overflow-x: auto">
         <table>
@@ -135,7 +155,7 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <template v-for="(item, indexItem) in paginatedData" :key="indexItem">
+            <template v-for="(item, indexItem) in dataInvoice" :key="indexItem">
               <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
                 <td class="invoice-table__data">
                   {{ indexItem + 1 + (currentPage - 1) * pageSize }}
@@ -165,16 +185,18 @@ onMounted(() => {
               </tr>
             </template>
           </tbody>
-          <!-- <tbody v-else>
-            <tr>
-              <td colspan="7">Data Tidak ada</td>
-            </tr>
-          </tbody> -->
         </table>
       </div>
+    </div>
 
-      <!-- Pagination Controls -->
-      <div class="pagination-controls">
+    <!-- <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div> -->
+  </div>
+  <!-- Pagination Controls -->
+  <!-- <div class="pagination-controls">
         <button @click="prevPage" :disabled="currentPage === 1" class="btn-pagination">
           Previous
         </button>
@@ -182,21 +204,87 @@ onMounted(() => {
         <button @click="nextPage" :disabled="currentPage === totalPages" class="btn-pagination">
           Next
         </button>
-      </div>
+      </div> -->
 
-      <!-- Confirm Delete Dialog -->
-      <div v-if="confirmAlert" class="confirm-dialog">
-        <p>Are you sure you want to delete {{ name }}?</p>
-        <button @click="confirm">Yes</button>
-        <button @click="confirmAlert = false">No</button>
-      </div>
-    </div>
+  <!-- <div class="report-activity__filters">
+        <label for="limit-select" class="limit-select">Items per page:</label>
+        <select
+          id="limit-select"
+          v-model="selectedLimit"
+          @change="handleLimitChange"
+          class="dropdown category__input-dropdown"
+        >
+          <option v-for="option in limitOptions" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </select>
+      </div> -->
+  <!-- Confirm Delete Dialog -->
+  <div v-if="confirmAlert" class="confirm-dialog">
+    <p>Are you sure you want to delete {{ name }}?</p>
+    <button @click="confirm">Yes</button>
+    <button @click="confirmAlert = false">No</button>
   </div>
 
   <invoiceDetail :selectedItem="selectedItem" ref="detailPopup" />
 </template>
 
 <style scoped>
+report-activity__filters {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.limit-select-label {
+  margin-right: 10px;
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 5px 30px 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding-right: 30px;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.dropdown:hover,
+.dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 18px;
+  color: #333;
+}
+
+.category__input-dropdown {
+  transition: all 0.3s ease;
+}
+
+.category__input-dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
 .btn-pagination {
   border: 0;
   padding: 0.5rem 1rem;

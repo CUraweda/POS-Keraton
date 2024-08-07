@@ -1,12 +1,11 @@
 <template>
   <div>
     <div class="ticket-info-card">
-      <div v-if="statusTransaksi">
+      <div v-if="infoCardDatas.length > 0" class="card">
         <button @click="scrollLeft" class="scroll-left">
           <span class="material-symbols-outlined"> arrow_back_ios </span>
         </button>
         <div
-          v-if="statusTransaksi"
           class="ticket-info-card__wrapper"
           ref="cardWrapper"
           style="position: relative; overflow-x: scroll; padding-inline: auto"
@@ -90,6 +89,9 @@ export default {
 </script>
 
 <style scoped>
+.card {
+  display: flex;
+}
 p,
 span {
   cursor: default;
@@ -130,6 +132,12 @@ span {
   padding: 10px;
   cursor: pointer;
 }
+@media screen and (max-width: 900px) {
+  .ticket-info-card__wrapper {
+    display: block;
+    overflow-x: unset;
+  }
+}
 @media screen and (max-width: 1087px) {
   .ticket-info-card {
     display: block;
@@ -137,13 +145,11 @@ span {
   .scroll-left {
     display: none;
   }
-
+  .card {
+    display: block;
+  }
   .scroll-right {
     display: none;
-  }
-  .ticket-info-card__wrapper {
-    display: block;
-    overflow-x: unset;
   }
   .ticket-info-card__container {
     display: block;

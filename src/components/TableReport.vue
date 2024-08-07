@@ -1,44 +1,72 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import ReportHelper from '@/utilities/ReportHelper'
 
 const { activityReportData, fetchTableDataReport, formatDate, formatCurrency } = ReportHelper
 
+const limitOptions = [10, 20, 50, 100, 'All']
+const selectedLimit = ref(limitOptions[0])
+
+const fetchTableData = async () => {
+  const limit = selectedLimit.value === 'All' ? 1000000 : selectedLimit.value
+  await fetchTableDataReport({ limit })
+}
+
 onMounted(() => {
-  fetchTableDataReport()
+  fetchTableData()
 })
+
+const handleLimitChange = async (event) => {
+  selectedLimit.value = event.target.value
+  await fetchTableData()
+}
 </script>
 
 <template>
-  <div class="report-activity__table">
-    <table class="report-activity__table-data">
-      <thead>
-        <tr class="report-activity__table-header">
-          <th>No</th>
-          <th>Pembelian</th>
-          <th>Kategori</th>
-          <th>Tanggal</th>
-          <th>Jumlah</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          class="report-activity__table-items"
-          v-for="(item, index) in activityReportData"
-          :key="index"
-        >
-          <td>{{ index + 1 }}</td>
-          <td class="to-ellipsis">{{ item.order ? item.order.name : item.event.name }}</td>
-          <td>{{ item.order ? item.order.category.name : 'Event' }}</td>
-          <td>{{ formatDate(item.transaction.plannedDate) }}</td>
-          <td>{{ item.amount }}</td>
-          <td>
-            {{ formatCurrency((item.order ? item.order.price : item.event.price) * item.amount) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="report-activity">
+    <div class="report-activity__filters">
+      <label for="limit-select" class="limit-select">Items per page:</label>
+      <select
+        id="limit-select"
+        v-model="selectedLimit"
+        @change="handleLimitChange"
+        class="dropdown category__input-dropdown"
+      >
+        <option v-for="option in limitOptions" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+    <div class="report-activity__table">
+      <table class="report-activity__table-data">
+        <thead>
+          <tr class="report-activity__table-header">
+            <th>No</th>
+            <th>Pembelian</th>
+            <th>Kategori</th>
+            <th>Tanggal</th>
+            <th>Jumlah</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            class="report-activity__table-items"
+            v-for="(item, index) in activityReportData"
+            :key="index"
+          >
+            <td>{{ index + 1 }}</td>
+            <td class="to-ellipsis">{{ item.order ? item.order.name : item.event.name }}</td>
+            <td>{{ item.order ? item.order.category.name : 'Event' }}</td>
+            <td>{{ formatDate(item.transaction.plannedDate) }}</td>
+            <td>{{ item.amount }}</td>
+            <td>
+              {{ formatCurrency((item.order ? item.order.price : item.event.price) * item.amount) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -47,9 +75,22 @@ th,
 td {
   cursor: pointer;
 }
-
+.category__input-dropdown {
+  height: 1.5rem;
+  width: 6rem;
+  text-align: center;
+  border-radius: 0.3rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: transparent;
+  position: relative;
+}
+.limit-select {
+  padding-inline: 10px;
+}
 .report-activity__table {
-  max-height: calc(374px - 2rem);
+  max-height: calc(374px - 3rem);
   overflow-y: overlay;
   overflow-x: auto;
 }

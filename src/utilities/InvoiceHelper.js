@@ -20,38 +20,26 @@ const paginatedData = computed(() => {
 })
 
 
-const fetchTransactionList = async () => {
+const fetchTransactionList = async ({ limit, page }) => {
   showLoader.value = true
   try {
-    let url = `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/detail-invoice?search=${encodeURIComponent(searchQuery.value)}&limit=100000`
-    // if (searchQuery.value) {
-    //   url += `}`
-    // }
-    if (category.value) url += `category=${encodeURIComponent(category.value)}&`;
+    let url = `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/detail-invoice?search=${encodeURIComponent(searchQuery.value)}&limit=${limit}`
+    
     const response = await fetch(url)
     if (!response.ok) throw new Error('Failed to fetch data')
+    
     const res = await response.json()
     dataInvoice.value = res.data
-    totalPages.value = Math.ceil(dataInvoice.value.length / pageSize.value)
+    
+    totalPages.value = limit === 'All' ? 1 : Math.ceil(dataInvoice.value.length / limit)
+    currentPage.value = page
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
     showLoader.value = false
   }
 }
-const fetchTaxes = async () => {
-  try {
-    const response = await fetch(`${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/list-tax`)
-    if (!response.ok) throw Error('Terjadi kesalahan')
-    const responseData = await response.json()
-    listOfTaxes.value.cash = responseData.data.data.cash.filter((tax) => tax.paidBy === 'user')
-    listOfTaxes.value.nonCash = responseData.data.data.nonCash.filter(
-      (tax) => tax.paidBy === 'user'
-    )
-  } catch (err) {
-    console.log(err)
-  }
-}
+
 
 const mapInvoiceOrders = (data) => {
   console.log(data)
@@ -222,7 +210,6 @@ export default {
   searchQuery,
   resetSearch,
   mapInvoiceOrders,
-  fetchTaxes,
   mapInvoiceDetails,
   selectedItem,
   deleteTransaction,

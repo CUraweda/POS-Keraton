@@ -374,8 +374,8 @@ const fetchTableDataReport = async (filter = tableDataFilter.value) => {
     let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`;
     if (category.value) {
       url += `&category=${encodeURIComponent(category.value)}&`;
-
-    } if (filter.startDate) {
+    }
+    if (filter.startDate) {
       filter.startDate = filter.startDate.split('T')[0];
       url += `startDate=${filter.startDate}&`;
     }
@@ -383,6 +383,10 @@ const fetchTableDataReport = async (filter = tableDataFilter.value) => {
       filter.endDate = filter.endDate.split('T')[0];
       url += `&endDate=${filter.endDate}&`;
     }
+    if (filter.limit) {
+      url += `&limit=${filter.limit}`;
+    }
+
     const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to fetch data Report');
 
@@ -394,6 +398,7 @@ const fetchTableDataReport = async (filter = tableDataFilter.value) => {
     console.error('Error fetching data Report:', error);
   }
 };
+
 
 /* TicketInfoCard Helper */
 const orderInfoCardData = ref([])
