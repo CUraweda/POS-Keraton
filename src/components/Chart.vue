@@ -223,10 +223,9 @@ watch(
 }
 
 .revenue-details__legend {
-  display: flex;
-  flex-direction: column;
-  margin-right: 40px;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 10px 20px;
 }
 
 .revenue-details__legend-item {

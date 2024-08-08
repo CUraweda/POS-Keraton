@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import GlobalHelper from './GlobalHelper'
 import LoginHelper from './LoginHelper'
 import DashboardHelper from './DashboardHelper'
-import html2pdf from 'html2pdf.js';
+import html2pdf from 'html2pdf.js'
 
 const {
   DB_BASE_URL,
@@ -14,7 +14,6 @@ const {
   sendQueue,
   assignAlert
 } = GlobalHelper
-
 
 const { userData, userCarts } = LoginHelper
 
@@ -99,9 +98,9 @@ const closeDropdownOutside = (event) => {
 const getUserCarts = () => {
   if (userCarts.value) {
     for (let item of userCarts.value) {
-      item.nationalityId = undefined,
-        item.cityName = undefined,
-        item.guideId = item.guideId || ''
+      ;(item.nationalityId = undefined),
+        (item.cityName = undefined),
+        (item.guideId = item.guideId || '')
       item.guideName = item.guideName || ''
     }
     console.log(userCarts.value)
@@ -147,7 +146,7 @@ const cityName = ref('')
 const biayaLayanan = ref(0)
 const biayaJasa = ref(0)
 const biayaJasaCard = ref(0.015)
-const maxTickets = ref(80)
+const maxTickets = ref()
 const fetchFeeSettings = () => {
   const savedBiayaLayanan = localStorage.getItem('biayaLayanan')
   if (savedBiayaLayanan) {
@@ -185,14 +184,15 @@ const totalHarga = computed(() => {
 })
 
 const totalBiaya = computed(() => {
-  const diskon = (totalHarga.value * discountValue.value) / 100;
-  const biayaJasaAplikasi = paymentSelection.value === 'Cash' ? biayaJasa.value : totalHarga.value * biayaJasaCard.value;
+  const diskon = (totalHarga.value * discountValue.value) / 100
+  const biayaJasaAplikasi =
+    paymentSelection.value === 'Cash' ? biayaJasa.value : totalHarga.value * biayaJasaCard.value
   console.log(paymentSelection.value)
-  return totalHarga.value - diskon + biayaLayanan.value + biayaJasaAplikasi;
+  return totalHarga.value - diskon + biayaLayanan.value + biayaJasaAplikasi
 })
 
 const totalTagihan = computed(() => {
-  const diskon = (totalHarga.value * discountValue.value) / 100;
+  const diskon = (totalHarga.value * discountValue.value) / 100
   let taxes = 0
   const taxesIdentifier = paymentSelection != 'Cash' ? 'nonCash' : 'cash'
   if (listOfTaxes[taxesIdentifier]) {
@@ -200,8 +200,8 @@ const totalTagihan = computed(() => {
       taxes += tax.multiply ? totalTagihan.value * tax.tax : totalTagihan.value + tax.tax
     }
   }
-  return totalHarga.value - diskon + biayaLayanan.value + taxes;
-});
+  return totalHarga.value - diskon + biayaLayanan.value + taxes
+})
 
 const totalTicketCount = computed(() => {
   let totalCount = 0
@@ -215,19 +215,19 @@ const totalTicketCount = computed(() => {
 const listOfTaxes = ref({})
 const paymentSelection = ref('Cash')
 const paymentSelect = ref(false)
-const paymentTaxIdentifier = ref("cash")
+const paymentTaxIdentifier = ref('cash')
 const showPaymentSelect = () => {
   paymentSelect.value = !paymentSelect.value
 }
 const selectPayment = (paymentMethod) => {
   paymentSelection.value = paymentMethod
-  switch(paymentMethod){
-    case "Kartu Kredit/Debit":
-      paymentTaxIdentifier.value = "nonCash"
-      break;
+  switch (paymentMethod) {
+    case 'Kartu Kredit/Debit':
+      paymentTaxIdentifier.value = 'nonCash'
+      break
     default:
-      paymentTaxIdentifier.value = "cash"
-      break;
+      paymentTaxIdentifier.value = 'cash'
+      break
   }
   paymentSelect.value = false
 }
@@ -237,8 +237,10 @@ const fetchTaxes = async () => {
     const response = await fetch(`${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/list-tax`)
     if (!response.ok) throw Error('Terjadi kesalahan')
     const responseData = await response.json()
-    listOfTaxes.value.cash = responseData.data.data.cash.filter((tax) => tax.paidBy === "user")
-    listOfTaxes.value.nonCash = responseData.data.data.nonCash.filter((tax) => tax.paidBy === "user")
+    listOfTaxes.value.cash = responseData.data.data.cash.filter((tax) => tax.paidBy === 'user')
+    listOfTaxes.value.nonCash = responseData.data.data.nonCash.filter(
+      (tax) => tax.paidBy === 'user'
+    )
   } catch (err) {
     console.log(err)
   }
@@ -259,7 +261,6 @@ const createTransaction = async () => {
       amount: item.amount,
       guideId: item.guideId
     }))
-
 
   try {
     if (order.length < 1) throw Error('No Item To Checkout')
@@ -479,7 +480,9 @@ const sendEmailToUser = async () => {
       status: ''
     })
     emailCooldown.value = true
-    let response = await fetch(`${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/generate-email-invoice/${ticketsData.value.id}`)
+    let response = await fetch(
+      `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/generate-email-invoice/${ticketsData.value.id}`
+    )
 
     if (!response.ok) {
       emailCooldown.value = false
@@ -536,7 +539,6 @@ const printTickets = async () => {
   //       })
   //     }
   //   )
-
   //   if (!response.ok) {
   //     showLoader.value = false
   //     throw new Error('Failed to print data!')
@@ -544,8 +546,6 @@ const printTickets = async () => {
   // } catch (error) {
   //   console.error('Error fetch data:', error)
   // }
-
-
 }
 
 export default {

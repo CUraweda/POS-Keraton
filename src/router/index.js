@@ -17,6 +17,7 @@ import RekapKeramaianView from '@/views/RekapKeramaian.vue'
 import LoginHelper from '@/utilities/LoginHelper'
 import RekapView from '@/views/RekapanView.vue'
 import UserManageView from '@/views/UserManageView.vue'
+import CreateUserView from '@/views/CreateUserView.vue'
 
 const { giveAccessRoute, grantAccessRoute } = GlobalHelper
 const { isAuthenticated, userData } = LoginHelper
@@ -28,6 +29,12 @@ const router = createRouter({
       path: '/manage-user',
       name: 'Manage',
       component: UserManageView,
+      meta: { protected: true, restrictCuraweda: true }
+    },
+    {
+      path: '/create-user',
+      name: 'Create',
+      component: CreateUserView,
       meta: { protected: true, restrictCuraweda: true }
     },
     {
@@ -57,7 +64,7 @@ const router = createRouter({
       path: '/report-curaweda',
       name: 'reportCuraweda',
       component: ReportCuraweda,
-      meta: { protected: true  }
+      meta: { protected: true }
     },
     {
       path: '/add',
