@@ -359,10 +359,12 @@ const category = ref('')
 
 const updateCategory = (value) => {
   category.value = value[0].name
-  fetchTableDataReport()
+  tableDataFilter.value['category'] = category.value
+  fetchTableDataReport(tableDataFilter.value)
 }
 
 const tableDataFilter = ref({
+  limit: null,
   startDate: null,
   endDate: null,
   optiondropdown: null
@@ -373,15 +375,15 @@ const fetchTableDataReport = async (filter = tableDataFilter.value) => {
     console.log(filter);
     let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`;
     if (category.value) {
-      url += `&category=${encodeURIComponent(category.value)}&`;
+      url += `&category=${encodeURIComponent(category.value)}`;
     }
     if (filter.startDate) {
       filter.startDate = filter.startDate.split('T')[0];
-      url += `startDate=${filter.startDate}&`;
+      url += `&startDate=${filter.startDate}`;
     }
     if (filter.endDate) {
       filter.endDate = filter.endDate.split('T')[0];
-      url += `&endDate=${filter.endDate}&`;
+      url += `&endDate=${filter.endDate}`;
     }
     if (filter.limit) {
       url += `&limit=${filter.limit}`;
@@ -425,16 +427,27 @@ const exportToExcel = () => {
     No: index + 1,
     Pembelian: item.order ? item.order.name : item.event.name,
     Kategori: item.order ? item.order.category.name : 'Event',
-    Tanggal: item.transaction.plannedDate,
+    Tanggal: item.transaction.plannedDate.split('T')[0],
     Jumlah: item.amount,
     Total: (item.order ? item.order.price : item.event.price) * item.amount,
   }))
-
   const ws = XLSX.utils.json_to_sheet(data)
+  const maxLengths = data.reduce((lengths, row) => {
+    Object.keys(row).forEach((key, i) => {
+      lengths[i] = Math.max(lengths[i] || 0, row[key].toString().length)
+    })
+    return lengths
+  }, [])
+  ws['!cols'] = maxLengths.map(length => ({ width: length }))
+
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Report')
 
-  XLSX.writeFile(wb, 'Report.xlsx')
+  const formattedStartDate = tableDataFilter.value.startDate ? tableDataFilter.value.startDate.split('T')[0] : 'N/A'
+  const formattedEndDate = tableDataFilter.value.endDate ? tableDataFilter.value.endDate.split('T')[0] : 'N/A'
+  const fileName = `Report_${formattedStartDate}_to_${formattedEndDate}.xlsx`
+
+  XLSX.writeFile(wb, fileName)
 }
 
 export default {

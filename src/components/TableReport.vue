@@ -1,16 +1,29 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import ReportHelper from '@/utilities/ReportHelper'
 
-const { activityReportData, fetchTableDataReport, formatDate, formatCurrency } = ReportHelper
+const { activityReportData, fetchTableDataReport, formatDate, formatCurrency, tableDataFilter } =
+  ReportHelper
 
 const limitOptions = [10, 20, 50, 100, 'All']
 const selectedLimit = ref(limitOptions[0])
 
 const fetchTableData = async () => {
-  const limit = selectedLimit.value === 'All' ? 1000000 : selectedLimit.value
-  await fetchTableDataReport({ limit })
+  const limit = selectedLimit.value === 'All' ? 0 : selectedLimit.value
+  await fetchTableDataReport({
+    limit,
+    category: category.value,
+    startDate: startDate.value,
+    endDate: endDate.value
+  })
 }
+watch(
+  () => selectedLimit.value,
+  (newVal) => {
+    tableDataFilter.value['limit'] = newVal
+    fetchTableDataReport()
+  }
+)
 
 onMounted(() => {
   fetchTableData()

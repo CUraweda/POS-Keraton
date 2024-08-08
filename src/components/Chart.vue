@@ -86,10 +86,10 @@ const chartOptions = ref({
     tooltip: {
       enabled: false
     },
-    min: 1,
+    min: 1
     // max: 31
     // max: todayDay
-    max: dataCategory.length
+    // max: dataCategory.length
   },
   yaxis: {
     axisBorder: {

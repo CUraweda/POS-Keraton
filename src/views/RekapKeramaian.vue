@@ -11,12 +11,14 @@
     "
   >
     <div style="width: 95%; display: flex; gap: 20px; justify-content: center">
+      <!-- <div style="height: 1080px; justify-content: center; align-content: center"> -->
       <Chart
         :targetDate="currentYear"
         :dataSeries="yearlyData"
         :dataCategory="yearlyCategory"
         :width="widthcart"
       />
+      <!-- </div> -->
       <Chart
         :targetDate="monthName"
         :dataSeries="monthlyData"
@@ -37,7 +39,7 @@
       <tbody>
         <tr v-for="(year, i) in yearlyData" :key="i">
           <td>{{ year.name }}</td>
-          <td v-for="(yearData, i) in year.data">{{ yearData }}</td>
+          <td v-for="(yearData, i) in year.data" :key="i">{{ yearData }}</td>
         </tr>
       </tbody>
     </table>
@@ -54,7 +56,7 @@
       <tbody>
         <tr v-for="(month, i) in monthlyData" :key="i">
           <td>{{ month.name }}</td>
-          <td v-for="(monthData, i) in month.data">{{ monthData }}</td>
+          <td v-for="(monthData, i) in month.data" :key="i">{{ monthData }}</td>
         </tr>
       </tbody>
     </table>
@@ -82,66 +84,63 @@
       </table> -->
   </div>
 </template>
-
-<script>
+<script setup>
+import { ref, onMounted, watch } from 'vue'
 import Chart from '@/components/Chart.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
-import { ref } from 'vue'
-const { DB_BASE_URL, TRANSACTION_BASE_URL, ORDER_BASE_URL, DETAILTRANS_BASE_URL, showLoader } =
-  GlobalHelper
+import ReportHelper from '@/utilities/ReportHelper'
+const { selectedMonth, selectedYear, selectedMonthName } = ReportHelper
+const { DB_BASE_URL, ORDER_BASE_URL } = GlobalHelper
 
-export default {
-  components: {
-    Chart
-  },
-  data() {
-    return {
-      yearlyData: ref([]),
-      yearlyCategory: ref([]),
-      monthlyData: ref([]),
-      monthlyCategoryDatas: ref([]),
-      currentYear: ref(),
-      currentMonth: ref(),
-      monthName: ref(),
-      widthcart: ref('250')
-    }
-  },
-  beforeMount() {},
-  mounted() {
-    const today = new Date()
-    today.setHours(7, 0, 0, 0)
-    this.currentYear = today.getFullYear()
-    this.currentMonth = today.getMonth() + 1
-    this.monthName = today.toLocaleString('id-ID', { month: 'long' })
-    this.fetchData().then(() => {
-      // window.print()
-    })
-    // window.location.reload()
-  },
-  methods: {
-    async fetchData() {
-      try {
-        const responseYear = await fetch(
-          `${DB_BASE_URL.value}/${ORDER_BASE_URL.value}/chart-data/${encodeURIComponent(this.currentYear)}`
-        )
-        const responseMonth = await fetch(
-          `${DB_BASE_URL.value}/${ORDER_BASE_URL.value}/chart-data/${encodeURIComponent(this.currentYear)}/${encodeURIComponent(this.currentMonth)}`
-        )
-        if (!responseYear.ok) throw new Error('Failed to fetch data')
-        if (!responseMonth.ok) throw new Error('Failed to fetch data')
-        const resYear = await responseYear.json()
-        const resMonth = await responseMonth.json()
-        this.yearlyCategory = resYear.data.yearlyCategory
-        this.yearlyData = resYear.data.yearlyData
-        this.monthlyCategory = resMonth.data.monthlyCategory
-        console.log(this.monthlyCategory)
-        this.monthlyData = resMonth.data.monthlyData
-      } catch (err) {
-        console.log(err)
-      }
-    }
+const yearlyData = ref([])
+const yearlyCategory = ref([])
+const monthlyData = ref([])
+const monthlyCategory = ref([])
+const currentYear = ref(selectedMonth.value ? selectedMonth.value : new Date().getFullYear())
+const currentMonth = ref(selectedYear.value ? selectedYear.value : new Date().getMonth() + 1)
+const monthName = ref(
+  selectedMonthName.value
+    ? selectedMonthName.value.toLocaleString('id-ID', { month: 'long' })
+    : new Date().toLocaleString('id-ID', { month: 'long' })
+)
+const widthcart = ref('250')
+
+const fetchData = async () => {
+  try {
+    const responseYear = await fetch(
+      `${DB_BASE_URL.value}/${ORDER_BASE_URL.value}/chart-data/${encodeURIComponent(currentYear.value)}`
+    )
+    const responseMonth = await fetch(
+      `${DB_BASE_URL.value}/${ORDER_BASE_URL.value}/chart-data/${encodeURIComponent(currentYear.value)}/${encodeURIComponent(currentMonth.value)}`
+    )
+    if (!responseYear.ok) throw new Error('Failed to fetch data')
+    if (!responseMonth.ok) throw new Error('Failed to fetch data')
+    const resYear = await responseYear.json()
+    const resMonth = await responseMonth.json()
+    yearlyCategory.value = resYear.data.yearlyCategory
+    yearlyData.value = resYear.data.yearlyData
+    monthlyCategory.value = resMonth.data.monthlyCategory
+    monthlyData.value = resMonth.data.monthlyData
+  } catch (err) {
+    console.log(err)
   }
 }
+
+watch(
+  [selectedMonth, selectedYear],
+  ([newMonth, newYear]) => {
+    currentMonth.value = newMonth
+    currentYear.value = newYear
+    fetchData()
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  fetchData().then(() => {
+    window.print()
+  })
+})
 </script>
 
 <style scoped>
