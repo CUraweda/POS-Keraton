@@ -363,6 +363,15 @@ const confirm = () => {
           <ph-user :size="48" color="var(--color-primary)" />
           <span>Manage User</span>
         </button>
+
+        <button
+          class="settings__menu-items"
+          v-if="LoginHelper.userData.value.role === 'SUPER_ADMIN'"
+          @click="router.push({ name: 'Create' })"
+        >
+          <ph-user :size="48" color="var(--color-primary)" />
+          <span>Create User</span>
+        </button>
       </div>
     </section>
 
