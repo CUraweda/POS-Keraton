@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="add__alert-confirmation_overlay" v-if="confirmAlertUpload">
+    <div class="add__alert-confirmation_overlay" style="padding: 5px" v-if="confirmAlertUpload">
       <div class="settings_modal-container fee">
         <div
           style="display: flex; align-items: center; width: 100%; justify-content: space-between"
@@ -437,12 +437,12 @@ export default {
       try {
         if (!this.jsonFile) throw Error('Please specify the JSON file')
         const formData = new FormData()
-        // formData.append('jsonFile', this.jsonFile)
-        // formData.append('rdb', this.resetDatabase)
+        formData.append('jsonFile', this.jsonFile)
+        formData.append('rdb', this.resetDatabase)
 
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/backup/backup-data`, {
           method: 'POST',
-          body: formData.append('jsonFile', this.jsonFile),
+          body: formData,
           headers: {
             token: getCookie('token')
           }
@@ -571,9 +571,10 @@ export default {
   margin-left: 8rem;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
   .container {
     margin-left: 0;
+    padding-inline: 1rem;
   }
 }
 
@@ -763,6 +764,7 @@ a.browse__placeholder {
 .settings_modal-container.fee {
   width: 90%;
   height: 90%;
+  overflow-y: scroll;
   padding: 2rem;
 }
 
@@ -1130,7 +1132,7 @@ a.browse__placeholder {
   outline: 0;
   margin-top: 1rem;
   width: 100%;
-  box-shadow: 1px 5px 10px 1px #0000012c;
+  /* box-shadow: 1px 5px 10px 1px #0000012c; */
   border-radius: 0.5rem;
 
   /* border-top-left-radius: 0.5rem;

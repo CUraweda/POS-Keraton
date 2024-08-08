@@ -5,7 +5,6 @@ import LoginHelper from '@/utilities/LoginHelper'
 import GlobalHelper from '@/utilities/GlobalHelper'
 
 const { userData, userLogout } = LoginHelper
-
 const activeLink = ref(0)
 const router = useRouter()
 const route = useRoute()
@@ -87,18 +86,32 @@ watchEffect(() => {
   <div>
     <nav class="mobile-navbar">
       <button @click="toggleMenu" class="menu-button">☰</button>
-      <div v-if="menuOpen" class="menu-overlay" @click="toggleMenu">
+      <div v-if="menuOpen" class="menu-overlay" @click.self="toggleMenu">
         <div class="menu" @click.stop>
           <ul>
-            <li v-if="!isCurawedaAccount"><a href="/">Dashboard</a></li>
-            <li v-if="!isCurawedaAccount"><a href="/invoice">Invoice</a></li>
-            <li>
-              <RouterLink to="/report" :class="{ active: activeLink === 2 }">Report</RouterLink>
+            <li v-if="!isCurawedaAccount">
+              <RouterLink to="/" :class="{ active: activeLink === 0 }" @click="toggleMenu"
+                >Dashboard</RouterLink
+              >
             </li>
-            <li v-if="!isCurawedaAccount"><a href="/checkout">Checkout</a></li>
+            <li v-if="!isCurawedaAccount">
+              <RouterLink to="/invoice" :class="{ active: activeLink === 1 }" @click="toggleMenu"
+                >Invoice</RouterLink
+              >
+            </li>
+            <li>
+              <RouterLink to="/report" :class="{ active: activeLink === 2 }" @click="toggleMenu"
+                >Report</RouterLink
+              >
+            </li>
+            <li v-if="!isCurawedaAccount">
+              <RouterLink to="/checkout" :class="{ active: activeLink === 3 }" @click="toggleMenu"
+                >Checkout</RouterLink
+              >
+            </li>
             <li v-if="!isCurawedaAccount">
               <a
-                @click="toSettings()"
+                @click="toSettings(), toggleMenu()"
                 :class="{ active: activeLink === 5 }"
                 v-if="!isCurawedaAccount"
                 style="cursor: pointer"
@@ -107,7 +120,11 @@ watchEffect(() => {
               </a>
             </li>
             <li v-if="isCurawedaAccount">
-              <RouterLink to="/report-curaweda" :class="{ active: activeLink === 4 }">
+              <RouterLink
+                to="/report-curaweda"
+                :class="{ active: activeLink === 4 }"
+                @click="toggleMenu"
+              >
                 Report Curaweda
               </RouterLink>
             </li>
@@ -115,7 +132,7 @@ watchEffect(() => {
               <RouterLink
                 to="/login"
                 name="Logout"
-                @click="userLogout(), router.replace('/login')"
+                @click="userLogout(), router.replace('/login'), toggleMenu()"
                 @mouseover="showTooltip"
                 @mouseleave="hideTooltip"
               >
@@ -156,6 +173,7 @@ export default {
   border: none;
   font-size: 24px;
   cursor: pointer;
+  padding: 10px;
 }
 
 .menu {

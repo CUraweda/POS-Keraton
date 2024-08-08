@@ -367,7 +367,7 @@ const confirm = () => {
     </section>
 
     <section
-      class="settings_modal-overla overlay w-full h-full"
+      class="settings_modal-overlay overlay w-full h-full"
       v-if="LoginHelper.userData.value.role === 'SUPER_ADMIN' && feePage"
     >
       <div class="settings_modal-container fee">
@@ -684,19 +684,21 @@ input:focus {
 }
 
 .settings__menu {
-  margin-left: 8rem;
+  margin-inline: auto;
+  justify-content: center;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 170px));
   gap: 2.1rem;
+  padding-left: 8rem;
 }
 
 .title {
   margin-left: 8rem;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   .settings__menu {
-    margin-left: 0.9rem;
+    padding-left: 0;
   }
 
   .title {

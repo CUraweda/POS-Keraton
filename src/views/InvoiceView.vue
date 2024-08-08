@@ -1,61 +1,96 @@
 <script setup>
 import { onMounted, watch, ref } from 'vue'
+import invoiceDetail from '@/components/InvoiceDetail.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
-import InvoiceDetail from '@/components/InvoiceDetail.vue'
 import InvoiceHelper from '@/utilities/InvoiceHelper'
 import LoginHelper from '@/utilities/LoginHelper'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-
-// Akses rute saat ini
 const currentRoute = route.name
+const { DB_BASE_URL, TRANSACTION_BASE_URL, showLoader } = GlobalHelper
 
+// Destructure methods and refs from InvoiceHelper
 const {
   dataInvoice,
+  paginatedData,
   getSearchQuery,
-  data,
-  fetchTransactionList,
   searchQuery,
-  resetSearch,
+  fetchTransactionList,
   deleteTransaction,
   fetchTaxes,
   mapInvoiceOrders,
-  selectedItem,
   splitDate,
-  detailPopup,
-  showDetail
+  showDetail,
+  currentPage,
+  pageSize,
+  totalPages
 } = InvoiceHelper
 
-const { userData, userLogout } = LoginHelper
+const { userData } = LoginHelper
 
-watch(
-  () => searchQuery.value,
-  (newValue) => {
-    if (typeof newValue === 'string') {
-      searchQuery.value = newValue.toLowerCase()
-      fetchTransactionList()
-      getSearchQuery(searchQuery.value)
-      // searchList(searchQuery.value)
-    }
+// Pagination state
+const limitOptions = [10, 20, 50, 70, 100, 'All']
+const selectedLimit = ref(limitOptions[0])
+
+const fetchData = async () => {
+  const limit = selectedLimit.value === 'All' ? 1000000 : selectedLimit.value
+  await fetchTransactionList({ page: currentPage.value, limit })
+}
+// Watch for search query changes and fetch data
+watch(searchQuery, (newValue) => {
+  if (typeof newValue === 'string') {
+    searchQuery.value = newValue.toLowerCase()
+    fetchTransactionList({ page: currentPage.value, limit: selectedLimit.value })
+    getSearchQuery(searchQuery.value)
   }
-)
+})
+
+// Define methods for pagination
+// const fetchData = async () => {
+//   GlobalHelper.showLoader.value = true
+//   await fetchTransactionList({ page: currentPage.value, limit: selectedLimit.value })
+//   GlobalHelper.showLoader.value = false
+// }
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    fetchData()
+  }
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    fetchData()
+  }
+}
+
+const confirmAlert = ref(false)
 const idData = ref(null)
 const name = ref(null)
-const confirmAlert = ref(false)
+
 const confirmDelete = (data) => {
   idData.value = data.id
   name.value = data.customer.name
   confirmAlert.value = true
 }
+
 const confirm = () => {
   confirmAlert.value = false
   deleteTransaction(idData.value)
 }
+
+const handleLimitChange = async (event) => {
+  selectedLimit.value = event.target.value
+  currentPage.value = 1 // Reset to first page when limit changes
+  await fetchData()
+}
+
+// Fetch data and taxes on component mount
 onMounted(() => {
-  GlobalHelper.showLoader.value = true
-  fetchTransactionList()
-  fetchTaxes()
+  fetchData()
 })
 </script>
 
@@ -63,12 +98,6 @@ onMounted(() => {
   <div class="add__alert-confirmation_overlay" v-if="confirmAlert">
     <div class="add__alert-confirmation">
       <h5>Apakah yakin ingin menghapus invoice dengan nama {{ name }}?</h5>
-      <!-- <input
-        type="number"
-        v-model="inputValue"
-        style="border-width: 2px"
-        placeholder="Masukkan nominal..."
-      /> -->
       <div class="button-group">
         <button @click="confirmAlert = false">Cancel</button>
         <button @click="confirm()">Yes</button>
@@ -94,57 +123,180 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Invoice -->
-    <div class="invoice-table" style="overflow-x: auto">
-      <table>
-        <thead>
-          <tr class="invoice-table__row-header">
-            <th class="invoice-table__header">No.</th>
-            <th class="invoice-table__header">Nama</th>
-            <th class="invoice-table__header">Pembelian</th>
-            <th class="invoice-table__header">Tanggal</th>
-            <th class="invoice-table__header">Jadwal</th>
-            <th class="invoice-table__header">Email</th>
-          </tr>
-        </thead>
-        <tbody v-if="dataInvoice">
-          <template v-for="(item, indexItem) in dataInvoice" :key="indexItem">
-            <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
-              <td class="invoice-table__data">{{ indexItem + 1 }}</td>
-              <td class="invoice-table__data">
-                {{ item.customer ? item.customer.name : item.user.name }}
-              </td>
-              <td class="invoice-table__data">{{ mapInvoiceOrders(item) }}</td>
-              <td class="invoice-table__data">{{ splitDate(item.plannedDate)[0] }}</td>
-              <td class="invoice-table__data">{{ splitDate(item.plannedDate)[1] }}</td>
-              <td class="invoice-table__data">
-                {{ item.customer ? item.customer.email : item.user.email }} <br />
-                <div style="display: flex; gap: 10px; justify-content: center">
-                  <button class="btn-primary invoice-table__button" @click="showDetail(item)">
-                    Detail
-                  </button>
-                  <button
-                    class="btn-primary invoice-table__button"
-                    @click="confirmDelete(item)"
-                    v-if="userData.role !== 'CASHIER'"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-        <tbody v-else>
-          Data Tidak ada
-        </tbody>
-      </table>
+    <div class="report-activity__filters">
+      <label for="limit-select" class="limit-select-label">Items per page:</label>
+      <div class="dropdown-container">
+        <select
+          id="limit-select"
+          v-model="selectedLimit"
+          @change="handleLimitChange"
+          class="dropdown category__input-dropdown"
+        >
+          <option v-for="option in limitOptions" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </select>
+        <span class="dropdown-arrow">&#9662;</span>
+      </div>
     </div>
+
+    <div style="overflow-x: auto; width: 100%">
+      <div class="invoice-table" style="overflow-x: auto">
+        <table>
+          <thead>
+            <tr class="invoice-table__row-header">
+              <th class="invoice-table__header">No.</th>
+              <th class="invoice-table__header">UID</th>
+              <th class="invoice-table__header">Nama</th>
+              <th class="invoice-table__header">Pembelian</th>
+              <th class="invoice-table__header">Tanggal</th>
+              <th class="invoice-table__header">Jadwal</th>
+              <th class="invoice-table__header">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="(item, indexItem) in dataInvoice" :key="indexItem">
+              <tr v-if="mapInvoiceOrders(item)" class="invoice-table__row-data">
+                <td class="invoice-table__data">
+                  {{ indexItem + 1 + (currentPage - 1) * pageSize }}
+                </td>
+                <td class="invoice-table__data">{{ item.id }}</td>
+                <td class="invoice-table__data">
+                  {{ item.customer ? item.customer.name : item.user.name }}
+                </td>
+                <td class="invoice-table__data">{{ mapInvoiceOrders(item) }}</td>
+                <td class="invoice-table__data">{{ splitDate(item.plannedDate)[0] }}</td>
+                <td class="invoice-table__data">{{ splitDate(item.plannedDate)[1] }}</td>
+                <td class="invoice-table__data">
+                  {{ item.customer ? item.customer.email : item.user.email }} <br />
+                  <div style="display: flex; gap: 10px; justify-content: center">
+                    <button class="btn-primary invoice-table__button" @click="showDetail(item)">
+                      Detail
+                    </button>
+                    <button
+                      class="btn-primary invoice-table__button"
+                      @click="confirmDelete(item)"
+                      v-if="userData.role !== 'CASHIER'"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div> -->
   </div>
-  <InvoiceDetail :selectedItem="selectedItem" ref="detailPopup" />
+  <!-- Pagination Controls -->
+  <!-- <div class="pagination-controls">
+        <button @click="prevPage" :disabled="currentPage === 1" class="btn-pagination">
+          Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn-pagination">
+          Next
+        </button>
+      </div> -->
+
+  <!-- <div class="report-activity__filters">
+        <label for="limit-select" class="limit-select">Items per page:</label>
+        <select
+          id="limit-select"
+          v-model="selectedLimit"
+          @change="handleLimitChange"
+          class="dropdown category__input-dropdown"
+        >
+          <option v-for="option in limitOptions" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </select>
+      </div> -->
+  <!-- Confirm Delete Dialog -->
+  <div v-if="confirmAlert" class="confirm-dialog">
+    <p>Are you sure you want to delete {{ name }}?</p>
+    <button @click="confirm">Yes</button>
+    <button @click="confirmAlert = false">No</button>
+  </div>
+
+  <invoiceDetail :selectedItem="selectedItem" ref="detailPopup" />
 </template>
 
 <style scoped>
+report-activity__filters {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.limit-select-label {
+  margin-right: 10px;
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 5px 30px 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding-right: 30px;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.dropdown:hover,
+.dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 18px;
+  color: #333;
+}
+
+.category__input-dropdown {
+  transition: all 0.3s ease;
+}
+
+.category__input-dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.btn-pagination {
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: black;
+  background-color: var(--color-primary);
+  color: rgb(69, 69, 69);
+  margin-inline: 0.5rem;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
 .add__alert-confirmation_overlay {
   position: fixed;
   top: 0;
@@ -215,7 +367,7 @@ onMounted(() => {
 .invoice-search__icon {
   align-items: center;
   justify-content: center;
-  width: 50px;
+  width: 20px;
   display: flex;
 }
 .invoice-search__input-field {

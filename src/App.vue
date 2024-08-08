@@ -34,7 +34,10 @@ watchEffect(() => {
   <Navbar v-if="loggedIn && showSidebar" />
   <!-- <SendProgress v-if="loggedIn && showSidebar"/> -->
   <!-- showSidebar ? 'pd-left-8' : 'no-pd-left' -->
-  <div :class="[loggedIn ? 'pd-block-2 no-pd-left' : 'no-pd-block']" class="responsive-content">
+  <div
+    :class="[loggedIn && showSidebar ? 'pd-block-2 no-pd-left' : 'no-pd-block']"
+    class="responsive-content"
+  >
     <RouterView />
   </div>
 </template>

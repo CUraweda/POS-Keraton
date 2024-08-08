@@ -125,7 +125,6 @@ const generateExcel = async () => {
     for (let ticketData of Object.values(ticketsSoldment)) {
       ticketSheetData.push(Object.values(ticketData))
     }
-    console.log(ticketSheetData)
     const ticketSheets = XLSX.utils.aoa_to_sheet(ticketSheetData)
     const ticketColWidth = ticketSheetData[0].map((_, colIndex) => {
       const colValues = ticketSheetData.map(row => row[colIndex] ? row[colIndex].toString() : '');
@@ -137,6 +136,8 @@ const generateExcel = async () => {
 
 
     // SUMMARY SHEET
+
+    console.log(monthlyData)
     let yearlyTempData = yearlyData.value
     let monthlyTempData = monthlyData.value
     const summaryTableData = [
@@ -361,23 +362,43 @@ const updateCategory = (value) => {
   fetchTableDataReport()
 }
 
-const fetchTableDataReport = async () => {
+const tableDataFilter = ref({
+  startDate: null,
+  endDate: null,
+  optiondropdown: null
+})
+
+const fetchTableDataReport = async (filter = tableDataFilter.value) => {
   try {
-    let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`
-    if (category.value && category.value !== '') {
-      url += `category=${encodeURIComponent(category.value)}`
+    console.log(filter);
+    let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`;
+    if (category.value) {
+      url += `&category=${encodeURIComponent(category.value)}&`;
     }
-    if (filterDate.value) url += `date=${filterDate.value}`
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error('Failed to fetch data Report')
+    if (filter.startDate) {
+      filter.startDate = filter.startDate.split('T')[0];
+      url += `startDate=${filter.startDate}&`;
     }
-    const res = await response.json()
-    if (res.data) activityReportData.value = res.data
+    if (filter.endDate) {
+      filter.endDate = filter.endDate.split('T')[0];
+      url += `&endDate=${filter.endDate}&`;
+    }
+    if (filter.limit) {
+      url += `&limit=${filter.limit}`;
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch data Report');
+
+    const res = await response.json();
+    if (res.data) {
+      activityReportData.value = res.data;
+    }
   } catch (error) {
-    console.error('Error fetching data Report:', error)
+    console.error('Error fetching data Report:', error);
   }
-}
+};
+
 
 /* TicketInfoCard Helper */
 const orderInfoCardData = ref([])
@@ -399,8 +420,25 @@ const fetchOrderInfoCardData = async () => {
     console.error('Error fetching data:', error)
   }
 }
+const exportToExcel = () => {
+  const data = activityReportData.value.map((item, index) => ({
+    No: index + 1,
+    Pembelian: item.order ? item.order.name : item.event.name,
+    Kategori: item.order ? item.order.category.name : 'Event',
+    Tanggal: item.transaction.plannedDate,
+    Jumlah: item.amount,
+    Total: (item.order ? item.order.price : item.event.price) * item.amount,
+  }))
+
+  const ws = XLSX.utils.json_to_sheet(data)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Report')
+
+  XLSX.writeFile(wb, 'Report.xlsx')
+}
 
 export default {
+  exportToExcel,
   incomeRevenue,
   fetchIncomeRevenue,
   generateExcel,
@@ -419,6 +457,7 @@ export default {
   targetMonths,
   monthlyCategory,
   monthlyData,
+  tableDataFilter,
   filterDate,
   changeSelectedMonth,
   fetchTargetMonths,

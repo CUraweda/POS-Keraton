@@ -15,12 +15,12 @@ const fetchCategory = async () => {
     const data = await response.json()
     categoryOptions.value.push({
       id: 0,
-      name: "All"
+      name: 'All'
     })
     categoryOptions.value.push(...data.data)
     categoryOptions.value.push({
       id: 0,
-      name: "Event"
+      name: 'Event'
     })
     console.log(data)
     showLoader.value = false
