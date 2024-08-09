@@ -119,7 +119,7 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await fetch(`http://localhost:3000/keraton-pos/user`, {
+        const response = await fetch(`${DB_BASE_URL}/${USER_BASE_URL}`, {
           headers: {
             Authorization: getCookie('token')
           }
@@ -144,7 +144,7 @@ export default {
         role: this.form.role
       }
       try {
-        const response = await fetch(`http://localhost:3000/keraton-pos/user`, {
+        const response = await fetch(`${DB_BASE_URL}/${USER_BASE_URL}`, {
           method: 'POST',
           body: JSON.stringify(dataPost),
           headers: {

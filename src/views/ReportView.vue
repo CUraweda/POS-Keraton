@@ -71,7 +71,18 @@ const checkData = async () => {
     console.error(error)
   }
 }
-
+watch(
+  () => selectedYear.value,
+  (newVal) => {
+    changeSelectedYear(newVal)
+  }
+)
+watch(
+  () => selectedMonth.value,
+  (newVal) => {
+    changeSelectedMonth(newVal)
+  }
+)
 const startDate = ref()
 const endDate = ref()
 const isLoadingKeramaian = ref(false)
