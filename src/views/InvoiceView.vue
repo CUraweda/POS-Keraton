@@ -34,7 +34,7 @@ const limitOptions = [10, 20, 50, 70, 100, 'All']
 const selectedLimit = ref(limitOptions[0])
 
 const fetchData = async () => {
-  const limit = selectedLimit.value === 'All' ? 1000000 : selectedLimit.value
+  const limit = selectedLimit.value === 'All' ? '0' : selectedLimit.value
   await fetchTransactionList({ page: currentPage.value, limit })
 }
 // Watch for search query changes and fetch data

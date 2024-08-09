@@ -9,7 +9,7 @@ const limitOptions = [10, 20, 50, 100, 'All']
 const selectedLimit = ref(limitOptions[0])
 
 const fetchTableData = async () => {
-  const limit = selectedLimit.value === 'All' ? 0 : selectedLimit.value
+  const limit = selectedLimit.value === 'All' ? '0' : selectedLimit.value
   await fetchTableDataReport({
     limit,
     category: category.value,
@@ -19,9 +19,15 @@ const fetchTableData = async () => {
 }
 watch(
   () => selectedLimit.value,
-  (newVal) => {
-    tableDataFilter.value['limit'] = newVal
-    fetchTableDataReport()
+  async (newVal) => {
+    const limit = newVal === 'All' ? '0' : newVal
+    tableDataFilter.value['limit'] = limit
+    await fetchTableDataReport({
+      limit,
+      category: category.value,
+      startDate: startDate.value,
+      endDate: endDate.value
+    })
   }
 )
 
