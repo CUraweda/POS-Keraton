@@ -8,7 +8,6 @@
           <th>Total</th>
           <th>Nama Kota</th>
           <th>Total</th>
-          <!-- <th>Mancanegara 'Dalam Negri</th> -->
         </tr>
       </thead>
       <tbody>
@@ -21,43 +20,41 @@
       </tbody>
     </table>
 
-    <!-- <h2 style="margin-top: 2rem">Data Tingkat Keramaian Bulan</h2>
-    <table class="history-report-table" style="margin-top: 2rem">
-      <thead>
-        <tr>
-          <th>Tanggal</th>
-          <th>Umum</th>
-          <th>Pelajar</th>
-          <th>Mancanegara 'Luar Negri'</th>
-          <th>Mancanegara 'Dalam Negri</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="record in historyRecords" :key="record.date">
-          <td>{{ record.date }}</td>
-          <td>{{ formatCurrency(record.revenueKeraton.COH) }}</td>
-          <td>{{ formatCurrency(record.revenueKeraton.CIA) }}</td>
-          <td>{{ formatCurrency(record.revenueCuraweda) }}</td>
-          <td>{{ formatCurrency(record.totalRevenue) }}</td>
-        </tr>
-      </tbody>
-    </table> -->
+    <div style="align-self: start; margin-top: 1rem">
+      {{ formattedDateRange }}
+    </div>
   </div>
 </template>
 
 <script>
 import GlobalHelper from '@/utilities/GlobalHelper'
-import { ref } from 'vue'
-const { DB_BASE_URL, TRANSACTION_BASE_URL, ORDER_BASE_URL, DETAILTRANS_BASE_URL, showLoader } =
-  GlobalHelper
+
+const { DB_BASE_URL, TRANSACTION_BASE_URL } = GlobalHelper
 
 export default {
   data() {
     return {
-      tableData: ref()
+      tableData: [],
+      startDate: '',
+      endDate: ''
+    }
+  },
+  computed: {
+    formattedDateRange() {
+      return `${this.formatDate(this.startDate)}${this.endDate ? ' - ' + this.formatDate(this.endDate) : ''}`
     }
   },
   mounted() {
+    const today = new Date()
+    const defaultStartDate = new Date(today.getFullYear(), today.getMonth(), 2)
+    this.startDate = defaultStartDate.toISOString().split('T')[0]
+    this.endDate = today.toISOString().split('T')[0]
+
+    // Format dates if they are the same
+    if (this.startDate === this.endDate) {
+      this.endDate = ''
+    }
+
     this.fetchData().then(() => {
       window.print()
     })
@@ -68,12 +65,12 @@ export default {
         const response = await fetch(
           `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/get-all-detail`
         )
-        if (!response.ok) throw Error('Gagal Fetching Data')
+        if (!response.ok) throw new Error('Gagal Fetching Data')
         const responseData = await response.json()
         this.tableData = this.formatTabel(responseData.data)
         console.log(this.tableData)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     formatTabel(datas) {
@@ -108,6 +105,27 @@ export default {
       }
       console.log(rawFormatedTabel)
       return rawFormatedTabel
+    },
+    formatDate(dateString) {
+      const months = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+      ]
+      const date = new Date(dateString)
+      const day = date.getDate()
+      const month = months[date.getMonth()]
+      const year = date.getFullYear()
+      return `${day} ${month} ${year}`
     }
   }
 }

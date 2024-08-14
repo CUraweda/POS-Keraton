@@ -119,7 +119,7 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await fetch(`${DB_BASE_URL}/${USER_BASE_URL}`, {
+        const response = await fetch(`${DB_BASE_URL.value}/get-all-data`, {
           headers: {
             Authorization: getCookie('token')
           }
@@ -144,7 +144,7 @@ export default {
         role: this.form.role
       }
       try {
-        const response = await fetch(`${DB_BASE_URL}/${USER_BASE_URL}`, {
+        await fetch(`${DB_BASE_URL.value}/${USER_BASE_URL.value}`, {
           method: 'POST',
           body: JSON.stringify(dataPost),
           headers: {
