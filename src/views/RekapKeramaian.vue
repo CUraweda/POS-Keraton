@@ -1,16 +1,14 @@
 <template>
   <div
     style="
-      margin-top: 2rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 20px;
-      margin-top: 5px;
     "
   >
-    <div style="width: 95%; display: flex; gap: 20px; justify-content: center">
+    <div style="display: flex; gap: 10px; justify-content: center">
       <!-- <div style="height: 1080px; justify-content: center; align-content: center"> -->
       <Chart
         :targetDate="currentYear"
@@ -27,39 +25,45 @@
       />
     </div>
 
-    <h2>Data Penjualan Tiket Tahun {{ currentYear }}</h2>
-    <table class="history-report-table" style="margin-top: 2rem">
-      <thead>
-        <tr>
-          <th>Tipe</th>
-          <th v-for="(header, i) in yearlyCategory" :key="i">{{ header }}</th>
-          <!-- <th>Mancanegara 'Dalam Negri</th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(year, i) in yearlyData" :key="i">
-          <td>{{ year.name }}</td>
-          <td v-for="(yearData, i) in year.data" :key="i">{{ yearData }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="responsive_print">
+      <div>
+        <h6>Data Penjualan Tiket Tahun {{ currentYear }}</h6>
+        <table class="history-report-table" style="margin-top: 2rem; font-size: 0.5rem">
+          <thead>
+            <tr>
+              <th>Tipe</th>
+              <th v-for="(header, i) in yearlyCategory" :key="i">{{ header }}</th>
+              <!-- <th>Mancanegara 'Dalam Negri</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(year, i) in yearlyData" :key="i">
+              <td>{{ year.name }}</td>
+              <td v-for="(yearData, i) in year.data" :key="i">{{ yearData }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <h2>Data Penjualan Tiket Bulan {{ monthName }}</h2>
-    <table class="history-report-table" style="margin-top: 2rem">
-      <thead>
-        <tr>
-          <th>Tipe</th>
-          <th v-for="(header, i) in monthlyCategory" :key="i">{{ header }}</th>
-          <!-- <th>Mancanegara 'Dalam Negri</th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(month, i) in monthlyData" :key="i">
-          <td>{{ month.name }}</td>
-          <td v-for="(monthData, i) in month.data" :key="i">{{ monthData }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <div>
+        <h6>Data Penjualan Tiket Bulan {{ monthName }}</h6>
+        <table class="history-report-table" style="margin-top: 2rem; font-size: 0.5rem">
+          <thead>
+            <tr>
+              <th>Tipe</th>
+              <th v-for="(header, i) in monthlyCategory" :key="i">{{ header }}</th>
+              <!-- <th>Mancanegara 'Dalam Negri</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(month, i) in monthlyData" :key="i">
+              <td>{{ month.name }}</td>
+              <td v-for="(monthData, i) in month.data" :key="i">{{ monthData }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- <h2 style="margin-top: 2rem">Data Tingkat Keramaian Bulan</h2>
       <table class="history-report-table" style="margin-top: 2rem">
@@ -86,7 +90,7 @@
 </template>
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import Chart from '@/components/Chart.vue'
+import Chart from '@/components/ChartRekap.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import ReportHelper from '@/utilities/ReportHelper'
 const { selectedMonth, selectedYear, selectedMonthName } = ReportHelper
@@ -103,7 +107,7 @@ const monthName = ref(
     ? selectedMonthName.value.toLocaleString('id-ID', { month: 'long' })
     : new Date().toLocaleString('id-ID', { month: 'long' })
 )
-const widthcart = ref('250')
+const widthcart = ref('1')
 
 const fetchData = async () => {
   try {
@@ -160,5 +164,30 @@ onMounted(() => {
 .history-report-table th {
   background-color: #f2f2f2;
   font-weight: bold;
+}
+
+@media print and (orientation: landscape) {
+  .responsive_print {
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  .history-report-table th,
+  .history-report-table td {
+    border: 1px solid #ddd;
+    padding: 4px;
+    text-align: center;
+  }
+}
+
+@media print and (orientation: potrait) {
+  .history-report-table th,
+  .history-report-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
 }
 </style>
