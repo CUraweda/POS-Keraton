@@ -119,7 +119,7 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await fetch(`${DB_BASE_URL.value}/get-all-data`, {
+        const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/user/get-all-data`, {
           headers: {
             Authorization: getCookie('token')
           }
@@ -144,7 +144,7 @@ export default {
         role: this.form.role
       }
       try {
-        await fetch(`${DB_BASE_URL.value}/${USER_BASE_URL.value}`, {
+        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/update-user`, {
           method: 'POST',
           body: JSON.stringify(dataPost),
           headers: {
