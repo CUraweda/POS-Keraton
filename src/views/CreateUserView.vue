@@ -72,16 +72,18 @@
             <label for="email">Email:</label>
             <input type="email" v-model="form.email" required />
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="!isEdit">
             <label for="password">Password:</label>
             <input type="password" v-model="form.password" required />
           </div>
           <div class="form-group">
             <label for="role">Role:</label>
             <select v-model="form.role" required>
-              <option value="admin">Admin</option>
-              <option value="superadmin">Superadmin</option>
-              <option value="cashier">Cashier</option>
+              <option value="ADMIN">Admin</option>
+              <option value="SUPER_ADMIN">Superadmin</option>
+              <option value="CASHIER">Cashier</option>
+              <option value="CUSTOMER">Customer</option>
+              <option value="CURAWEDA">Curaweda</option>
             </select>
           </div>
           <button type="submit" class="submit-btn">{{ isEdit ? 'Update' : 'Add' }}</button>
@@ -109,7 +111,7 @@ export default {
         name: '',
         email: '',
         password: '',
-        role: 'admin'
+        role: 'ADMIN'
       }
     }
   },
@@ -131,7 +133,6 @@ export default {
           email: data.email,
           role: data.role
         }))
-        console.log(this.users)
       } catch (error) {
         console.error(error)
       }
@@ -144,7 +145,7 @@ export default {
         role: this.form.role
       }
       try {
-        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/update-user`, {
+        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/create-update-user`, {
           method: 'POST',
           body: JSON.stringify(dataPost),
           headers: {
@@ -152,8 +153,48 @@ export default {
             'Content-Type': 'application/json'
           }
         })
-      } catch (error) {
-        console.error(error)
+        this.resetForm()
+        this.showModal = false
+        this.fetchData()
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async updateUser() {
+      const dataPost = {
+        name: this.form.name,
+        email: this.form.email,
+        password: this.form.password,
+        role: this.form.role
+      }
+      try {
+        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/create-update-user`, {
+          method: 'POST',
+          body: JSON.stringify(dataPost),
+          headers: {
+            Authorization: getCookie('token'),
+            'Content-Type': 'application/json'
+          }
+        })
+        this.resetForm()
+        this.showModal = false
+        this.fetchData()
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async deleteUser(id) {
+      try{
+        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/delete-user/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: getCookie('token'),
+            'Content-Type': 'application/json'
+          }
+        })
+        this.fetchData()
+      }catch(e){
+        console.log(e)
       }
     },
     editUser(user) {
@@ -161,24 +202,13 @@ export default {
       this.isEdit = true
       this.showModal = true
     },
-    updateUser() {
-      const index = this.users.findIndex((user) => user.id === this.form.id)
-      if (index !== -1) {
-        this.users.splice(index, 1, this.form)
-      }
-      this.resetForm()
-      this.showModal = false
-    },
-    deleteUser(id) {
-      this.users = this.users.filter((user) => user.id !== id)
-    },
     resetForm() {
       this.form = {
         id: null,
         name: '',
         email: '',
         password: '',
-        role: 'admin'
+        role: 'ADMIN'
       }
       this.isEdit = false
     }
