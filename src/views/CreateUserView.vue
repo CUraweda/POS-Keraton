@@ -15,20 +15,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id" @click="openUserDialog(user)">
+        <tr v-for="user in users" :key="user.id">
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
-          <td
-            style="
-              display: flex;
-              align-items: center;
-              gap: 1rem;
-              justify-content: center;
-              padding: 1rem;
-            "
-          >
-            <button class="edit-btn" @click="editUser(user)">
+          <td style="align-items: center; height: 100%; justify-content: center; padding: 1rem">
+            <button class="edit-btn" @click="handleModal(user, 'edit')">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="24px"
@@ -40,6 +32,9 @@
                   d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"
                 />
               </svg>
+            </button>
+            <button style="cursor: pointer; color: green" @click="handleModal(user, 'pass')">
+              <PhKey :size="24" />
             </button>
             <button class="delete-btn" @click="deleteUser(user.id)">
               <svg
@@ -61,33 +56,44 @@
 
     <div v-if="showModal" class="modal">
       <div class="modal-content">
-        <span class="close" @click="showModal = false">&times;</span>
+        <span class="close" @click="(showModal = false), (isPassModal = false)">&times;</span>
         <h2>{{ isEdit ? 'Edit User' : 'Add User' }}</h2>
-        <form @submit.prevent="isEdit ? updateUser() : addUser()">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" v-model="form.name" required />
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" v-model="form.email" required />
-          </div>
-          <div class="form-group" v-if="!isEdit">
-            <label for="password">Password:</label>
-            <input type="password" v-model="form.password" required />
-          </div>
-          <div class="form-group">
-            <label for="role">Role:</label>
-            <select v-model="form.role" required>
-              <option value="ADMIN">Admin</option>
-              <option value="SUPER_ADMIN">Superadmin</option>
-              <option value="CASHIER">Cashier</option>
-              <option value="CUSTOMER">Customer</option>
-              <option value="CURAWEDA">Curaweda</option>
-            </select>
-          </div>
-          <button type="submit" class="submit-btn">{{ isEdit ? 'Update' : 'Add' }}</button>
-        </form>
+        <template v-if="isPassModal">
+          <form @submit.prevent="changePassword()">
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="password" v-model="form.password" required />
+            </div>
+            <button type="submit" class="submit-btn">Ubah</button>
+          </form>
+        </template>
+        <template v-else>
+          <form @submit.prevent="isEdit ? updateUser() : addUser()">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" v-model="form.name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" v-model="form.email" required />
+            </div>
+            <div class="form-group" v-if="!isEdit">
+              <label for="password">Password:</label>
+              <input type="password" v-model="form.password" required />
+            </div>
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select v-model="form.role" required>
+                <option value="ADMIN">Admin</option>
+                <option value="SUPER_ADMIN">Superadmin</option>
+                <option value="CASHIER">Cashier</option>
+                <option value="CUSTOMER">Customer</option>
+                <option value="CURAWEDA">Curaweda</option>
+              </select>
+            </div>
+            <button type="submit" class="submit-btn">{{ isEdit ? 'Update' : 'Add' }}</button>
+          </form>
+        </template>
       </div>
     </div>
   </div>
@@ -97,6 +103,7 @@
 import { ref } from 'vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import LoginHelper from '@/utilities/LoginHelper'
+import Swal from 'sweetalert2'
 const { getCookie } = LoginHelper
 const { DB_BASE_URL, USER_BASE_URL, CATEGORY_BASE_URL, assignAlert } = GlobalHelper
 
@@ -106,6 +113,8 @@ export default {
       users: ref([]),
       showModal: false,
       isEdit: false,
+      isPassModal: false,
+      originalUserData: {},
       form: {
         id: null,
         name: '',
@@ -119,6 +128,31 @@ export default {
     this.fetchData()
   },
   methods: {
+    async changePassword() {
+      try {
+        const response = await fetch(
+          `${DB_BASE_URL.value}/keraton-pos/user/change-password/${this.form.id}`,
+          {
+            method: 'PUT',
+            body: JSON.stringify({ password: this.form.password }),
+            headers: {
+              Authorization: getCookie('token'),
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+        if (response.success === true) {
+          Swal.fire({
+            title: 'Success',
+            text: 'Password changed successfully',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          })
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
     async fetchData() {
       try {
         const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/user/get-all-data`, {
@@ -153,6 +187,14 @@ export default {
             'Content-Type': 'application/json'
           }
         })
+        if (response.status === 200) {
+          Swal.fire({
+            title: 'Success',
+            text: 'data created successfully',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          })
+        }
         this.resetForm()
         this.showModal = false
         this.fetchData()
@@ -161,21 +203,54 @@ export default {
       }
     },
     async updateUser() {
-      const dataPost = {
-        name: this.form.name,
-        email: this.form.email,
-        password: this.form.password,
-        role: this.form.role
+      // const dataPost = {
+      //   name: this.form.name,
+      //   email: this.form.email,
+      //   password: this.form.password,
+      //   role: this.form.role
+      // }
+      const originalData = this.originalUserData
+
+      const dataPost = {}
+
+      if (this.form.name !== originalData.name) {
+        dataPost.name = this.form.name
+      }
+      if (this.form.email !== originalData.email) {
+        dataPost.email = this.form.email
+      }
+      if (this.form.password !== originalData.password) {
+        dataPost.password = this.form.password
+      }
+      if (this.form.role !== originalData.role) {
+        dataPost.role = this.form.role
+      }
+
+      // Pastikan ada data yang diupdate
+      if (Object.keys(dataPost).length === 0) {
+        console.log('Tidak ada perubahan data.')
+        return
       }
       try {
-        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/create-update-user`, {
-          method: 'POST',
-          body: JSON.stringify(dataPost),
-          headers: {
-            Authorization: getCookie('token'),
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${DB_BASE_URL.value}/keraton-pos/user/update-user-data/${this.form.id}`,
+          {
+            method: 'POST',
+            body: JSON.stringify(dataPost),
+            headers: {
+              Authorization: getCookie('token'),
+              'Content-Type': 'application/json'
+            }
           }
-        })
+        )
+        if (response.status === 200) {
+          Swal.fire({
+            title: 'Success',
+            text: 'data updated successfully',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          })
+        }
         this.resetForm()
         this.showModal = false
         this.fetchData()
@@ -184,23 +259,66 @@ export default {
       }
     },
     async deleteUser(id) {
-      try{
-        await fetch(`${DB_BASE_URL.value}/keraton-pos/user/delete-user/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: getCookie('token'),
-            'Content-Type': 'application/json'
+      // Tampilkan Swal untuk konfirmasi
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(async (result) => {
+        // Jika user memilih "Yes"
+        if (result.isConfirmed) {
+          try {
+            // Lakukan request DELETE ke API
+            const response = await fetch(
+              `${DB_BASE_URL.value}/keraton-pos/user/delete-user/${id}`,
+              {
+                method: 'DELETE',
+                headers: {
+                  Authorization: getCookie('token'),
+                  'Content-Type': 'application/json'
+                }
+              }
+            )
+
+            // Cek status response
+            if (response.status === 200) {
+              // Berhasil, tampilkan notifikasi sukses
+              Swal.fire({
+                title: 'Success',
+                text: 'User deleted successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+              })
+              // Refresh data setelah penghapusan
+              this.fetchData()
+            }
+          } catch (e) {
+            console.error(e)
+            // Tampilkan notifikasi jika gagal
+            Swal.fire({
+              title: 'Error',
+              text: 'There was a problem deleting the user.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            })
           }
-        })
-        this.fetchData()
-      }catch(e){
-        console.log(e)
-      }
+        }
+      })
     },
-    editUser(user) {
+    handleModal(user, type) {
+      this.originalUserData = { ...user }
       this.form = { ...user }
-      this.isEdit = true
-      this.showModal = true
+      if (type === 'pass') {
+        this.isPassModal = true
+        this.showModal = true
+      } else {
+        this.isEdit = true
+        this.showModal = true
+      }
     },
     resetForm() {
       this.form = {
@@ -323,6 +441,7 @@ td:hover:nth-child(3) {
 
 .edit-btn {
   color: #4caf50;
+  padding: 0.3rem 0.5rem;
 }
 
 .edit-btn:hover {
@@ -331,6 +450,7 @@ td:hover:nth-child(3) {
 
 .delete-btn {
   color: #f44336;
+  padding: 0.3rem 0.5rem;
 }
 
 .delete-btn:hover {
@@ -342,7 +462,7 @@ td:hover:nth-child(3) {
   justify-content: center;
   align-items: center;
   position: fixed;
-  z-index: 1;
+  z-index: 8889;
   left: 0;
   top: 0;
   width: 100%;
@@ -353,8 +473,9 @@ td:hover:nth-child(3) {
 .modal-content {
   background-color: white;
   padding: 2rem;
+  z-index: 9999;
   border-radius: 8px;
-  width: 300px;
+  width: 400px;
   position: relative;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
