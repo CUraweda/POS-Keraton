@@ -101,7 +101,7 @@ watchEffect(() => {
         font-size: 12px;
         line-height: 16px;
         white-space: nowrap;
-        z-index: 9999;
+        z-index: 8888;
       "
     ></div>
     <div style="overflow-y: auto; overflow-x: hidden; height: 100%">

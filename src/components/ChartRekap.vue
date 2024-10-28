@@ -169,8 +169,8 @@ watch(
     <div id="chart" class="revenue-details__chart-container" style="width: 100%">
       <apexchart
         type="line"
-        height="340"
-        width="800"
+        height="220"
+        width="360"
         :options="chartOptions"
         :series="dataSeries"
       ></apexchart>
@@ -181,7 +181,6 @@ watch(
 <style>
 .revenue-details {
   width: fit-content;
-  padding: 2rem;
   border-radius: 20px;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
   overflow-x: auto; /* Tambahkan overflow agar dapat digulir */
@@ -220,12 +219,6 @@ watch(
 .revenue-details__desc-subtitle {
   font-size: 12px;
   line-height: 14px;
-}
-
-.revenue-details__legend {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 10px 20px;
 }
 
 .revenue-details__legend-item {

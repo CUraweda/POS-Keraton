@@ -56,7 +56,6 @@ const {
 const checkData = async () => {
   try {
     isShowChart.value = false
-    GlobalHelper.showLoader.value = true
     await fetchIncomeRevenue()
     await fetchTargetYears()
     await fetchTargetMonths()
@@ -72,7 +71,18 @@ const checkData = async () => {
     console.error(error)
   }
 }
-
+watch(
+  () => selectedYear.value,
+  (newVal) => {
+    changeSelectedYear(newVal)
+  }
+)
+watch(
+  () => selectedMonth.value,
+  (newVal) => {
+    changeSelectedMonth(newVal)
+  }
+)
 const startDate = ref()
 const endDate = ref()
 const isLoadingKeramaian = ref(false)
@@ -196,7 +206,6 @@ const confirm = () => {
   confirmAlert.value = !confirmAlert.value
 }
 const transfer = async () => {
-  showLoader.value = true
   try {
     const response = await fetch(`${DB_BASE_URL.value}/keraton-pos/curaweda-income/transfer`, {
       method: 'POST',
@@ -214,7 +223,6 @@ const transfer = async () => {
   } catch (err) {
     console.error(err)
   } finally {
-    showLoader.value = false
   }
 }
 const submitOrder = () => {
