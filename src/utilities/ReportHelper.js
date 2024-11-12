@@ -19,8 +19,19 @@ const capitalizeFirstLetter = (str) => {
   return lowercaseStr.charAt(0).toUpperCase() + lowercaseStr.slice(1)
 }
 const formatDate = (dateStr) => {
-  return dateStr.split('T')[0].replace(/-/g, '/')
+  const date = new Date(dateStr);
+
+// Mendapatkan komponen tanggal, bulan, tahun, jam, menit, dan detik
+const day = String(date.getDate()).padStart(2, '0');
+const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+const year = date.getFullYear();
+const hours = String(date.getHours()).padStart(2, '0');
+const minutes = String(date.getMinutes()).padStart(2, '0');
+const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
 }
+
 const formatCurrency = (amount) => {
   return Number(amount).toLocaleString('id-ID')
 }
@@ -44,6 +55,7 @@ const fetchIncomeRevenue = async () => {
   }
 }
 
+
 const generateExcel = async () => {
   try {
     const response = await fetch(`${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data-all`);
@@ -59,8 +71,10 @@ const generateExcel = async () => {
     let ticketsSoldment = {}
 
     // Adding headers to the sheet data
-    tableSheetData.push(["No.", "Tanggal", "Pelanggan", "Nama Tiket", "Ketersediaan Item", "Jenis Tiket", "Pembayaran", "Jumlah", "Harga", "Total", "Total Dibayar", "Dihapus"]);
+    tableSheetData.push(["No.", "Tanggal", "Pelanggan", "Nama Tiket", "Ketersediaan Item", "Jenis Tiket", "Pembayaran", "Jumlah", "Harga", "Total", "Total Dibayar", "Dihapus", "Lokasi", "Timestamp"]);
 
+    console.log(responseData.data);
+    
     responseData.data.forEach((data, i) => {
       const row = [];
       let numTabel = "", total = "";
@@ -71,10 +85,8 @@ const generateExcel = async () => {
         rowIndex++;
       }
 
-      console.log(data)
-
       row.push(numTabel);
-      row.push(data.transaction.plannedDate.split('T')[0]);
+      row.push(formatDate(data.transaction.plannedDate));
       row.push(data.transaction.customer?.name || data.transaction.user?.name);
       row.push(data.order?.name || data.event.name);
       row.push(data.order ? (data.order.deleted ? "Tidak" : "Aktif") : (data.event.deleted ? "Tidak" : "Aktif"))
@@ -85,6 +97,8 @@ const generateExcel = async () => {
       row.push(formatCurrency(data.amount * (data.order?.price || data.event.price)));
       row.push(formatCurrency(total));
       row.push(data.transaction.deleted ? "Ya" : "Tidak")
+      row.push(data.cityName);
+      row.push(formatDate(data.transaction.createdDate));
       // IF the data.deleted is true then make all the cell to get filled with red 
 
       if (!ticketsSoldment[data.order?.name || data.event.name]) ticketsSoldment[data.order?.name || data.event.name] = {
@@ -423,11 +437,13 @@ const fetchOrderInfoCardData = async () => {
   }
 }
 const exportToExcel = () => {
+ 
+  
   const data = activityReportData.value.map((item, index) => ({
     No: index + 1,
     Pembelian: item.order ? item.order.name : item.event.name,
     Kategori: item.order ? item.order.category.name : 'Event',
-    Tanggal: item.transaction.plannedDate.split('T')[0],
+    Tanggal: formatDate(item.transaction.plannedDate),
     Jumlah: item.amount,
     Total: (item.order ? item.order.price : item.event.price) * item.amount,
   }))
@@ -446,7 +462,7 @@ const exportToExcel = () => {
   const formattedStartDate = tableDataFilter.value.startDate ? tableDataFilter.value.startDate.split('T')[0] : 'N/A'
   const formattedEndDate = tableDataFilter.value.endDate ? tableDataFilter.value.endDate.split('T')[0] : 'N/A'
   const fileName = `Report_${formattedStartDate}_to_${formattedEndDate}.xlsx`
-
+  
   XLSX.writeFile(wb, fileName)
 }
 
