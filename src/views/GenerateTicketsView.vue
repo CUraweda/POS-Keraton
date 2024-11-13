@@ -16,10 +16,12 @@ const route = useRoute()
 const generatePDFcooldown = ref(false)
 let customerName = ''
 let customerEmail = ''
+let arrayTiket = []
 
 const formatCurrency = (amount) => {
   return Number(amount).toLocaleString('id-ID')
 }
+
 const formatDate = (dateStr) => {
   const date = new Date(dateStr)
 
@@ -56,6 +58,17 @@ const fetchTickets = async (id) => {
     }
     const res = await response.json()
     ticketsData.value = res.data
+
+    const detail = res.data.detailTrans
+
+    detail.forEach((item) => {
+      if (item.order && item.order.desc) {
+        // Split setiap .order.desc dan masukkan hasilnya sebagai subarray ke arrayTiket
+        arrayTiket.push(item.order.desc.split(','))
+      }
+    })
+
+    console.log(arrayTiket)
 
     customerName = res.data.customer.name
     customerEmail = res.data.customer.email
@@ -131,45 +144,57 @@ const PrintCut = async (idComponen1, idComponen2) => {
 
 const PrintNonCut = async (idComponen) => {
   try {
-    const ticketElement = document.getElementById(idComponen);
+    const ticketElement = document.getElementById(idComponen)
     if (!ticketElement) {
-      console.error('Element not found');
-      return;
+      console.error('Element not found')
+      return
     }
 
     // Konversi elemen ke gambar menggunakan html2canvas
-    const canvas = await html2canvas(ticketElement, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
+    const canvas = await html2canvas(ticketElement, { scale: 2 })
+    const imgData = canvas.toDataURL('image/png')
 
     // Hitung tinggi PDF berdasarkan tinggi canvas
-    const widthInMm = 80;
-    const heightInMm = (canvas.height * 80) / canvas.width;
+    const widthInMm = 80
+    const heightInMm = (canvas.height * 80) / canvas.width
 
-    const pdf = new jsPDF('p', 'mm', [widthInMm, heightInMm]);
-    pdf.addImage(imgData, 'PNG', 0, 0, widthInMm, heightInMm);
+    const pdf = new jsPDF('p', 'mm', [widthInMm, heightInMm])
+    pdf.addImage(imgData, 'PNG', 0, 0, widthInMm, heightInMm)
 
-    const pdfOutput = pdf.output('blob');
-    const url = URL.createObjectURL(pdfOutput);
-    const printWindow = window.open(url, '_blank');
+    const pdfOutput = pdf.output('blob')
+    const url = URL.createObjectURL(pdfOutput)
+    const printWindow = window.open(url, '_blank')
 
     printWindow.onload = () => {
-      printWindow.print();
+      printWindow.print()
       printWindow.onafterprint = () => {
-        printWindow.close();
-        URL.revokeObjectURL(url);
-      };
-    };
+        printWindow.close()
+        URL.revokeObjectURL(url)
+      }
+    }
 
     printWindow.onerror = () => {
-      console.error("Print window couldn't be opened. Please check your popup blocker.");
-      isLoading.value = false;
-    };
+      console.error("Print window couldn't be opened. Please check your popup blocker.")
+      isLoading.value = false
+    }
   } catch (err) {
-    console.error(err);
-    isLoading.value = false;
+    console.error(err)
+    isLoading.value = false
   }
-};
+}
 
+const formatUniqeCode = (date, name) => {
+  const tanggal = date ? new Date(date) : new Date()
+  const nameuser = name ? name.split(' ')[0] : 'NC'
+
+  const formattedDate =
+    nameuser +
+    tanggal.toISOString().slice(2, 10).replace(/-/g, '') +
+    '-' +
+    tanggal.toTimeString().slice(0, 8).replace(/:/g, '')
+
+  return formattedDate
+}
 
 onMounted(() => {
   fetchTickets(route.params.id)
@@ -227,22 +252,7 @@ onMounted(() => {
         <p class="fw-700">Ticket non Cut ( potrait )</p>
         <ph-printer :size="32" />
       </button>
-      <button
-        class="generate-tickets__btn-print flex align-items-center gap[0.5]"
-       @click="PrintCut('ticket-landscape', '#ticket-landscape-potong')"
-        v-if="!generatePDFcooldown"
-      >
-        <p class="fw-700">Ticket Auto Cut ( landscape )</p>
-        <ph-printer :size="32" />
-      </button>
-      <button
-        class="generate-tickets__btn-print flex align-items-center gap[0.5]"
-        @click="PrintNonCut('tiket-full-landscape')"
-        v-if="!generatePDFcooldown"
-      >
-        <p class="fw-700">Ticket non Cut ( landscape )</p>
-        <ph-printer :size="32" />
-      </button>
+
       <div v-else>
         <p class="fw-700">Generate PDF<span class="send-email__text-cooldown"></span></p>
       </div>
@@ -272,9 +282,8 @@ onMounted(() => {
     </div>
 
     <div style="width: 100%; justify-content: center; display: flex; margin-top: 2rem">
-      <div style="border: 2px solid black" >
+      <div style="border: 2px solid black">
         <div id="tiket-full">
-
           <div ref="ticketRef" id="ticket" style="width: fit-content; height: fit-content">
             <div>
               <div style="display: grid; width: 100%; overflow-x: auto; flex-wrap: wrap">
@@ -296,11 +305,22 @@ onMounted(() => {
                       </div>
                       <div style="width: 90%; margin: auto">
                         <h5>
-                          Jl. Kasepuhan No.43, Kasepuhan, Kec. Lemahwungkuk, Kota Cirebon, Jawa Barat
+                          Jl. Kasepuhan No.43, Kasepuhan, Kec. Lemahwungkuk, Kota Cirebon, Jawa
+                          Barat
                         </h5>
                         <p class="desc">Selamat datang di wisata Keraton Kesepuhan Cirebon</p>
-                        <p class="desc">
-                          {{ ticketsData.plannedDate ? formatDate(ticketsData.plannedDate) : '0%' }}
+                      </div>
+                      <p class="text"></p>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">
+                          #{{ formatUniqeCode(ticketsData.createdDate, customerName) }}
                         </p>
                       </div>
                       <div
@@ -420,14 +440,16 @@ onMounted(() => {
                           class="descList"
                           style="display: inline; max-width: 50%; text-align: right"
                         >
-                          {{ `Rp.${formatCurrency(+ticketsData.total + ticketsData.additionalFee)}` }}
+                          {{
+                            `Rp.${formatCurrency(+ticketsData.total + ticketsData.additionalFee)}`
+                          }}
                         </p>
                       </div>
                       <section
                         class="separator"
                         style="margin-inline: auto; margin-top: 8px"
                       ></section>
-  
+
                       <div style="width: 100%; margin: auto">
                         <p class="desc">www.keraton-kasepuhan.com</p>
                         <p class="desc">
@@ -441,238 +463,81 @@ onMounted(() => {
               </div>
             </div>
           </div>
-  
+
           <div
             v-for="(ticket, index) in ticketsData.detailTrans"
             :key="index"
             style="width: fit-content; height: fit-content"
           >
-            <div id="tiket-potong" v-for="n in ticket.amount" :key="n">
-              <section class="ticket">
-                <div style="display: block; width: 100%; justify-content: center">
-                  <section class="separator" style="margin-inline: auto; margin-top: 8px"></section>
-                  <div style="width: 100%; margin: auto">
-                    <h5 style="text-transform: uppercase; font-size: x-small">Tiket Masuk</h5>
-                    <h5 style="text-transform: uppercase; font-size: x-small">
-                      {{ `${ticket.order.name} (${ticket.order.category.name})` }}
-                    </h5>
-                    <div style="display: flex; width: 100%">
-                      <img
-                        id="qrImage"
-                        :src="ticketsData.qrImage"
-                        style="
-                          width: 140px;
-                          height: 140px;
-                          margin-inline: auto;
-                          margin-top: 5px;
-                          margin-bottom: 5px;
-                        "
-                        alt="Keraton Kasepuhan Cirebon"
-                      />
+            <div v-for="(itemName, number) in arrayTiket[index]" :key="number">
+              <div id="tiket-potong" v-for="n in ticket.amount" :key="n">
+                <section class="ticket">
+                  <div style="display: block; width: 100%; justify-content: center">
+                    <section
+                      class="separator"
+                      style="margin-inline: auto; margin-top: 8px"
+                    ></section>
+                    <div style="width: 100%; margin: auto" class="tiket-potong">
+                      <div class="header">
+                        <p class="text">Tiket Masuk {{ itemName }}</p>
+                        <p class="text">
+                          #{{ formatUniqeCode(ticketsData.createdDate, customerName) }}
+                        </p>
+                      </div>
+                      <div class="body">
+                        <img
+                          id="qrImage"
+                          :src="ticketsData.qrImage"
+                          style="width: 100px; height: 100px"
+                          alt="Keraton Kasepuhan Cirebon"
+                        />
+                        <div>
+                          <p class="body-desc">
+                            {{ customerName }}
+                          </p>
+                          <p class="body-desc">
+                            {{ customerEmail }}
+                          </p>
+                          <p class="body-desc">
+                            {{
+                              ticketsData.createdDate ? formatDate(ticketsData.createdDate) : '0%'
+                            }}
+                          </p>
+                          <h5
+                            style="text-transform: uppercase; font-size: x-small; margin-top: 10px"
+                          >
+                            Enjoy The Tour!
+                          </h5>
+                        </div>
+                      </div>
                     </div>
-                    <div style="width: 70%; margin: auto">
-                      <h5 style="text-transform: uppercase; font-size: x-small">Enjoy The Tour!</h5>
-                    </div>
-                    <p class="desc">www.keraton-kasepuhan.com</p>
+                    <section
+                      class="separator"
+                      style="margin-inline: auto; margin-top: 8px"
+                    ></section>
                   </div>
-                  <section class="separator" style="margin-inline: auto; margin-top: 8px"></section>
-                </div>
-              </section>
+                </section>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- tiket landscape -->
-      <div style="border: 2px solid black; margin-left: 10px">
-        <div id="tiket-full-landscape">
-
-          <div ref="ticketRef" id="ticket-landscape">
-            <section class="ticket">
-              <div style="display: block; width: 100%; justify-content: center">
-                <div class="rotated-text">
-                  <div style="display: flex; width: 100%">
-                    <img
-                      src="../assets/images/vectordesign.svg"
-                      alt="Keraton Kasepuhan Cirebon"
-                      style="
-                        width: 120px;
-                        height: 120px;
-                        margin-inline: auto;
-                        margin-top: 10px;
-                        margin-bottom: 10px;
-                      "
-                    />
-                  </div>
-                  <div style="width: 90%; margin: auto">
-                    <h5>
-                      Jl. Kasepuhan No.43, Kasepuhan, Kec. Lemahwungkuk, Kota Cirebon, Jawa Barat
-                    </h5>
-                    <p class="desc">Selamat datang di wisata Keraton Kesepuhan Cirebon</p>
-                    <p class="desc">
-                      {{ ticketsData.plannedDate ? formatDate(ticketsData.plannedDate) : '0%' }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-  
-            <section class="ticket">
-              <div
-                style="
-                  display: block;
-                  height: 255px;
-                  width: 250px;
-                  justify-content: center;
-                  padding-top: 20px;
-                  margin-top: 20px;
-                  margin-bottom: 30px;
-                "
-                class="rotated-text"
-              >
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    width: 95%;
-                    margin-inline: auto;
-                  "
-                >
-                  <p class="descList">Customer</p>
-                  <p class="descList" style="display: inline; max-width: 40%; text-align: right">
-                    {{ customerName }}
-                  </p>
-                </div>
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    width: 95%;
-                    margin-inline: auto;
-                  "
-                >
-                  <p class="descList">Email</p>
-                  <p class="descList" style="display: inline; text-align: right">
-                    {{ customerEmail }}
-                  </p>
-                </div>
-                <section class="separator" style="margin-inline: auto; margin-top: 8px"></section>
-  
-                <div
-                  style="width: 95%; margin: auto"
-                  v-for="(ticket, index) in ticketsData.detailTrans"
-                  :key="index"
-                >
-                  <div style="display: flex; justify-content: space-between; width: 100%">
-                    <p class="descList">
-                      {{
-                        `${ticket.order.name} (${ticket.order.category.name}) x ${ticket.amount} Tiket`
-                      }}
-                    </p>
-                    <p class="descList" style="display: inline; max-width: 45%; text-align: right">
-                      {{ `Rp.${formatCurrency(ticket.order.price)}` }}
-                    </p>
-                  </div>
-                </div>
-                <section class="separator" style="margin-inline: auto; margin-top: 8px"></section>
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    width: 95%;
-                    margin-inline: auto;
-                  "
-                >
-                  <p class="descList">Pembayaran</p>
-                  <p class="descList" style="display: inline; max-width: 40%; text-align: right">
-                    {{ ticketsData.method }}
-                  </p>
-                </div>
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    width: 95%;
-                    margin-inline: auto;
-                  "
-                >
-                  <p class="descList">Potongan</p>
-                  <p class="descList" style="display: inline; max-width: 40%; text-align: right">
-                    {{ ticketsData.discount ? ticketsData.discount.split('|')[1] : '0%' }}
-                  </p>
-                </div>
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    width: 95%;
-                    margin-inline: auto;
-                  "
-                >
-                  <p class="descList">Cashback</p>
-                  <p class="descList" style="display: inline; max-width: 40%; text-align: right">
-                    {{ ticketsData.cashback ? ticketsData.cashback.split('|')[1] : '0%' }}
-                  </p>
-                </div>
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    width: 90%;
-                    margin-inline: auto;
-                  "
-                >
-                  <p class="descList">Total</p>
-                  <p class="descList" style="display: inline; max-width: 50%; text-align: right">
-                    {{ `Rp.${formatCurrency(+ticketsData.total + ticketsData.additionalFee)}` }}
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
-  
-          <div
-            v-for="(ticket, index) in ticketsData.detailTrans"
-            :key="index"
-            style="width: fit-content; height: fit-content"
-          >
-            <div id="ticket-landscape-potong" v-for="n in ticket.amount" :key="n">
-              <section
-                class="separator rotate-text"
-                style="margin-inline: auto; margin-top: 8px"
-              ></section>
-              <section class="ticket rotated-text">
-                <div style="display: block; width: 100%; justify-content: center">
-                  <div style="width: 100%; margin: auto">
-                    <h5 style="text-transform: uppercase; font-size: x-small">Tiket Masuk</h5>
-                    <h5 style="text-transform: uppercase; font-size: x-small">
-                      {{ `${ticket.order.name} (${ticket.order.category.name})` }}
-                    </h5>
-                    <div style="display: flex; width: 100%">
-                      <img
-                        id="qrImage"
-                        :src="ticketsData.qrImage"
-                        style="
-                          width: 140px;
-                          height: 140px;
-                          margin-inline: auto;
-                          margin-top: 5px;
-                          margin-bottom: 5px;
-                        "
-                        alt="Keraton Kasepuhan Cirebon"
-                      />
-                    </div>
-                    <div style="width: 70%; margin: auto">
-                      <h5 style="text-transform: uppercase; font-size: x-small">Enjoy The Tour!</h5>
-                    </div>
-                    <p class="desc">www.keraton-kasepuhan.com</p>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div
+      style="
+        width: 100%;
+        justify-content: center;
+        display: flex;
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+        flex-direction: column;
+        align-items: center;
+      "
+    >
+      <p>Driver Printer ( Recomended IWARE IW-j82BT )</p>
+      <a href="https://drive.google.com/file/d/1G2fwzPr9087BNZm9DNEttVANdH1AQGyT/view?usp=drive_link" target="_blank"> Android </a>
+      <a href="https://drive.google.com/file/d/1LjcxpPEO1wjFGdVCRQEm2fNyHbqJMgY5/view?usp=drive_link" target="_blank"> Windows </a>
     </div>
   </div>
 </template>
@@ -776,8 +641,24 @@ onMounted(() => {
   text-align: center;
 }
 
+.tiket-potong .header .text {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.5;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tiket-potong .body {
+  display: flex;
+  margin-top: 5px;
+}
+.tiket-potong .body p {
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .ticket .desc {
-  font-size: small;
   padding: 5px;
   font-size: x-small;
   width: 80%;
