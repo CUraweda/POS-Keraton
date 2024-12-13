@@ -70,9 +70,6 @@ const generateExcel = async () => {
         total = +data.transaction.total;
         rowIndex++;
       }
-
-      console.log(data)
-
       row.push(numTabel);
       row.push(data.transaction.plannedDate.split('T')[0]);
       row.push(data.transaction.customer?.name || data.transaction.user?.name);
@@ -105,7 +102,6 @@ const generateExcel = async () => {
       tableSheetData.push(row);
     });
 
-    console.log(tableSheetData)
     // Create worksheet and add data to it
     const worksheet = XLSX.utils.aoa_to_sheet(tableSheetData);
 
@@ -132,19 +128,17 @@ const generateExcel = async () => {
       return { wch: maxLength + 2 }; // Adding padding for better spacing
     });
     ticketSheets['!cols'] = ticketColWidth
-    XLSX.utils.book_append_sheet(workbook, ticketSheets, "Penjualan Tiket Tahun 2024")
-
-
+    XLSX.utils.book_append_sheet(workbook, ticketSheets, `Penjualan Tiket Tahun ${selectedYear.value}`)
+    
+    
     // SUMMARY SHEET
-
-    console.log(monthlyData)
     let yearlyTempData = yearlyData.value
     let monthlyTempData = monthlyData.value
     const summaryTableData = [
       [`Tabel Tingkat Keramaian ${selectedYear.value}`],
       ['Bulan', ...yearlyCategory.value, 'Total']
     ]
-
+    
     // YEAR SUMMARY
     const yearlyTotals = new Array(yearlyCategory.value.length).fill(0)
     yearlyTempData.forEach((item) => {
@@ -160,7 +154,7 @@ const generateExcel = async () => {
     })
     summaryTableData.push(['Total', ...yearlyTotals, yearlyTotals.reduce((a, b) => a + b, 0)])
 
-
+    
     // MONTH SUMMARY
     summaryTableData.push(
       [''],
@@ -168,7 +162,7 @@ const generateExcel = async () => {
       ['Tanggal', ...monthlyCategory.value, 'Total']
     )
     const monthlyTotals = new Array(monthlyCategory.value.length).fill(0)
-
+    
     monthlyTempData.forEach((item) => {
       const rowData = [item.name]
       let total = 0
@@ -184,7 +178,52 @@ const generateExcel = async () => {
 
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryTableData)
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Rekapan Transaksi')
-
+    
+    //DATA PENGUNJUNG
+    const pengunjungExcelData = [
+      [`Tabel Data Pengunjung ${selectedYear.value}`],
+      ['Negara', 'Jumlah', 'Kota', 'Jumlah']
+      
+    ]
+    const responsePengunjung = await fetch(
+      `${DB_BASE_URL.value}/${TRANSACTION_BASE_URL.value}/get-all-detail`
+    )
+    if (!responsePengunjung.ok) throw new Error('Gagal Fetching Data')
+    const pengunjungData = await responsePengunjung.json()
+    
+    let rawTabel = { city: {}, country: {}, cityLength: 0, countryLength: 0 }, rawFormatedTabel = []
+    for (let data of pengunjungData.data) {
+      let identifier = 'city', dataName = data.cityName
+      if (data.nationalityId) {
+        identifier = 'country'
+        dataName = data.nationality.name
+      }
+      
+      if (!rawTabel[identifier][dataName]) {
+        rawTabel[identifier][dataName] = {
+          amount: 0,
+          name: dataName
+        }
+        rawTabel[`${identifier}Length`]++
+      }
+      rawTabel[identifier][dataName].amount += data.amount
+    }
+    const highestLenght = Math.max(rawTabel.cityLength, rawTabel.countryLength)
+    const cityData = Object.values(rawTabel.city)
+    const countryData = Object.values(rawTabel.country)
+    for (let num = 0; num < highestLenght; num++) {
+      pengunjungExcelData.push([countryData[num]?.name || "", countryData[num]?.amount || '', cityData[num]?.name || '', cityData[num]?.amount || ''])
+    }
+    
+    const pengungjungSheets = XLSX.utils.aoa_to_sheet(pengunjungExcelData)
+     // Auto size columns
+     const colWidthPengujung = pengunjungExcelData.map((_, colIndex) => {
+      const colValues = pengunjungExcelData.map(row => row[colIndex] ? row[colIndex].toString() : '');
+      const maxLength = Math.max(...colValues.map(val => val.length));
+      return { wch: maxLength + 2 }; // Adding padding for better spacing
+    });
+    pengungjungSheets['!cols'] = colWidthPengujung;
+    XLSX.utils.book_append_sheet(workbook, pengungjungSheets, `Data Pengunjung Bulan ${selectedMonthName.value}`)
     // Write workbook to file
     XLSX.writeFile(workbook, `Pendapatan_Tiket ${new Date().toISOString()}.xlsx`);
   } catch (err) {
