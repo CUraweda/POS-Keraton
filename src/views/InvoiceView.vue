@@ -73,13 +73,14 @@ const name = ref(null)
 
 const confirmDelete = (data) => {
   idData.value = data.id
-  name.value = data.customer.name
+  name.value = data.user.name
   confirmAlert.value = true
 }
 
 const confirm = () => {
   confirmAlert.value = false
   deleteTransaction(idData.value)
+  fetchData()
 }
 
 const handleLimitChange = async (event) => {

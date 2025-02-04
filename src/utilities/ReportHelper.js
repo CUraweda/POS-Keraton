@@ -19,15 +19,15 @@ const capitalizeFirstLetter = (str) => {
   return lowercaseStr.charAt(0).toUpperCase() + lowercaseStr.slice(1)
 }
 const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
+  const date = new Date(dateStr)
 
-// Mendapatkan komponen tanggal, bulan, tahun, jam, menit, dan detik
-const day = String(date.getDate()).padStart(2, '0');
-const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
-const year = date.getFullYear();
-const hours = String(date.getHours()).padStart(2, '0');
-const minutes = String(date.getMinutes()).padStart(2, '0');
-const seconds = String(date.getSeconds()).padStart(2, '0');
+  // Mendapatkan komponen tanggal, bulan, tahun, jam, menit, dan detik
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Bulan dimulai dari 0
+  const year = date.getFullYear()
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
 
   return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
 }
@@ -38,7 +38,6 @@ const formatCurrency = (amount) => {
 
 /* ReportView Helper */
 const incomeRevenue = ref(0)
-
 
 const fetchIncomeRevenue = async () => {
   try {
@@ -55,99 +54,151 @@ const fetchIncomeRevenue = async () => {
   }
 }
 
-
 const generateExcel = async () => {
   try {
-    const response = await fetch(`${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data-all`);
-    if (!response.ok) throw new Error('Failed to fetch data');
+    const response = await fetch(
+      `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data-all`
+    )
+    const responseNational = await fetch(
+      `${DB_BASE_URL.value}/keraton-pos/nationality/nationality-list`
+    )
+    if (!response.ok) throw new Error('Failed to fetch data')
 
-    const responseData = await response.json();
-    const workbook = XLSX.utils.book_new();
-    const tableSheetData = [];
+    const responseData = await response.json()
+    const responseRegion = await responseNational.json()
+    const workbook = XLSX.utils.book_new()
+    const tableSheetData = []
 
     setMonthLocaleString()
-    let rowIndex = 1;
-    let currentTransactionId;
+    let rowIndex = 1
+    let currentTransactionId
     let ticketsSoldment = {}
 
     // Adding headers to the sheet data
-    tableSheetData.push(["No.", "Tanggal", "Pelanggan", "Nama Tiket", "Ketersediaan Item", "Jenis Tiket", "Pembayaran", "Jumlah", "Harga", "Total", "Total Dibayar", "Dihapus", "Lokasi", "Timestamp"]);
+    tableSheetData.push([
+      'No.',
+      'Tanggal',
+      'Pelanggan',
+      'Asal Kota',
+      'Asal Negara',
+      'Nama Tiket',
+      'Ketersediaan Item',
+      'Jenis Tiket',
+      'Pembayaran',
+      'Jumlah',
+      'Harga',
+      'Total',
+      'Total Dibayar',
+      'Dihapus',
+      'Lokasi',
+      'Timestamp'
+    ])
 
-    console.log(responseData.data);
-    
+    console.log(responseData.data)
+
+    let regionDatas = {}
+    responseRegion.data.forEach((data) => {
+      regionDatas[data.id] = data.name
+    })
+
     responseData.data.forEach((data, i) => {
-      const row = [];
-      let numTabel = "", total = "";
+      const row = []
+      let numTabel = '',
+        total = ''
       // Check if it's a new transaction
       if (data.transactionId !== currentTransactionId) {
-        numTabel = rowIndex;
-        total = +data.transaction.total;
-        rowIndex++;
+        numTabel = rowIndex
+        total = +data.transaction.total
+        rowIndex++
       }
 
-      row.push(numTabel);
-      row.push(formatDate(data.transaction.plannedDate));
-      row.push(data.transaction.customer?.name || data.transaction.user?.name);
-      row.push(data.order?.name || data.event.name);
-      row.push(data.order ? (data.order.deleted ? "Tidak" : "Aktif") : (data.event.deleted ? "Tidak" : "Aktif"))
-      row.push(data.order?.category.name || "Event");
-      row.push(data.transaction.method);
-      row.push(data.amount);
-      row.push(formatCurrency(data.order?.price || data.event.price));
-      row.push(formatCurrency(data.amount * (data.order?.price || data.event.price)));
-      row.push(formatCurrency(total));
-      row.push(data.transaction.deleted ? "Ya" : "Tidak")
-      row.push(data.cityName);
-      row.push(formatDate(data.transaction.createdDate));
-      // IF the data.deleted is true then make all the cell to get filled with red 
+      row.push(numTabel)
+      row.push(formatDate(data.transaction.plannedDate))
+      row.push(data.transaction.customer?.name || data.transaction.user?.name)
+      row.push(data.cityName ?? '-')
+      row.push(data.nationalityId ? regionDatas[data.nationalityId] : '-')
+      row.push(data.order?.name || data.event.name)
+      row.push(
+        data.order
+          ? data.order.deleted
+            ? 'Tidak'
+            : 'Aktif'
+          : data.event.deleted
+            ? 'Tidak'
+            : 'Aktif'
+      )
+      row.push(data.order?.category.name || 'Event')
+      row.push(data.transaction.method)
+      row.push(data.amount)
+      row.push(formatCurrency(data.order?.price || data.event.price))
+      row.push(formatCurrency(data.amount * (data.order?.price || data.event.price)))
+      row.push(formatCurrency(total))
+      row.push(data.transaction.deleted ? 'Ya' : 'Tidak')
+      row.push(data.cityName)
+      row.push(formatDate(data.transaction.createdDate))
+      // IF the data.deleted is true then make all the cell to get filled with red
 
-      if (!ticketsSoldment[data.order?.name || data.event.name]) ticketsSoldment[data.order?.name || data.event.name] = {
-        name: data.order?.name || data.event.name,
-        price: data.order?.price || data.event.price,
-        soldAmount: 0,
-        revenueTotal: 0,
-        revenueKeraton: 0,
-        revenueCuraweda: 0,
-      }
+      if (!ticketsSoldment[data.order?.name || data.event.name])
+        ticketsSoldment[data.order?.name || data.event.name] = {
+          name: data.order?.name || data.event.name,
+          price: data.order?.price || data.event.price,
+          soldAmount: 0,
+          revenueTotal: 0,
+          revenueKeraton: 0,
+          revenueCuraweda: 0
+        }
       if (!data.transaction.deleted) {
         ticketsSoldment[data.order?.name || data.event.name].soldAmount += data.amount
-        ticketsSoldment[data.order?.name || data.event.name].revenueTotal += data.amount * (data.order?.price || data.event.price)
-        ticketsSoldment[data.order?.name || data.event.name].revenueKeraton += data.transaction.keratonIncome.COH + data.transaction.keratonIncome.CIA
-        ticketsSoldment[data.order?.name || data.event.name].revenueCuraweda += data.transaction.curawedaIncome.COH + data.transaction.curawedaIncome.CIA
-        currentTransactionId = data.transactionId;
+        ticketsSoldment[data.order?.name || data.event.name].revenueTotal +=
+          data.amount * (data.order?.price || data.event.price)
+        ticketsSoldment[data.order?.name || data.event.name].revenueKeraton +=
+          data.transaction.keratonIncome.COH + data.transaction.keratonIncome.CIA
+        ticketsSoldment[data.order?.name || data.event.name].revenueCuraweda +=
+          data.transaction.curawedaIncome.COH + data.transaction.curawedaIncome.CIA
+        currentTransactionId = data.transactionId
       }
-      tableSheetData.push(row);
-    });
+      tableSheetData.push(row)
+    })
 
     console.log(tableSheetData)
     // Create worksheet and add data to it
-    const worksheet = XLSX.utils.aoa_to_sheet(tableSheetData);
+    const worksheet = XLSX.utils.aoa_to_sheet(tableSheetData)
 
     // Auto size columns
     const colWidths = tableSheetData[0].map((_, colIndex) => {
-      const colValues = tableSheetData.map(row => row[colIndex] ? row[colIndex].toString() : '');
-      const maxLength = Math.max(...colValues.map(val => val.length));
-      return { wch: maxLength + 2 }; // Adding padding for better spacing
-    });
-    worksheet['!cols'] = colWidths;
+      const colValues = tableSheetData.map((row) => (row[colIndex] ? row[colIndex].toString() : ''))
+      const maxLength = Math.max(...colValues.map((val) => val.length))
+      return { wch: maxLength + 2 } // Adding padding for better spacing
+    })
+    worksheet['!cols'] = colWidths
 
     // Append worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pendapatan Tiket Tahun 2024');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pendapatan Tiket Tahun 2024')
 
     // TICKET SHEET
-    const ticketSheetData = [['Nama Tiket', 'Harga Tiket', 'Total Penjualan', 'Revenue Penjualan', 'Revenue Keraton', 'Revenue Curaweda']]
+    const ticketSheetData = [
+      [
+        'Nama Tiket',
+        'Harga Tiket',
+        'Total Penjualan',
+        'Revenue Penjualan',
+        'Revenue Keraton',
+        'Revenue Curaweda'
+      ]
+    ]
     for (let ticketData of Object.values(ticketsSoldment)) {
       ticketSheetData.push(Object.values(ticketData))
     }
     const ticketSheets = XLSX.utils.aoa_to_sheet(ticketSheetData)
     const ticketColWidth = ticketSheetData[0].map((_, colIndex) => {
-      const colValues = ticketSheetData.map(row => row[colIndex] ? row[colIndex].toString() : '');
-      const maxLength = Math.max(...colValues.map(val => val.length));
-      return { wch: maxLength + 2 }; // Adding padding for better spacing
-    });
+      const colValues = ticketSheetData.map((row) =>
+        row[colIndex] ? row[colIndex].toString() : ''
+      )
+      const maxLength = Math.max(...colValues.map((val) => val.length))
+      return { wch: maxLength + 2 } // Adding padding for better spacing
+    })
     ticketSheets['!cols'] = ticketColWidth
-    XLSX.utils.book_append_sheet(workbook, ticketSheets, "Penjualan Tiket Tahun 2024")
-
+    XLSX.utils.book_append_sheet(workbook, ticketSheets, 'Penjualan Tiket Tahun 2024')
 
     // SUMMARY SHEET
 
@@ -174,7 +225,6 @@ const generateExcel = async () => {
     })
     summaryTableData.push(['Total', ...yearlyTotals, yearlyTotals.reduce((a, b) => a + b, 0)])
 
-
     // MONTH SUMMARY
     summaryTableData.push(
       [''],
@@ -200,12 +250,11 @@ const generateExcel = async () => {
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Rekapan Transaksi')
 
     // Write workbook to file
-    XLSX.writeFile(workbook, `Pendapatan_Tiket ${new Date().toISOString()}.xlsx`);
+    XLSX.writeFile(workbook, `Pendapatan_Tiket ${new Date().toISOString()}.xlsx`)
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
 }
-
 
 /* ChartReport Helper*/
 const selectedYear = ref(0)
@@ -386,35 +435,34 @@ const tableDataFilter = ref({
 
 const fetchTableDataReport = async (filter = tableDataFilter.value) => {
   try {
-    console.log(filter);
-    let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`;
+    console.log(filter)
+    let url = `${DB_BASE_URL.value}/${DETAILTRANS_BASE_URL.value}/table-data?`
     if (category.value) {
-      url += `&category=${encodeURIComponent(category.value)}`;
+      url += `&category=${encodeURIComponent(category.value)}`
     }
     if (filter.startDate) {
-      filter.startDate = filter.startDate.split('T')[0];
-      url += `&startDate=${filter.startDate}`;
+      filter.startDate = filter.startDate.split('T')[0]
+      url += `&startDate=${filter.startDate}`
     }
     if (filter.endDate) {
-      filter.endDate = filter.endDate.split('T')[0];
-      url += `&endDate=${filter.endDate}`;
+      filter.endDate = filter.endDate.split('T')[0]
+      url += `&endDate=${filter.endDate}`
     }
     if (filter.limit) {
-      url += `&limit=${filter.limit}`;
+      url += `&limit=${filter.limit}`
     }
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch data Report');
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Failed to fetch data Report')
 
-    const res = await response.json();
+    const res = await response.json()
     if (res.data) {
-      activityReportData.value = res.data;
+      activityReportData.value = res.data
     }
   } catch (error) {
-    console.error('Error fetching data Report:', error);
+    console.error('Error fetching data Report:', error)
   }
-};
-
+}
 
 /* TicketInfoCard Helper */
 const orderInfoCardData = ref([])
@@ -437,15 +485,13 @@ const fetchOrderInfoCardData = async () => {
   }
 }
 const exportToExcel = () => {
- 
-  
   const data = activityReportData.value.map((item, index) => ({
     No: index + 1,
     Pembelian: item.order ? item.order.name : item.event.name,
     Kategori: item.order ? item.order.category.name : 'Event',
     Tanggal: formatDate(item.transaction.plannedDate),
     Jumlah: item.amount,
-    Total: (item.order ? item.order.price : item.event.price) * item.amount,
+    Total: (item.order ? item.order.price : item.event.price) * item.amount
   }))
   const ws = XLSX.utils.json_to_sheet(data)
   const maxLengths = data.reduce((lengths, row) => {
@@ -454,15 +500,19 @@ const exportToExcel = () => {
     })
     return lengths
   }, [])
-  ws['!cols'] = maxLengths.map(length => ({ width: length }))
+  ws['!cols'] = maxLengths.map((length) => ({ width: length }))
 
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Report')
 
-  const formattedStartDate = tableDataFilter.value.startDate ? tableDataFilter.value.startDate.split('T')[0] : 'N/A'
-  const formattedEndDate = tableDataFilter.value.endDate ? tableDataFilter.value.endDate.split('T')[0] : 'N/A'
+  const formattedStartDate = tableDataFilter.value.startDate
+    ? tableDataFilter.value.startDate.split('T')[0]
+    : 'N/A'
+  const formattedEndDate = tableDataFilter.value.endDate
+    ? tableDataFilter.value.endDate.split('T')[0]
+    : 'N/A'
   const fileName = `Report_${formattedStartDate}_to_${formattedEndDate}.xlsx`
-  
+
   XLSX.writeFile(wb, fileName)
 }
 
