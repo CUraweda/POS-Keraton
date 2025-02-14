@@ -1,3 +1,6 @@
+# Script Create Shortcut auto print mode kiosk 
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --user-data-dir="C:\Users\<username>\AppData\Local\Google\Chrome\User Data\Profile 1" --kiosk --kiosk-printing
+
 # admin-page
 
 This template should help get you started developing with Vue 3 in Vite.

@@ -694,7 +694,6 @@ input:focus {
 
 .settings__menu {
   margin-inline: auto;
-  justify-content: center;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 170px));
   gap: 2.1rem;
@@ -708,6 +707,7 @@ input:focus {
 @media screen and (max-width: 768px) {
   .settings__menu {
     padding-left: 0;
+    justify-content: center;
   }
 
   .title {
@@ -717,10 +717,10 @@ input:focus {
 
 .settings__menu-items {
   padding: 0.5rem;
+  justify-content: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   width: 10rem;
   height: 10rem;
   margin-top: 1rem;

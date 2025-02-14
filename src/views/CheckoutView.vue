@@ -475,13 +475,13 @@ onMounted(() => {
                       </span>
                       <ph-caret-right :size="16" weight="bold" />
                     </button>
-                    <!-- <button @click="selectPayment('Qode Qr')">
+                    <button @click="selectPayment('Qris')">
                       <span
                         ><ph-qr-code :size="16" weight="bold" />
-                        <h6>Code Qr</h6>
+                        <h6>Qris</h6>
                       </span>
                       <ph-caret-right :size="16" weight="bold" />
-                    </button> -->
+                    </button>
                   </div>
                 </div>
               </section>

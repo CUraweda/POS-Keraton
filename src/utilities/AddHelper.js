@@ -67,7 +67,9 @@ const handleFileSelected = (file) => {
 }
 
 const formattedPrice = computed(() => {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(orderPrice.value)
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(
+    orderPrice.value
+  )
 })
 
 const updateCategory = (value) => {

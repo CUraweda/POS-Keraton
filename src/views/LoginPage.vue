@@ -76,13 +76,13 @@ watch(loggedIn, (newValue) => {
                 autocomplete="password"
               />
 
-              <button @click="toggleShowPassword" class="password-toggle-btn">
+              <div @click="toggleShowPassword" class="password-toggle-btn">
                 <component
                   :is="showPasswordText === 'Hide Password' ? 'ph-eye-slash' : 'ph-eye'"
                   :size="24"
                   :color="'#545454'"
                 />
-              </button>
+              </div>
             </div>
           </div>
           <div class="login-button">
