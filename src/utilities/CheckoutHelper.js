@@ -15,7 +15,7 @@ const {
   assignAlert
 } = GlobalHelper
 
-const { userData, userCarts } = LoginHelper
+const { userData, userCarts, getCookie } = LoginHelper
 
 /* NationalityDropdown Helper */
 const nationalityData = ref([])
@@ -98,7 +98,7 @@ const closeDropdownOutside = (event) => {
 const getUserCarts = () => {
   if (userCarts.value) {
     for (let item of userCarts.value) {
-      ;(item.nationalityId = undefined),
+      ; (item.nationalityId = undefined),
         (item.cityName = undefined),
         (item.guideId = item.guideId || '')
       item.guideName = item.guideName || ''
@@ -262,6 +262,8 @@ const createTransaction = async () => {
       guideId: item.guideId
     }))
 
+  console.log(getCookie('token'))
+
   try {
     if (order.length < 1) throw Error('No Item To Checkout')
     showLoader.value = true
@@ -270,7 +272,8 @@ const createTransaction = async () => {
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: getCookie('token')
         },
         body: JSON.stringify({
           // customer: {
