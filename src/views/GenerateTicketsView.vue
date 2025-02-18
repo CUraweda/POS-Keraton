@@ -7,6 +7,7 @@ import DashboardHelper from '@/utilities/DashboardHelper'
 import LoginHelper from '@/utilities/LoginHelper'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import QRCode from 'qrcode'
 
 const { DB_BASE_URL, TRANSACTION_BASE_URL, showLoader, getImageURL } = GlobalHelper
 const { ticketsData, emailCooldown, sendEmailToUser } = CheckoutHelper
@@ -17,6 +18,7 @@ const generatePDFcooldown = ref(false)
 let customerName = ''
 let customerEmail = ''
 let arrayTiket = []
+const qrCodeUrl = ref('')
 
 const formatCurrency = (amount) => {
   return Number(amount).toLocaleString('id-ID')
@@ -195,10 +197,19 @@ const formatUniqeCode = (date, name) => {
 
   return formattedDate
 }
-
+const generateQr = (id) => {
+  let Url = '' 
+  QRCode.toDataURL(id, (err, url) => {
+    if (err) console.error(err)
+   Url = url
+  })
+  return Url
+}
 onMounted(() => {
   fetchTickets(route.params.id)
+ 
 })
+
 </script>
 
 <template>
@@ -479,18 +490,23 @@ onMounted(() => {
                     ></section>
                     <div style="width: 100%; margin: auto" class="tiket-potong">
                       <div class="header">
-                        <p class="text">Tiket Masuk {{ itemName }}</p>
-                        <p class="text">
-                          #{{ formatUniqeCode(ticketsData.createdDate, customerName) }}
-                        </p>
+                        <div>
+                          <img
+                            src="../assets/images/vectordesign.svg"
+                            alt="Keraton Kasepuhan Cirebon"
+                            style="width: 40px; height: 40px"
+                          />
+                        </div>
+                        <div>
+                          <p class="text">Tiket Masuk {{ itemName }}</p>
+                          <p class="text">
+                            #{{ formatUniqeCode(ticketsData.createdDate, customerName) }}
+                          </p>
+                        </div>
                       </div>
                       <div class="body">
-                        <img
-                          id="qrImage"
-                          :src="ticketsData.qrImage"
-                          style="width: 100px; height: 100px"
-                          alt="Keraton Kasepuhan Cirebon"
-                        />
+                        <img :src="generateQr(ticketsData.id)"  style="width: 60px; height: 60px" alt="QR Code">
+                      
                         <div>
                           <p class="body-desc">
                             {{ customerName }}
@@ -503,11 +519,6 @@ onMounted(() => {
                               ticketsData.createdDate ? formatDate(ticketsData.createdDate) : '0%'
                             }}
                           </p>
-                          <h5
-                            style="text-transform: uppercase; font-size: x-small; margin-top: 10px"
-                          >
-                            Enjoy The Tour!
-                          </h5>
                         </div>
                       </div>
                     </div>
@@ -536,8 +547,18 @@ onMounted(() => {
       "
     >
       <p>Driver Printer ( Recomended IWARE IW-j82BT )</p>
-      <a href="https://drive.google.com/file/d/1G2fwzPr9087BNZm9DNEttVANdH1AQGyT/view?usp=drive_link" target="_blank"> Android </a>
-      <a href="https://drive.google.com/file/d/1LjcxpPEO1wjFGdVCRQEm2fNyHbqJMgY5/view?usp=drive_link" target="_blank"> Windows </a>
+      <a
+        href="https://drive.google.com/file/d/1G2fwzPr9087BNZm9DNEttVANdH1AQGyT/view?usp=drive_link"
+        target="_blank"
+      >
+        Android
+      </a>
+      <a
+        href="https://drive.google.com/file/d/1LjcxpPEO1wjFGdVCRQEm2fNyHbqJMgY5/view?usp=drive_link"
+        target="_blank"
+      >
+        Windows
+      </a>
     </div>
   </div>
 </template>
@@ -648,14 +669,22 @@ onMounted(() => {
   text-transform: uppercase;
   font-weight: 600;
 }
+.tiket-potong .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .tiket-potong .body {
   display: flex;
-  margin-top: 5px;
+  justify-content: center;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .tiket-potong .body p {
   font-size: 10px;
   line-height: 1.5;
+  padding-left: 10px;
 }
 
 .ticket .desc {
