@@ -11,12 +11,12 @@ const router = useRouter()
 const route = useRoute()
 let allowedViewMenu = ref([])
 let listRouter = {
-  0: { name: "Dashboard", shown: false, path: "/" }, 
-  1: { name: "Invoice", shown: false, path: "/" }, 
-  2: { name: "Report", shown: false, path: "/" }, 
-  3: { name: "Checkout", shown: false, path: "/" }, 
-  4:{ name: "Report Curaweda", shown: false, path: "/" }, 
-  5:{ name: "Report", shown: false, path: "/" }, 
+  0: { name: 'Dashboard', shown: false, path: '/' },
+  1: { name: 'Invoice', shown: false, path: '/' },
+  2: { name: 'Report', shown: false, path: '/' },
+  3: { name: 'Checkout', shown: false, path: '/' },
+  4: { name: 'Report Curaweda', shown: false, path: '/' },
+  5: { name: 'Report', shown: false, path: '/' }
 }
 let isCurawedaAccount = ref(false)
 
@@ -69,9 +69,16 @@ onMounted(() => {
   } else {
     console.log(listRouter)
     console.log(router.getRoutes)
-    router.getRoutes().filter(route => route.meta?.sideBar).forEach((route) => { listRouter[route.meta.sideBarNo]['path'] = route.path })
+    router
+      .getRoutes()
+      .filter((route) => route.meta?.sideBar)
+      .forEach((route) => {
+        listRouter[route.meta.sideBarNo]['path'] = route.path
+      })
     console.log(userData)
-    allowedViewMenu = userData.value.shownPOSMenu.split(",").forEach((id) => { listRouter[+id].shown = true })
+    allowedViewMenu = userData?.value?.shownPOSMenu?.split(',').forEach((id) => {
+      listRouter[+id].shown = true
+    })
     console.log(listRouter)
     isCurawedaAccount = userData.value.role === 'CURAWEDA'
     determineActiveLink()
@@ -124,7 +131,8 @@ watchEffect(() => {
       <div class="navbar-links">
         <!-- Menggunakan router-link dengan params -->
         <div class="navbar-links-container flex fd-col" v-if="!isCurawedaAccount">
-          <RouterLink v-if="listRouter[0].shown"
+          <RouterLink
+            v-if="listRouter[0].shown"
             :to="listRouter[0].path"
             :class="{ active: activeLink === 0 }"
             :name="listRouter[0].name"
@@ -133,7 +141,11 @@ watchEffect(() => {
           >
             <ph-house :size="24" weight="bold" />
           </RouterLink>
-          <RouterLink :to="listRouter[1].path" :class="{ active: activeLink === 1 }" v-if="listRouter[1].shown">
+          <RouterLink
+            :to="listRouter[1].path"
+            :class="{ active: activeLink === 1 }"
+            v-if="listRouter[1].shown"
+          >
             <ph-envelope-simple
               :size="24"
               weight="bold"
@@ -142,7 +154,11 @@ watchEffect(() => {
               @mouseleave="hideTooltip"
             />
           </RouterLink>
-          <RouterLink :to="listRouter[2].path" :class="{ active: activeLink === 2 }" v-if="listRouter[2].shown">
+          <RouterLink
+            :to="listRouter[2].path"
+            :class="{ active: activeLink === 2 }"
+            v-if="listRouter[2].shown"
+          >
             <ph-currency-circle-dollar
               :size="24"
               weight="bold"
@@ -151,7 +167,11 @@ watchEffect(() => {
               @mouseleave="hideTooltip"
             />
           </RouterLink>
-          <RouterLink :to="listRouter[3].path" :class="{ active: activeLink === 3 }" v-if="listRouter[3].shown">
+          <RouterLink
+            :to="listRouter[3].path"
+            :class="{ active: activeLink === 3 }"
+            v-if="listRouter[3].shown"
+          >
             <ph-shopping-cart-simple
               :size="24"
               weight="bold"
@@ -163,7 +183,11 @@ watchEffect(() => {
           </RouterLink>
         </div>
         <div v-if="isCurawedaAccount" class="navbar-links-container flex fd-col">
-          <RouterLink :to="listRouter[4].path" :class="{ active: activeLink === 4 }" v-if="listRouter[4].shown">
+          <RouterLink
+            :to="listRouter[4].path"
+            :class="{ active: activeLink === 4 }"
+            v-if="listRouter[4].shown"
+          >
             <PhNotePencil
               :size="24"
               weight="bold"
@@ -172,7 +196,11 @@ watchEffect(() => {
               @mouseleave="hideTooltip"
             />
           </RouterLink>
-          <RouterLink :to="listRouter[2].path" :class="{ active: activeLink === 4 }" v-if="listRouter[2].shown">
+          <RouterLink
+            :to="listRouter[2].path"
+            :class="{ active: activeLink === 4 }"
+            v-if="listRouter[2].shown"
+          >
             <ph-currency-circle-dollar
               :size="24"
               weight="bold"
@@ -182,10 +210,10 @@ watchEffect(() => {
             />
           </RouterLink>
         </div>
-        <div class="navbar-links__settings-container flex fd-col" >
+        <div class="navbar-links__settings-container flex fd-col">
           <a
-          @click="toSettings()"
-          :class="{ active: activeLink === 5 }"
+            @click="toSettings()"
+            :class="{ active: activeLink === 5 }"
             v-if="!isCurawedaAccount || listRouter[5].shown"
             style="cursor: pointer"
           >

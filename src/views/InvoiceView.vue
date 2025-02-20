@@ -4,9 +4,9 @@ import invoiceDetail from '@/components/InvoiceDetail.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import InvoiceHelper from '@/utilities/InvoiceHelper'
 import LoginHelper from '@/utilities/LoginHelper'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-const route = useRoute()
+const route = useRouter()
 const currentRoute = route.name
 const { DB_BASE_URL, TRANSACTION_BASE_URL, showLoader } = GlobalHelper
 
@@ -87,6 +87,10 @@ const handleLimitChange = async (event) => {
   selectedLimit.value = event.target.value
   currentPage.value = 1 // Reset to first page when limit changes
   await fetchData()
+}
+
+const navigateGenerate = (id) => {
+  route.push(`/checkout/generate-tickets/${id}`)
 }
 
 // Fetch data and taxes on component mount
@@ -180,6 +184,13 @@ onMounted(() => {
                       v-if="userData.role !== 'CASHIER'"
                     >
                       Delete
+                    </button>
+                    <button
+                      class="btn-primary invoice-table__button"
+                      @click="navigateGenerate(item.id)"
+                      v-if="userData.role !== 'CASHIER'"
+                    >
+                      Generate Ticket
                     </button>
                   </div>
                 </td>

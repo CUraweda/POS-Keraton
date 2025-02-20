@@ -185,6 +185,88 @@ const PrintNonCut = async (idComponen) => {
   }
 }
 
+const PrintRecipt = async (idComponen) => {
+  try {
+    const ticketElement = document.getElementById(idComponen)
+    if (!ticketElement) {
+      console.error('Element not found')
+      return
+    }
+
+    // Konversi elemen ke gambar menggunakan html2canvas
+    const canvas = await html2canvas(ticketElement, { scale: 2 })
+    const imgData = canvas.toDataURL('image/png')
+
+    // Hitung tinggi PDF berdasarkan tinggi canvas
+    const widthInMm = 80
+    const heightInMm = (canvas.height * 80) / canvas.width
+
+    const pdf = new jsPDF('p', 'mm', [widthInMm, heightInMm])
+    pdf.addImage(imgData, 'PNG', 0, 0, widthInMm, heightInMm)
+
+    const pdfOutput = pdf.output('blob')
+    const url = URL.createObjectURL(pdfOutput)
+    const printWindow = window.open(url, '_blank')
+
+    printWindow.onload = () => {
+      printWindow.print()
+      printWindow.onafterprint = () => {
+        printWindow.close()
+        URL.revokeObjectURL(url)
+      }
+    }
+
+    printWindow.onerror = () => {
+      console.error("Print window couldn't be opened. Please check your popup blocker.")
+      isLoading.value = false
+    }
+  } catch (err) {
+    console.error(err)
+    isLoading.value = false
+  }
+}
+
+const PrintInvoice = async (idComponen) => {
+  try {
+    const ticketElement = document.getElementById(idComponen)
+    if (!ticketElement) {
+      console.error('Element not found')
+      return
+    }
+
+    // Konversi elemen ke gambar menggunakan html2canvas
+    const canvas = await html2canvas(ticketElement, { scale: 2 })
+    const imgData = canvas.toDataURL('image/png')
+
+    // Hitung tinggi PDF berdasarkan tinggi canvas
+    const widthInMm = 80
+    const heightInMm = (canvas.height * 80) / canvas.width
+
+    const pdf = new jsPDF('p', 'mm', [widthInMm, heightInMm])
+    pdf.addImage(imgData, 'PNG', 0, 0, widthInMm, heightInMm)
+
+    const pdfOutput = pdf.output('blob')
+    const url = URL.createObjectURL(pdfOutput)
+    const printWindow = window.open(url, '_blank')
+
+    printWindow.onload = () => {
+      printWindow.print()
+      printWindow.onafterprint = () => {
+        printWindow.close()
+        URL.revokeObjectURL(url)
+      }
+    }
+
+    printWindow.onerror = () => {
+      console.error("Print window couldn't be opened. Please check your popup blocker.")
+      isLoading.value = false
+    }
+  } catch (err) {
+    console.error(err)
+    isLoading.value = false
+  }
+}
+
 const formatUniqeCode = (date, name) => {
   const tanggal = date ? new Date(date) : new Date()
   const nameuser = name ? name.split(' ')[0] : 'NC'
@@ -198,18 +280,16 @@ const formatUniqeCode = (date, name) => {
   return formattedDate
 }
 const generateQr = (id) => {
-  let Url = '' 
+  let Url = ''
   QRCode.toDataURL(id, (err, url) => {
     if (err) console.error(err)
-   Url = url
+    Url = url
   })
   return Url
 }
 onMounted(() => {
   fetchTickets(route.params.id)
- 
 })
-
 </script>
 
 <template>
@@ -261,6 +341,24 @@ onMounted(() => {
         v-if="!generatePDFcooldown"
       >
         <p class="fw-700">Ticket non Cut ( potrait )</p>
+        <ph-printer :size="32" />
+      </button>
+
+      <button
+        class="generate-tickets__btn-print flex align-items-center gap[0.5]"
+        @click="PrintRecipt('recipt')"
+        v-if="!generatePDFcooldown"
+      >
+        <p class="fw-700">Recipt (Potrait)</p>
+        <ph-printer :size="32" />
+      </button>
+
+      <button
+        class="generate-tickets__btn-print flex align-items-center gap[0.5]"
+        @click="PrintInvoice('invoice')"
+        v-if="!generatePDFcooldown"
+      >
+        <p class="fw-700">Invoice (Potrait)</p>
         <ph-printer :size="32" />
       </button>
 
@@ -505,8 +603,12 @@ onMounted(() => {
                         </div>
                       </div>
                       <div class="body">
-                        <img :src="generateQr(ticketsData.id)"  style="width: 60px; height: 60px" alt="QR Code">
-                      
+                        <img
+                          :src="generateQr(ticketsData.id)"
+                          style="width: 60px; height: 60px"
+                          alt="QR Code"
+                        />
+
                         <div>
                           <p class="body-desc">
                             {{ customerName }}
@@ -560,9 +662,436 @@ onMounted(() => {
         Windows
       </a>
     </div>
+
+    <div
+      style="
+        width: 100%;
+        justify-content: center;
+        display: flex;
+        margin-top: 2rem;
+        visibility: hidden;
+      "
+    >
+      <div style="border: 2px solid black">
+        <div id="recipt">
+          <div ref="ticketRef" id="ticket" style="width: fit-content; height: fit-content">
+            <div>
+              <div style="display: grid; width: 100%; overflow-x: auto; flex-wrap: wrap">
+                <div style="gap: 5px">
+                  <section class="ticket">
+                    <div style="display: block; width: 100%; justify-content: center">
+                      <div style="display: flex; width: 100%">
+                        <img
+                          src="../assets/images/vectordesign.svg"
+                          alt="Keraton Kasepuhan Cirebon"
+                          style="
+                            width: 120px;
+                            height: 120px;
+                            margin-inline: auto;
+                            margin-top: 10px;
+                            margin-bottom: 10px;
+                          "
+                        />
+                      </div>
+                      <div style="width: 90%; margin: auto">
+                        <h5>
+                          Jl. Kasepuhan No.43, Kasepuhan, Kec. Lemahwungkuk, Kota Cirebon, Jawa
+                          Barat
+                        </h5>
+                        <p class="desc">Selamat datang di wisata Keraton Kesepuhan Cirebon</p>
+                      </div>
+                      <p class="text"></p>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">
+                          #{{ formatUniqeCode(ticketsData.createdDate, customerName) }}
+                        </p>
+                      </div>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">Customer</p>
+                        <p
+                          class="descList"
+                          style="display: inline; max-width: 40%; text-align: right"
+                        >
+                          {{ customerName }}
+                        </p>
+                      </div>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">Email</p>
+                        <p class="descList" style="display: inline; text-align: right">
+                          {{ customerEmail }}
+                        </p>
+                      </div>
+                      <section
+                        class="separator"
+                        style="margin-inline: auto; margin-top: 8px"
+                      ></section>
+                      <div
+                        style="width: 95%; margin: auto"
+                        v-for="(ticket, index) in ticketsData.detailTrans"
+                        :key="index"
+                      >
+                        <div style="display: flex; justify-content: space-between; width: 100%">
+                          <p class="descList">
+                            {{
+                              `${ticket.order.name} (${ticket.order.category.name}) x ${ticket.amount} Tiket`
+                            }}
+                          </p>
+                          <p
+                            class="descList"
+                            style="display: inline; max-width: 45%; text-align: right"
+                          >
+                            {{ `Rp.${formatCurrency(ticket.order.price)}` }}
+                          </p>
+                        </div>
+                      </div>
+                      <section
+                        class="separator"
+                        style="margin-inline: auto; margin-top: 8px"
+                      ></section>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">Pembayaran</p>
+                        <p
+                          class="descList"
+                          style="display: inline; max-width: 40%; text-align: right"
+                        >
+                          {{ ticketsData.method }}
+                        </p>
+                      </div>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">Potongan</p>
+                        <p
+                          class="descList"
+                          style="display: inline; max-width: 40%; text-align: right"
+                        >
+                          {{ ticketsData.discount ? ticketsData.discount.split('|')[1] : '0%' }}
+                        </p>
+                      </div>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 95%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">Cashback</p>
+                        <p
+                          class="descList"
+                          style="display: inline; max-width: 40%; text-align: right"
+                        >
+                          {{ ticketsData.cashback ? ticketsData.cashback.split('|')[1] : '0%' }}
+                        </p>
+                      </div>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          width: 90%;
+                          margin-inline: auto;
+                        "
+                      >
+                        <p class="descList">Total</p>
+                        <p
+                          class="descList"
+                          style="display: inline; max-width: 50%; text-align: right"
+                        >
+                          {{
+                            `Rp.${formatCurrency(+ticketsData.total + ticketsData.additionalFee)}`
+                          }}
+                        </p>
+                      </div>
+                      <section
+                        class="separator"
+                        style="margin-inline: auto; margin-top: 8px"
+                      ></section>
+
+                      <div style="width: 100%; margin: auto">
+                        <p class="desc">www.keraton-kasepuhan.com</p>
+                        <p class="desc">
+                          *Tiket yang sudah dibeli tidak dapat ditukar atau dikembalikan<br />Berlaku
+                          hanya pada tanggal yang tertera pada tiket ini
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      style="
+        justify-content: center;
+        display: flex;
+        margin-top: 2rem;
+        padding-inline: 1rem;
+        visibility: hidden;
+      "
+    >
+      <div style="border: 2px solid black">
+        <div id="invoice">
+          <img src="../assets/images/kop-surat.png" alt="Kop Surat" style="width: 100%" />
+
+          <div style="padding-inline: 7rem">
+            <div
+              style="
+                font-weight: bold;
+                text-decoration: underline;
+                text-align: center;
+                font-size: 1.5rem;
+                border: 2px solid black;
+                margin-top: 3rem;
+              "
+            >
+              INVOICE
+            </div>
+
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 1.2rem;
+                margin-top: 1rem;
+              "
+            >
+              <div style="font-weight: bold">Kepada Yth.</div>
+              <div style="font-weight: bold">
+                Tanggal: <span>{{ new Date().toISOString().split('T')[0] }}</span>
+              </div>
+            </div>
+
+            <div style="font-size: 1.2rem">
+              <div>{{ customerName }}</div>
+              <div>Di Tempat</div>
+            </div>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <div>Dengan Hormat,</div>
+            </div>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <div>
+                Bersama ini kami sampaikan tagihan pembayaran untuk kegiatan kunjungan wisata
+                <span style="font-weight: bold">{{ customerName }}</span> di
+                <span style="font-weight: bold">Keraton Kasepuhan Cirebon</span> yang akan
+                dilaksanakan pada:
+              </div>
+            </div>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <div style="font-weight: bold">
+                Tanggal:
+                <span>{{
+                  ticketsData.plannedDate?.split('T')[0] || 'Tanggal belum tersedia'
+                }}</span>
+              </div>
+              <div style="font-weight: bold">
+                Tempat: <span>Pagelaran Keraton Kasepuhan Cirebon</span>
+              </div>
+            </div>
+
+            <div style="font-size: 1.5rem; margin-top: 1rem">
+              <div style="font-weight: bold">Rincian Biaya Paket Wisata</div>
+            </div>
+
+            <div
+              v-for="(ticket, index) in ticketsData.detailTrans"
+              :key="index"
+              style="margin-top: 1rem"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>Uraian</th>
+                    <th>Jumlah</th>
+                    <th>Harga Satuan(Rp)</th>
+                    <th>Total(Rp)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ ticket.order.name }}</td>
+                    <td>{{ ticket.amount }} {{ ticket.order.units }}</td>
+                    <td>{{ ticket.order.price }}</td>
+                    <td>{{ ticket.amount * ticket.order.price }}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style="font-weight: bold">Total</td>
+                    <td></td>
+                    <td></td>
+                    <td style="font-weight: bold">{{ ticketsData.total }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <div style="font-size: 1.5rem; font-weight: bold">
+                Rincian Fasilitas yang Didapatkan:
+              </div>
+            </div>
+
+            <ol style="line-height: 1.8; font-size: 1.2rem; margin-left: 3rem; margin-top: 1rem">
+              <li>
+                Wisata edukasi di <span style="font-weight: bold">Area Keraton Kasepuhan</span>
+              </li>
+              <li>
+                Kunjungan ke <span style="font-weight: bold">Museum Pusaka Keraton Kasepuhan</span>
+              </li>
+              <li>
+                Kunjungan ke <span style="font-weight: bold">Museum Al Keraton Kasepuhan</span>
+              </li>
+              <li>
+                Eksplorasi <span style="font-weight: bold">Dalam Agung Pakungwati Keraton</span>
+              </li>
+              <li>
+                <span style="font-weight: bold">Sambutan Khusus</span> oleh
+                <span style="font-weight: bold">Pangeran Patih</span>
+                (Pangeran Raja Muhammad Nusantara)
+              </li>
+              <li>
+                Penampilan <span style="font-weight: bold">Tarian Tradisional Cirebon</span> (<span
+                  style="font-style: italic"
+                  >Tari Selamat Datang</span
+                >)
+              </li>
+              <li>
+                Snack Ringan (<span style="font-style: italic">Air Mineral & Kue Tradisional</span>)
+              </li>
+              <li><span style="font-weight: bold">Jajanan Pasar Khas Cirebon</span></li>
+              <li>
+                <span style="font-weight: bold">Minuman Tradisional</span>
+                (<span style="font-style: italic">Es Tape</span> atau
+                <span style="font-style: italic">Es Tjampolay</span>)
+              </li>
+              <li>
+                Fasilitas <span style="font-weight: bold">Round Tables</span> dan
+                <span style="font-weight: bold">Sound System</span>
+              </li>
+            </ol>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <div style="font-size: 1.5rem; font-weight: bold">Status Pembayaran:</div>
+            </div>
+
+            <div style="margin-top: 1rem">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Keterangan</th>
+                    <th>Jumlah (Rp)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Total Tagihan</td>
+                    <td>{{ ticketsData.paidTotal }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">Sisa Pembayaran</td>
+                    <td style="font-weight: bold">{{ ticketsData.unpaidTotal }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <div style="font-size: 1.5rem; font-weight: bold">Catatan:</div>
+            </div>
+
+            <ul style="line-height: 1.8; font-size: 1.2rem; margin-left: 3rem; margin-top: 1rem">
+              <li>
+                Sisa pembayaran sebesar
+                <span style="font-weight: bold">{{ ticketsData.unpaidTotal }}</span> dapat
+                diselesaikan pada saat acara (<span style="font-weight: bold">H-1</span>).
+              </li>
+              <li>
+                <span style="font-weight: bold">Bukti pembayaran</span> harap dikonfirmasi kepada
+                pihak pengelola.
+              </li>
+            </ul>
+
+            <div style="font-size: 1.2rem; margin-top: 1rem">
+              <p style="font-weight: bold">Pembayaran melalui transfer ke:</p>
+              <p style="font-weight: bold">Bank: <span>t</span></p>
+              <p style="font-weight: bold">Nama Rekening: Yayasan Keraton Kasepuhan Cirebon</p>
+              <p style="font-weight: bold">
+                Nomor Rekening:
+                <span style="font-weight: bold">2024000000002</span>
+              </p>
+            </div>
+
+            <div style="font-size: 1.2rem; margin-top: 4rem">
+              Demikian invoice ini kami sampaikan. Terima kasih atas kerja sama dan dukungan
+              <span style="font-weight: bold"> {{ customerName }}</span> dalam melestarikan budaya
+              dan sejarah di <span style="font-weight: bold">Keraton Kasepuhan Cirebon</span>.
+            </div>
+
+            <p style="font-size: 1.2rem; margin-top: 4rem">Hormat kami,</p>
+            <p style="font-weight: bold; font-size: 1.2rem">Badan Pengelola Keraton Kasepuhan</p>
+
+            <p style="font-weight: bold; font-size: 1.2rem; margin-top: 5rem">
+              Elang Yunus Kurniawan Jayaningrat
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <style scoped>
+table,
+th,
+td {
+  border: 1px solid;
+}
+table {
+  width: 100%;
+  font-size: 1.5rem;
+}
+
 .rotated-text {
   transform: rotate(90deg);
   text-align: center; /* Mengatur agar teks tetap berada di tengah */

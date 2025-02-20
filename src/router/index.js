@@ -10,7 +10,7 @@ import SettingsView from '@/views/SettingsView.vue'
 import DatabaseLogsView from '@/views/DatabaseLogsView.vue'
 import BackupView from '@/views/BackupView.vue'
 import AfterCheckoutView from '@/views/AfterCheckoutView.vue'
-import reportCurawedaView from '@/views/ReportViewCuraweda.vue'
+// import reportCurawedaView from '@/views/ReportViewCuraweda.vue'
 import ReportCuraweda from '@/views/ReportCuraweda.vue'
 import GlobalHelper from '@/utilities/GlobalHelper'
 import RekapKeramaianView from '@/views/RekapKeramaian.vue'
@@ -18,6 +18,7 @@ import LoginHelper from '@/utilities/LoginHelper'
 import RekapView from '@/views/RekapanView.vue'
 import UserManageView from '@/views/UserManageView.vue'
 import CreateUserView from '@/views/CreateUserView.vue'
+import SettingUserMenuView from '@/views/SettingUserMenuView.vue'
 
 const { giveAccessRoute, grantAccessRoute } = GlobalHelper
 const { isAuthenticated, userData } = LoginHelper
@@ -25,6 +26,12 @@ const { isAuthenticated, userData } = LoginHelper
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/menu-user',
+      name: 'Menu',
+      component: SettingUserMenuView,
+      meta: { protected: true, restrictCuraweda: true }
+    },
     {
       path: '/manage-user',
       name: 'Manage',
@@ -64,7 +71,7 @@ const router = createRouter({
       path: '/report-curaweda',
       name: 'reportCuraweda',
       component: ReportCuraweda,
-      meta: { protected: true, sideBar: true, sideBarNo: 4  }
+      meta: { protected: true, sideBar: true, sideBarNo: 4 }
     },
     {
       path: '/add',
