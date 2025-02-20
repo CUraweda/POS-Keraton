@@ -173,6 +173,7 @@ onUnmounted(() => {
   <main class="add pd-bottom-2">
     <section class="add__input">
       <InputFoto @file-selected="handleFileSelected" :selectedImageURL="selectedImageURL" />
+      <div>Rasio: 16:9</div>
       <!-- <input type="file" v-model="image/"> -->
       <div class="add__input-card_title">
         <h6>Judul</h6>
