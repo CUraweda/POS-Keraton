@@ -46,6 +46,7 @@ const toHomepage = async () => {
   LoginHelper.userCarts.value = []
   await DashboardHelper.saveToUserCarts()
   await router.replace('/')
+  window.location.reload()
 }
 
 const fetchTickets = async (id) => {
