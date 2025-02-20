@@ -58,13 +58,13 @@ const router = createRouter({
       path: '/',
       name: 'dashboard',
       component: DashboardView,
-      meta: { protected: true, restrictCuraweda: true }
+      meta: { protected: true, restrictCuraweda: true, sideBar: true, sideBarNo: 0 }
     },
     {
       path: '/report-curaweda',
       name: 'reportCuraweda',
       component: ReportCuraweda,
-      meta: { protected: true }
+      meta: { protected: true, sideBar: true, sideBarNo: 4  }
     },
     {
       path: '/add',
@@ -82,7 +82,7 @@ const router = createRouter({
       path: '/checkout',
       name: 'checkout',
       component: CheckoutView,
-      meta: { protected: true, restrictCuraweda: true }
+      meta: { protected: true, restrictCuraweda: true, sideBar: true, sideBarNo: 3 }
     },
     {
       path: '/checkout/generate-tickets/:id',
@@ -94,19 +94,19 @@ const router = createRouter({
       path: '/invoice',
       name: 'invoice',
       component: InvoiceView,
-      meta: { protected: true, restrictCuraweda: true }
+      meta: { protected: true, restrictCuraweda: true, sideBar: true, sideBarNo: 1 }
     },
     {
       path: '/report',
       name: 'report',
       component: ReportView,
-      meta: { protected: true }
+      meta: { protected: true, sideBar: true, sideBarNo: 2 }
     },
     {
       path: '/settings',
       name: 'settings',
       component: SettingsView,
-      meta: { protected: true, restrictCuraweda: true }
+      meta: { protected: true, restrictCuraweda: true, sideBar: true, sideBarNo: 5 }
     },
     {
       path: '/database-logs',
