@@ -73,8 +73,8 @@ const fetchTickets = async (id) => {
 
     console.log(arrayTiket)
 
-    customerName = res.data.customer.name
-    customerEmail = res.data.customer.email
+    customerName = res?.data?.customer?.name || res?.data?.user?.name
+    customerEmail = res?.data?.customer?.email || res?.data?.user?.email
 
     showLoader.value = false
   } catch (error) {

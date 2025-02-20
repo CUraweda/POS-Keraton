@@ -18,6 +18,7 @@ const checkLogin = async () => {
         'success',
         `Login berhasil! Selamat datang ${username.value}`
       )
+      window.location.reload()
       router.replace('/')
     }
   } catch (error) {
