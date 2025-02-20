@@ -188,7 +188,6 @@ onMounted(() => {
                     <button
                       class="btn-primary invoice-table__button"
                       @click="navigateGenerate(item.id)"
-                      v-if="userData.role !== 'CASHIER'"
                     >
                       Generate Ticket
                     </button>
