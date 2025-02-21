@@ -333,7 +333,7 @@ onMounted(() => {
         @click="PrintCut('ticket', '#tiket-potong')"
         v-if="!generatePDFcooldown"
       >
-        <p class="fw-700">Ticket Auto Cut ( Potrait )</p>
+        <p class="fw-700">Ticket Auto Cut</p>
         <ph-printer :size="32" />
       </button>
       <button
@@ -341,7 +341,7 @@ onMounted(() => {
         @click="PrintNonCut('tiket-full')"
         v-if="!generatePDFcooldown"
       >
-        <p class="fw-700">Ticket non Cut ( potrait )</p>
+        <p class="fw-700">Ticket non Cut</p>
         <ph-printer :size="32" />
       </button>
 
@@ -350,7 +350,7 @@ onMounted(() => {
         @click="PrintRecipt('recipt')"
         v-if="!generatePDFcooldown"
       >
-        <p class="fw-700">Recipt (Potrait)</p>
+        <p class="fw-700">Cetak Hanya Recipt</p>
         <ph-printer :size="32" />
       </button>
 
@@ -359,7 +359,7 @@ onMounted(() => {
         @click="PrintInvoice('invoice')"
         v-if="!generatePDFcooldown"
       >
-        <p class="fw-700">Invoice (Potrait)</p>
+        <p class="fw-700">Invoice</p>
         <ph-printer :size="32" />
       </button>
 
@@ -670,7 +670,7 @@ onMounted(() => {
         justify-content: center;
         display: flex;
         margin-top: 2rem;
-        visibility: hidden;
+        
       "
     >
       <div style="border: 2px solid black">
@@ -864,7 +864,7 @@ onMounted(() => {
         display: flex;
         margin-top: 2rem;
         padding-inline: 1rem;
-        visibility: hidden;
+       
       "
     >
       <div style="border: 2px solid black">
